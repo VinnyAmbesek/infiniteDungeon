@@ -318,10 +318,26 @@ cc.Class({
 
 	findPath: function(tile){
 		let paths = 0;
-		if (tile.north == 0 && this.canGoNorth(tile)) paths++;
-		if (tile.south == 0 && this.canGoSouth(tile)) paths++;
-		if (tile.east == 0 && this.canGoEast(tile)) paths++;
-		if (tile.west == 0 && this.canGoWest(tile)) paths++;
+		if (tile.north == 0 && this.canGoNorth(tile)){ 
+			paths++
+		} else if (tile.north == 0){
+			tile.north = 2;
+		}
+		if (tile.south == 0 && this.canGoSouth(tile)){ 
+			paths++
+		} else if (tile.south == 0){
+			tile.south = 2;
+		}
+		if (tile.east == 0 && this.canGoEast(tile)){ 
+			paths++
+		} else if (tile.east == 0){
+			tile.east = 2;
+		}
+		if (tile.west == 0 && this.canGoWest(tile)){ 
+			paths++
+		} else if (tile.west == 0){
+			tile.west = 2;
+		}
 		return paths;
 	},
 
