@@ -13,9 +13,22 @@ var gridController = cc.Class({
 
 	properties: {
 		tilePrefab: cc.Prefab,
+
 		gridNode: cc.Node,
 		nextButton: cc.Node,
+
+		dungeonHP: cc.Label,
 		dungeonLevel: cc.Label,
+		dungeonXP: cc.Label,
+
+		inventoryFire: cc.Label,
+		inventoryIce: cc.Label,
+		inventoryAcid: cc.Label,
+		inventoryElectricity: cc.Label,
+		inventorySpikes: cc.Label,
+		inventoryPoison: cc.Label,
+		inventoryPotion: cc.Label,
+
 		door_corner: cc.SpriteFrame,
 		door_side: cc.SpriteFrame,
 		deadend: cc.SpriteFrame,
@@ -55,14 +68,56 @@ var gridController = cc.Class({
 
 		// initialize gameSession
 		if (! window.gameSession) {
-			window.gameSession = {};
-			window.gameSession.level = 1;
+			this.initSession();
 		}
-		this.dungeonLevel.string = "Floor: " + window.gameSession.level;
+
+		this.initUI();
+
+		this.clicks = 0;
 
 		let size = 10;
 		this.initGrid(size);
 		cc.log(this.grid);
+	},
+
+	initUI: function(){
+		this.dungeonLevel.string = "Floor: " + window.gameSession.level;
+		this.dungeonXP.string = "XP: " + window.gameSession.xp;
+		this.dungeonHP.string = "HP: " + window.gameSession.hp;
+
+		this.inventoryPotion.string = "Potion: " + window.gameSession.inventory.potion;
+		this.inventoryFire.string = "Fire: " + window.gameSession.inventory.fire;
+		this.inventoryIce.string = "Ice: " + window.gameSession.inventory.ice;
+		this.inventoryAcid.string = "Acid: " + window.gameSession.inventory.acid;
+		this.inventoryElectricity.string = "Electricity: " + window.gameSession.inventory.electricity;
+		this.inventorySpikes.string = "Spikes: " + window.gameSession.inventory.spikes;
+		this.inventoryPoison.string = "Poison: " + window.gameSession.inventory.poison;
+	},
+
+	initSession: function(){
+		window.gameSession = {};
+
+		window.gameSession.level = 1;
+		window.gameSession.xp = 0;
+		window.gameSession.hp = 3;
+		window.gameSession.hpMax = 3;
+
+		window.gameSession.inventory = {};
+
+		window.gameSession.inventory.fire = 0;
+		window.gameSession.inventory.fireMax = 3;
+		window.gameSession.inventory.ice = 0;
+		window.gameSession.inventory.iceMax = 3;
+		window.gameSession.inventory.acid = 0;
+		window.gameSession.inventory.acidMax = 3;
+		window.gameSession.inventory.electricity = 0;
+		window.gameSession.inventory.electricityMax = 3;
+		window.gameSession.inventory.spikes = 0;
+		window.gameSession.inventory.spikesMax = 3;
+		window.gameSession.inventory.poison = 0;
+		window.gameSession.inventory.poisonMax = 3;
+		window.gameSession.inventory.potion = 0;
+		window.gameSession.inventory.potionMax = 3;
 	},
 
 	initGrid: function (size){
@@ -142,16 +197,66 @@ var gridController = cc.Class({
 	},
 
 	gridClick: function(node){
+		// show tile
 		let tile = node.target.tile;
 		tile.status = 2;
 		let sprite = node.target.getComponent(cc.Sprite);
 		sprite.spriteFrame = tile.sprite;
+
 		this.showClickZones(tile.x, tile.y);
+
+		// mark tiles walked to avoid tile replay
+		if (! node.target.used){
+			node.target.used = true;
+			// extra xp for clean map
+			this.clicks++;
+			if (this.clicks == 99) window.gameSession.xp += window.gameSession.level*101;
+
+			// gain xp
+			window.gameSession.xp += window.gameSession.level;
+
+			// verify content
+			if(tile.content == 1) {
+				this.giveTreasure(Math.floor((Math.random() * 100) + 1));
+			}
+			if(tile.content == 2) {
+				window.gameSession.xp += window.gameSession.level*10;
+				fightDanger(Math.floor((Math.random() * 6) + 1));
+				cc.log("danger")
+			};
+
+			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+		}
 
 		if (tile.tile == 2){
 			// found exit
 			// show next level button
 			this.nextButton.active = true;
+		}
+	},
+
+	giveTreasure: function(prize){
+		if (prize <= 10) {
+			window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potion+1, window.gameSession.inventory.potionMax);
+			this.inventoryPotion.string = "Potion: " + window.gameSession.inventory.potion;
+		} else if (prize <= 25 ) {
+			window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fire+1, window.gameSession.inventory.fireMax);
+			this.inventoryFire.string = "Fire: " + window.gameSession.inventory.fire;
+		} else if (prize <= 40 ) {
+			window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.ice+1, window.gameSession.inventory.iceMax);
+			this.inventoryIce.string = "Ice: " + window.gameSession.inventory.ice;
+		} else if (prize <= 55 ) {
+			window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acid+1, window.gameSession.inventory.acidMax);
+			this.inventoryAcid.string = "Acid: " + window.gameSession.inventory.acid;
+		} else if (prize <= 70 ) {
+			window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricity+1, window.gameSession.inventory.electricityMax);
+			this.inventoryElectricity.string = "Electricity: " + window.gameSession.inventory.electricity;
+		} else if (prize <= 85 ) {
+			window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikes+1, window.gameSession.inventory.spikesMax);
+			this.inventorySpikes.string = "Spikes: " + window.gameSession.inventory.spikes;
+		} else if (prize <= 100 ) {
+			window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poison+1, window.gameSession.inventory.poisonMax);
+			this.inventoryPoison.string = "Poison: " + window.gameSession.inventory.poison;
 		}
 	},
 
@@ -264,6 +369,9 @@ var gridController = cc.Class({
 		} else if (tile.west == 3) {
 			tile.rotation = 180;
 		}
+
+		// mark if has treasure or danger
+		tile.content = Math.floor((Math.random() * 2) + 1);
 	},
 	showLine: function(tile){
 		// 1 sprite, 2 directions
