@@ -16,6 +16,8 @@ var gridController = cc.Class({
 
 		gridNode: cc.Node,
 		nextButton: cc.Node,
+		upgradePopup: cc.Node,
+		deathPopup: cc.Node,
 
 		dungeonHP: cc.Label,
 		dungeonLevel: cc.Label,
@@ -28,6 +30,7 @@ var gridController = cc.Class({
 		inventorySpikes: cc.Label,
 		inventoryPoison: cc.Label,
 		inventoryPotion: cc.Label,
+		deathMessage: cc.Label,
 
 		door_corner: cc.SpriteFrame,
 		door_side: cc.SpriteFrame,
@@ -67,10 +70,7 @@ var gridController = cc.Class({
 		this.enumSprite = ["entrance", "exit", "deadend", "curve", "line", "threway", "fourway"];
 
 		// initialize gameSession
-		if (! window.gameSession) {
-			this.initSession();
-		}
-
+		if (! window.gameSession) this.initSession();
 		this.initUI();
 
 		this.clicks = 0;
@@ -98,25 +98,41 @@ var gridController = cc.Class({
 		window.gameSession = {};
 
 		window.gameSession.level = 1;
+		window.gameSession.levelMin = 1;
+
 		window.gameSession.xp = 0;
+
 		window.gameSession.hp = 3;
 		window.gameSession.hpMax = 3;
 
 		window.gameSession.inventory = {};
 
 		window.gameSession.inventory.fire = 0;
+		window.gameSession.inventory.fireMin = 0;
 		window.gameSession.inventory.fireMax = 3;
+
 		window.gameSession.inventory.ice = 0;
+		window.gameSession.inventory.iceMin = 0;
 		window.gameSession.inventory.iceMax = 3;
+
 		window.gameSession.inventory.acid = 0;
+		window.gameSession.inventory.acidMin = 0;
 		window.gameSession.inventory.acidMax = 3;
+
 		window.gameSession.inventory.electricity = 0;
+		window.gameSession.inventory.electricityMin = 0;
 		window.gameSession.inventory.electricityMax = 3;
+
 		window.gameSession.inventory.spikes = 0;
+		window.gameSession.inventory.spikesMin = 0;
 		window.gameSession.inventory.spikesMax = 3;
+
 		window.gameSession.inventory.poison = 0;
+		window.gameSession.inventory.poisonMin = 0;
 		window.gameSession.inventory.poisonMax = 3;
+
 		window.gameSession.inventory.potion = 0;
+		window.gameSession.inventory.potionMin = 0;
 		window.gameSession.inventory.potionMax = 3;
 	},
 
@@ -198,6 +214,7 @@ var gridController = cc.Class({
 
 	gridClick: function(node){
 		if (node.target.used) return;
+		if (window.gameSession.hp < 1) return;
 		// mark tiles walked to avoid tile replay
 		node.target.used = true;
 
@@ -236,6 +253,8 @@ var gridController = cc.Class({
 				window.gameSession.xp += window.gameSession.level*25
 			} else {
 				cc.log("dead");
+				this.deathPopup.active = true;
+				this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
 			}
 		};
 
@@ -248,12 +267,39 @@ var gridController = cc.Class({
 		}
 	},
 
+	iDied: function(){
+		this.closePopup();
+		// back to level
+		window.gameSession.level = window.gameSession.levelMin;
+
+		// restore hp
+		window.gameSession.hp = window.gameSession.hpMax;
+
+		// reset inventory
+		window.gameSession.inventory.fire = window.gameSession.inventory.fireMin;
+		window.gameSession.inventory.ice = window.gameSession.inventory.iceMin;
+		window.gameSession.inventory.acid = window.gameSession.inventory.acidMin;
+		window.gameSession.inventory.electricity = window.gameSession.inventory.electricityMin;
+		window.gameSession.inventory.spikes = window.gameSession.inventory.spikesMin;
+		window.gameSession.inventory.poison = window.gameSession.inventory.poisonMin;
+		window.gameSession.inventory.potion = window.gameSession.inventory.potionMin;
+
+		// restart scene
+		cc.director.loadScene("gameScene");
+	},
+
+	closePopup: function(){
+		this.deathPopup.active = false;
+		this.upgradePopup.active = false;
+	},
+
 	fightDanger: function(danger){
 		let damage = Math.floor(window.gameSession.level/10 + 1);
 		switch(danger) {
 			case 1:
 				// code block
 				cc.log("Fought Fire");
+				this.lastDanger = "burned";
 				if (window.gameSession.inventory.fire > 0){
 					window.gameSession.inventory.fire -= damage;
 					if (window.gameSession.inventory.fire < 0 ) {
@@ -268,6 +314,7 @@ var gridController = cc.Class({
 			case 2:
 				// code block
 				cc.log("Fought Ice");
+				this.lastDanger = "frozen";
 				if (window.gameSession.inventory.ice > 0){
 					window.gameSession.inventory.ice -= damage;
 					if (window.gameSession.inventory.ice < 0 ) {
@@ -282,6 +329,7 @@ var gridController = cc.Class({
 			case 3:
 				// code block
 				cc.log("Fought Acid");
+				this.lastDanger = "dissolved";
 				if (window.gameSession.inventory.acid > 0){
 					window.gameSession.inventory.acid -= damage;
 					if (window.gameSession.inventory.acid < 0 ) {
@@ -296,6 +344,7 @@ var gridController = cc.Class({
 			case 4:
 				// code block
 				cc.log("Fought Electricity");
+				this.lastDanger = "electrocuted";
 				if (window.gameSession.inventory.electricity > 0){
 					window.gameSession.inventory.electricity -= damage;
 					if (window.gameSession.inventory.electricity < 0 ) {
@@ -310,6 +359,7 @@ var gridController = cc.Class({
 			case 5:
 				// code block
 				cc.log("Fought Spikes");
+				this.lastDanger = "impaled";
 				if (window.gameSession.inventory.spikes > 0){
 					window.gameSession.inventory.spikes -= damage;
 					if (window.gameSession.inventory.spikes < 0 ) {
@@ -324,6 +374,7 @@ var gridController = cc.Class({
 			case 6:
 				// code block
 				cc.log("Fought Poison");
+				this.lastDanger = "poisoned";
 				if (window.gameSession.inventory.poison > 0){
 					window.gameSession.inventory.poison -= damage;
 					if (window.gameSession.inventory.poison < 0 ) {
