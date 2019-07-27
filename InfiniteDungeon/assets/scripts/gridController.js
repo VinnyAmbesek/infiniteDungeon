@@ -14,6 +14,8 @@ var gridController = cc.Class({
 	properties: {
 		tilePrefab: cc.Prefab,
 		gridNode: cc.Node,
+		nextButton: cc.Node,
+		dungeonLevel: cc.Label,
 		door_corner: cc.SpriteFrame,
 		door_side: cc.SpriteFrame,
 		deadend: cc.SpriteFrame,
@@ -50,6 +52,13 @@ var gridController = cc.Class({
 		this.enumStatus = ["hidden", "flashing", "visible"];
 		this.enumContent = ["empty","treasure","danger"];
 		this.enumSprite = ["entrance", "exit", "deadend", "curve", "line", "threway", "fourway"];
+
+		// initialize gameSession
+		if (! window.gameSession) {
+			window.gameSession = {};
+			window.gameSession.level = 1;
+		}
+		this.dungeonLevel.string = "Floor: " + window.gameSession.level;
 
 		let size = 10;
 		this.initGrid(size);
@@ -142,7 +151,13 @@ var gridController = cc.Class({
 		if (tile.tile == 2){
 			// found exit
 			// show next level button
+			this.nextButton.active = true;
 		}
+	},
+
+	nextLevel: function(){
+		window.gameSession.level++;
+		cc.director.loadScene("gameScene");
 	},
 
 	fillGrid: function(size){
