@@ -197,6 +197,10 @@ var gridController = cc.Class({
 	},
 
 	gridClick: function(node){
+		if (node.target.used) return;
+		// mark tiles walked to avoid tile replay
+		node.target.used = true;
+
 		// show tile
 		let tile = node.target.tile;
 		tile.status = 2;
@@ -205,28 +209,37 @@ var gridController = cc.Class({
 
 		this.showClickZones(tile.x, tile.y);
 
-		// mark tiles walked to avoid tile replay
-		if (! node.target.used){
-			node.target.used = true;
-			// extra xp for clean map
-			this.clicks++;
-			if (this.clicks == 99) window.gameSession.xp += window.gameSession.level*101;
-
-			// gain xp
-			window.gameSession.xp += window.gameSession.level;
-
-			// verify content
-			if(tile.content == 1) {
-				this.giveTreasure(Math.floor((Math.random() * 100) + 1));
-			}
-			if(tile.content == 2) {
-				window.gameSession.xp += window.gameSession.level*10;
-				fightDanger(Math.floor((Math.random() * 6) + 1));
-				cc.log("danger")
-			};
-
-			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+		// use a potion
+		if (window.gameSession.hp < window.gameSession.hpMax && window.gameSession.inventory.potion > 0) {
+			window.gameSession.inventory.potion--;
+			window.gameSession.hp++;
+			cc.log("Used potion");
+			this.dungeonHP.string = "HP: " + window.gameSession.hp;
+			this.inventoryPotion.string = "Potion: " + window.gameSession.inventory.potion;
 		}
+		
+		// extra xp for clean map
+		this.clicks++;
+		if (this.clicks == 99) window.gameSession.xp += window.gameSession.level*101;
+
+		// gain exploration xp
+		window.gameSession.xp += window.gameSession.level;
+
+		// verify content
+		if(tile.content == 1) {
+			this.giveTreasure(Math.floor((Math.random() * 100) + 1));
+		}
+		if(tile.content == 2) {
+			this.fightDanger(Math.floor((Math.random() * 6) + 1));
+			// victory xp
+			if (window.gameSession.hp > 0) {
+				window.gameSession.xp += window.gameSession.level*25
+			} else {
+				cc.log("dead");
+			}
+		};
+
+		this.dungeonXP.string = "XP: " + window.gameSession.xp;
 
 		if (tile.tile == 2){
 			// found exit
@@ -235,28 +248,129 @@ var gridController = cc.Class({
 		}
 	},
 
+	fightDanger: function(danger){
+		let damage = Math.floor(window.gameSession.level/10 + 1);
+		switch(danger) {
+			case 1:
+				// code block
+				cc.log("Fought Fire");
+				if (window.gameSession.inventory.fire > 0){
+					window.gameSession.inventory.fire -= damage;
+					if (window.gameSession.inventory.fire < 0 ) {
+						window.gameSession.hp += window.gameSession.inventory.fire;
+						window.gameSession.inventory.fire = 0;
+					}
+					this.inventoryFire.string = "Fire: " + window.gameSession.inventory.fire;
+				} else {
+					window.gameSession.hp -= damage;
+				}
+				break;
+			case 2:
+				// code block
+				cc.log("Fought Ice");
+				if (window.gameSession.inventory.ice > 0){
+					window.gameSession.inventory.ice -= damage;
+					if (window.gameSession.inventory.ice < 0 ) {
+						window.gameSession.hp += window.gameSession.inventory.ice;
+						window.gameSession.inventory.ice = 0;
+					}
+					this.inventoryIce.string = "Ice: " + window.gameSession.inventory.ice;
+				} else {
+					window.gameSession.hp -= damage;
+				}
+				break;
+			case 3:
+				// code block
+				cc.log("Fought Acid");
+				if (window.gameSession.inventory.acid > 0){
+					window.gameSession.inventory.acid -= damage;
+					if (window.gameSession.inventory.acid < 0 ) {
+						window.gameSession.hp += window.gameSession.inventory.acid;
+						window.gameSession.inventory.acid = 0;
+					}
+					this.inventoryAcid.string = "Acid: " + window.gameSession.inventory.acid;
+				} else {
+					window.gameSession.hp -= damage;
+				}
+				break;
+			case 4:
+				// code block
+				cc.log("Fought Electricity");
+				if (window.gameSession.inventory.electricity > 0){
+					window.gameSession.inventory.electricity -= damage;
+					if (window.gameSession.inventory.electricity < 0 ) {
+						window.gameSession.hp += window.gameSession.inventory.electricity;
+						window.gameSession.inventory.electricity = 0;
+					}
+					this.inventoryElectricity.string = "Electricity: " + window.gameSession.inventory.electricity;
+				} else {
+					window.gameSession.hp -= damage;
+				}
+				break;
+			case 5:
+				// code block
+				cc.log("Fought Spikes");
+				if (window.gameSession.inventory.spikes > 0){
+					window.gameSession.inventory.spikes -= damage;
+					if (window.gameSession.inventory.spikes < 0 ) {
+						window.gameSession.hp += window.gameSession.inventory.spikes;
+						window.gameSession.inventory.spikes = 0;
+					}
+					this.inventorySpikes.string = "Spikes: " + window.gameSession.inventory.spikes;
+				} else {
+					window.gameSession.hp -= damage;
+				}
+				break;
+			case 6:
+				// code block
+				cc.log("Fought Poison");
+				if (window.gameSession.inventory.poison > 0){
+					window.gameSession.inventory.poison -= damage;
+					if (window.gameSession.inventory.poison < 0 ) {
+						window.gameSession.hp += window.gameSession.inventory.poison;
+						window.gameSession.inventory.poison = 0;
+					}
+					this.inventoryPoison.string = "Poison: " + window.gameSession.inventory.poison;
+				} else {
+					window.gameSession.hp -= damage;
+				}
+				break;
+			default:
+				// code block
+		}
+
+		this.dungeonHP.string = "HP: " + window.gameSession.hp;
+	},
+
 	giveTreasure: function(prize){
 		if (prize <= 10) {
 			window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potion+1, window.gameSession.inventory.potionMax);
 			this.inventoryPotion.string = "Potion: " + window.gameSession.inventory.potion;
+			cc.log("Got Potion");
 		} else if (prize <= 25 ) {
 			window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fire+1, window.gameSession.inventory.fireMax);
 			this.inventoryFire.string = "Fire: " + window.gameSession.inventory.fire;
+			cc.log("Got Fire");
 		} else if (prize <= 40 ) {
 			window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.ice+1, window.gameSession.inventory.iceMax);
 			this.inventoryIce.string = "Ice: " + window.gameSession.inventory.ice;
+			cc.log("Got Ice");
 		} else if (prize <= 55 ) {
 			window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acid+1, window.gameSession.inventory.acidMax);
 			this.inventoryAcid.string = "Acid: " + window.gameSession.inventory.acid;
+			cc.log("Got Acid");
 		} else if (prize <= 70 ) {
 			window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricity+1, window.gameSession.inventory.electricityMax);
 			this.inventoryElectricity.string = "Electricity: " + window.gameSession.inventory.electricity;
+			cc.log("Got Electricity");
 		} else if (prize <= 85 ) {
 			window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikes+1, window.gameSession.inventory.spikesMax);
 			this.inventorySpikes.string = "Spikes: " + window.gameSession.inventory.spikes;
+			cc.log("Got Spikes");
 		} else if (prize <= 100 ) {
 			window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poison+1, window.gameSession.inventory.poisonMax);
 			this.inventoryPoison.string = "Poison: " + window.gameSession.inventory.poison;
+			cc.log("Got Poison");
 		}
 	},
 
