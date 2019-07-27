@@ -8,7 +8,7 @@
 //  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/life-cycle-callbacks.html
 
-cc.Class({
+var gridController = cc.Class({
 	extends: cc.Component,
 
 	properties: {
@@ -20,7 +20,9 @@ cc.Class({
 		line: cc.SpriteFrame,
 		curve: cc.SpriteFrame,
 		threeway: cc.SpriteFrame,
-		fourway: cc.SpriteFrame
+		fourway: cc.SpriteFrame,
+		unknown: cc.SpriteFrame,
+		open: cc.SpriteFrame
 		// foo: {
 		//	 // ATTRIBUTES:
 		//	 default: null,		// The default value will be used only when the component attaching
@@ -56,8 +58,10 @@ cc.Class({
 
 	initGrid: function (size){
 		this.grid = new Array(size);
+		this.gridUI = new Array(size);
 		for(var i = 0; i < size; i++){
 			this.grid[i] = new Array(size);
+			this.gridUI[i] = new Array(size);
 
 			for(var j = 0; j < size; j++){
 				this.grid[i][j] = {};
@@ -90,6 +94,55 @@ cc.Class({
 		this.buildMaze(this.entrance.x, this.entrance.y);
 		// put tiles on grid
 		this.fillGrid(size);
+
+		cc.log(this.entrance);
+		this.showClickZones(this.entrance.x, this.entrance.y);
+	},
+
+	showClickZones: function(x, y){
+		let tile = this.grid[x][y];
+		if (tile.north == 3) {
+			this.addClickFunction(x-1,y);
+		}
+		if (tile.south == 3) {
+			this.addClickFunction(x+1,y);
+		}
+		if (tile.east == 3) {
+			this.addClickFunction(x,y+1);
+		}
+		if (tile.west == 3) {
+			this.addClickFunction(x,y-1);
+		}
+	},
+
+	addClickFunction: function(x,y){
+		let tile = this.grid[x][y];
+		if (tile.status == 2) return;
+		if (tile.status == 1) return;
+		tile.status = 1;
+		let cell = this.gridUI[x][y];
+		let sprite = cell.getComponent(cc.Sprite);
+		sprite.spriteFrame = this.open;
+
+		let eventHandler = new cc.Component.EventHandler();
+        eventHandler.target = this.node;
+        eventHandler.component = "gridController";
+        eventHandler.handler = "gridClick";
+        cell.tile = tile;
+		cell.getComponent(cc.Button).clickEvents.push(eventHandler);
+	},
+
+	gridClick: function(node){
+		let tile = node.target.tile;
+		tile.status = 2;
+		let sprite = node.target.getComponent(cc.Sprite);
+		sprite.spriteFrame = tile.sprite;
+		this.showClickZones(tile.x, tile.y);
+
+		if (tile.tile == 2){
+			// found exit
+			// show next level button
+		}
 	},
 
 	fillGrid: function(size){
@@ -101,10 +154,17 @@ cc.Class({
 
 				//cc.log(tile);
 				let cell = cc.instantiate(this.tilePrefab);
+				this.gridUI[i][j] = cell;
 				cell.parent = this.gridNode;
 				cell.rotation = tile.rotation;
 				let sprite = cell.getComponent(cc.Sprite);
-				sprite.spriteFrame = tile.sprite;
+				if (tile.status == 2) {
+					// visible
+					sprite.spriteFrame = tile.sprite;	
+				} else if (tile.status == 0) {
+					// add click event
+					sprite.spriteFrame = this.unknown;
+				} 
 			}
 		}
 	},
@@ -401,7 +461,7 @@ cc.Class({
 
 		// exit
 		this.setTile(x2, y2, 2);
-		this.setTileStatus(x2, y2, 2);
+		//this.setTileStatus(x2, y2, 2);
 		this.exit = {};
 		this.exit.x = x2;
 		this.exit.y = y2;
