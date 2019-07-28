@@ -197,7 +197,6 @@ var gridController = cc.Class({
 			this.running = false;
 			return
 		}
-		cc.log("running");
 		let node = {};
 
 		for(var i = 0; i < size; i++){
@@ -538,9 +537,17 @@ var gridController = cc.Class({
 		}
 
 		// mark if has treasure or danger
-		tile.content = Math.floor((Math.random() * 2) + 1);
-		if (tile.content == 1) this.treasures++;
-		if (tile.content == 2) this.dangers++;
+		let chance = Math.floor((Math.random() * 100) + 1);
+		let level = Math.min(25, window.gameSession.level);
+		if (chance <= 25+level) {
+			// 25% de chance de perigo +1% por level, max 50%
+			tile.content = 2;
+			this.dangers++;
+		} else{
+			tile.content = 1;
+			this.treasures++;
+		}
+		
 	},
 	showLine: function(tile){
 		// 1 sprite, 2 directions
@@ -621,9 +628,16 @@ var gridController = cc.Class({
 				// chance to have trap or treasure
 				let chance = Math.floor((Math.random() * 100) + 1);
 				if (chance <=5) {
-					tile.content = Math.floor((Math.random() * 2) + 1);
-					if (tile.content == 1) this.treasures++;
-					if (tile.content == 2) this.dangers++;
+					let chance = Math.floor((Math.random() * 100) + 1);
+					let level = Math.min(25, window.gameSession.level);
+					if (chance <= 25+level) {
+						// 25% de chance de perigo +1% por level, max 50%
+						tile.content = 2;
+						this.dangers++;
+					} else{
+						tile.content = 1;
+						this.treasures++;
+					}
 				}
 			}
 			// make a path in random direction
@@ -777,7 +791,6 @@ var gridController = cc.Class({
 	},
 
 	showFeedback: function(text, color){
-		cc.log(text);
 		this.feedback.string = text;
 		this.feedback.node.opacity = 255;
 		this.feedback.node.color = color;
