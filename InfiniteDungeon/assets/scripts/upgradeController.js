@@ -111,7 +111,13 @@ var upgradeController = cc.Class({
 			// increase next xp cost
 			window.gameSession.upgrades[field] += 1000;
 			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades[field];
+
+			this.saveGame();
 		}
+	},
+
+	saveGame(){
+		cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
 	},
 
 	close: function(argument) {

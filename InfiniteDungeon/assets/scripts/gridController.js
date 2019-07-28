@@ -55,9 +55,7 @@ var gridController = cc.Class({
 		// },
 	},
 
-
 	// onLoad () {},
-
 	start () {
 		this.enumSides = ["undefined", "block", "wall", "open"];
 		this.enumTile = ["undefined","entrance", "exit", "deadend","corridor"];
@@ -70,12 +68,22 @@ var gridController = cc.Class({
 		this.initUI();
 		this.showUpgrades();
 
+		this.saveGame();
+
 		this.clicks = 0;
 		this.dangers = 0;
 		this.treasures = 0;
 
 		let size = 10;
 		this.initGrid(size);
+	},
+
+	saveGame(){
+		cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
+	},
+
+	loadGame(){
+		window.gameSession = JSON.parse(cc.sys.localStorage.getItem('gameSession'));
 	},
 
 	showUpgrades: function(){
@@ -105,6 +113,11 @@ var gridController = cc.Class({
 	},
 
 	initSession: function(){
+		this.loadGame();
+
+		cc.log(window.gameSession);
+		if (window.gameSession != null) return;
+
 		window.gameSession = {};
 
 		window.gameSession.level = 1;
