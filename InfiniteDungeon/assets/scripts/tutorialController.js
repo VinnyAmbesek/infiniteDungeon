@@ -108,7 +108,8 @@ cc.Class({
         window.gameSession.upgrades.potionMax = 1000;
 
         window.gameSession.upgrades.hpMax = 1000;
-        window.gameSession.upgrades.levelMax = 1000;
+        
+        window.gameSession.upgrades.levelMin = 1000;
         window.gameSession.upgrades.info = 1000;
     },
 

@@ -42,6 +42,20 @@ var upgradeController = cc.Class({
 		this.setButtons();
 	},
 
+	onEnable (){
+		this.checkSecretPassage();
+		
+	},
+
+	checkSecretPassage: function(){
+		if (window.gameSession.levelMin+5 < window.gameSession.levelMax && this.secretPassage) {
+			// show secret passage upgrade
+			this.secretPassage.active = true;
+		} else if (this.secretPassage) {
+			this.secretPassage.active = false;
+		}
+	},
+
 	setButtons: function(){
 		if (! window.gameSession) return;
 
@@ -63,8 +77,58 @@ var upgradeController = cc.Class({
 		this.createButton("Potion Pocket", "potionMax");
 
 		this.createButton("Max HP", "hpMax");
-		//createButton("Secret Passage", "levelMin");
+
+		this.createSecretPassageButton();
+		this.checkSecretPassage();
+		
 		//createButton("Information", "info");
+	},
+
+	createSecretPassageButton(){
+		let button = cc.instantiate(this.button);
+		button.parent = this.grid;
+		this.secretPassage = button;
+		cc.log(this.secretPassage);
+
+		// fill data
+		button.getChildByName("Name").getComponent(cc.Label).string = "Secret Passage";
+		button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.levelMin;
+		if (! window.gameSession.upgrades.levelMin) window.gameSession.upgrades.levelMin = 1000;
+		button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelMin;
+
+		//add click event
+
+		let eventHandler = new cc.Component.EventHandler();
+        eventHandler.target = this.node;
+        eventHandler.component = "upgradeController";
+        eventHandler.handler = "upgradeSecretPassage";
+		button.getComponent(cc.Button).clickEvents.push(eventHandler);
+
+	},
+
+	upgradeSecretPassage(event){
+		let button = event.target;
+
+		if (window.gameSession.xp >= window.gameSession.upgrades.levelMin) {
+			// take xp
+			window.gameSession.xp -= window.gameSession.upgrades.levelMin;
+			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+
+			// do upgrade
+			if (window.gameSession.levelMin == 1){
+				window.gameSession.levelMin = 5;
+			} else {
+				window.gameSession.levelMin += 5;
+			}
+			
+			button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.levelMin;
+			
+			// increase next xp cost
+			window.gameSession.upgrades.levelMin += 1000;
+			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelMin;
+
+			this.saveGame();
+		}
 	},
 
 	createButton(name, field){
@@ -92,8 +156,8 @@ var upgradeController = cc.Class({
 
 	},
 
-	upgrade(node){
-		let button = node.target;
+	upgrade(event){
+		let button = event.target;
 		let field = button.field;
 
 		if (window.gameSession.xp >= window.gameSession.upgrades[field]) {
