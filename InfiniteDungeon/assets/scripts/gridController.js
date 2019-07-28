@@ -1,11 +1,8 @@
 // Learn cc.Class:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/class.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/class.html
 // Learn Attribute:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/reference/attributes.html
 // Learn life-cycle callbacks:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/life-cycle-callbacks.html
 
 var gridController = cc.Class({
@@ -58,7 +55,6 @@ var gridController = cc.Class({
 		// },
 	},
 
-	// LIFE-CYCLE CALLBACKS:
 
 	// onLoad () {},
 
@@ -67,17 +63,31 @@ var gridController = cc.Class({
 		this.enumTile = ["undefined","entrance", "exit", "deadend","corridor"];
 		this.enumStatus = ["hidden", "flashing", "visible"];
 		this.enumContent = ["empty","treasure","danger"];
-		this.enumSprite = ["entrance", "exit", "deadend", "curve", "line", "threway", "fourway"];
+		this.enumSprite = ["entrance", "exit", "deadend", "curve", "line", "threeway", "fourway"];
 
 		// initialize gameSession
 		if (! window.gameSession) this.initSession();
 		this.initUI();
+		this.showUpgrades();
 
 		this.clicks = 0;
+		this.dangers = 0;
+		this.treasures = 0;
 
 		let size = 10;
 		this.initGrid(size);
-		cc.log(this.grid);
+	},
+
+	showUpgrades: function(){
+		let minXP = Math.min(window.gameSession.upgrades.fireMin, window.gameSession.upgrades.fireMax, window.gameSession.upgrades.iceMin,
+		window.gameSession.upgrades.iceMax, window.gameSession.upgrades.acidMin, window.gameSession.upgrades.acidMax, window.gameSession.upgrades.electricityMin,
+		window.gameSession.upgrades.electricityMax, window.gameSession.upgrades.spikesMin, window.gameSession.upgrades.spikesMax, window.gameSession.upgrades.poisonMin,
+		window.gameSession.upgrades.poisonMax, window.gameSession.upgrades.potionMin, window.gameSession.upgrades.potionMax, window.gameSession.upgrades.hpMax,
+		window.gameSession.upgrades.levelMax, window.gameSession.upgrades.info);
+
+		if (window.gameSession.xp > minXP) {
+			this.upgradePopup.active = true;
+		}
 	},
 
 	initUI: function(){
@@ -99,12 +109,16 @@ var gridController = cc.Class({
 
 		window.gameSession.level = 1;
 		window.gameSession.levelMin = 1;
+		window.gameSession.levelMax = 1;
+
+		window.gameSession.info = 0;
 
 		window.gameSession.xp = 0;
 
 		window.gameSession.hp = 3;
 		window.gameSession.hpMax = 3;
 
+		// inventory
 		window.gameSession.inventory = {};
 
 		window.gameSession.inventory.fire = 0;
@@ -134,6 +148,29 @@ var gridController = cc.Class({
 		window.gameSession.inventory.potion = 0;
 		window.gameSession.inventory.potionMin = 0;
 		window.gameSession.inventory.potionMax = 3;
+
+		// upgrades
+		window.gameSession.upgrades = {};
+
+		window.gameSession.upgrades.fireMin = 1000;
+		window.gameSession.upgrades.fireMax = 1000;
+		window.gameSession.upgrades.iceMin = 1000;
+		window.gameSession.upgrades.iceMax = 1000;
+		window.gameSession.upgrades.acidMin = 1000;
+		window.gameSession.upgrades.acidMax = 1000;
+		window.gameSession.upgrades.electricityMin = 1000;
+		window.gameSession.upgrades.electricityMax = 1000;
+		window.gameSession.upgrades.spikesMin = 1000;
+		window.gameSession.upgrades.spikesMax = 1000;
+		window.gameSession.upgrades.poisonMin = 1000;
+		window.gameSession.upgrades.poisonMax = 1000;
+
+		window.gameSession.upgrades.potionMin = 1000;
+		window.gameSession.upgrades.potionMax = 1000;
+
+		window.gameSession.upgrades.hpMax = 1000;
+		window.gameSession.upgrades.levelMax = 1000;
+		window.gameSession.upgrades.info = 1000;
 	},
 
 	initGrid: function (size){
@@ -175,7 +212,6 @@ var gridController = cc.Class({
 		// put tiles on grid
 		this.fillGrid(size);
 
-		cc.log(this.entrance);
 		this.showClickZones(this.entrance.x, this.entrance.y);
 	},
 
@@ -276,13 +312,13 @@ var gridController = cc.Class({
 		window.gameSession.hp = window.gameSession.hpMax;
 
 		// reset inventory
-		window.gameSession.inventory.fire = window.gameSession.inventory.fireMin;
-		window.gameSession.inventory.ice = window.gameSession.inventory.iceMin;
-		window.gameSession.inventory.acid = window.gameSession.inventory.acidMin;
-		window.gameSession.inventory.electricity = window.gameSession.inventory.electricityMin;
-		window.gameSession.inventory.spikes = window.gameSession.inventory.spikesMin;
-		window.gameSession.inventory.poison = window.gameSession.inventory.poisonMin;
-		window.gameSession.inventory.potion = window.gameSession.inventory.potionMin;
+		window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fireMin, window.gameSession.inventory.fireMax);
+		window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.iceMin, window.gameSession.inventory.iceMax);
+		window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acidMin, window.gameSession.inventory.acidMax);
+		window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricityMin, window.gameSession.inventory.electricityMax);
+		window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikesMin, window.gameSession.inventory.spikesMax);
+		window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poisonMin, window.gameSession.inventory.poisonMax);
+		window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potionMin, window.gameSession.inventory.potionMax);
 
 		// restart scene
 		cc.director.loadScene("gameScene");
@@ -294,6 +330,7 @@ var gridController = cc.Class({
 	},
 
 	fightDanger: function(danger){
+		this.dangers--;
 		let damage = Math.floor(window.gameSession.level/10 + 1);
 		switch(danger) {
 			case 1:
@@ -427,6 +464,7 @@ var gridController = cc.Class({
 
 	nextLevel: function(){
 		window.gameSession.level++;
+		if (window.gameSession.level > window.gameSession.levelMax) window.gameSession.levelMax = window.gameSession.level;
 		cc.director.loadScene("gameScene");
 	},
 
@@ -537,6 +575,8 @@ var gridController = cc.Class({
 
 		// mark if has treasure or danger
 		tile.content = Math.floor((Math.random() * 2) + 1);
+		if (tile.content == 1) this.treasures++;
+		if (tile.content == 2) this.dangers++;
 	},
 	showLine: function(tile){
 		// 1 sprite, 2 directions

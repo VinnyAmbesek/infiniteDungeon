@@ -97,7 +97,7 @@
       "__id__": 1
     },
     "_enabled": true,
-    "transition": 0,
+    "transition": 3,
     "pressedColor": {
       "__type__": "cc.Color",
       "r": 211,
@@ -147,7 +147,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "0bb2c429-f3dd-41f9-a3c1-925a27fa5d70"
     },
     "fileId": "0bpB+9CE5GLKFe1Y2ftW/b",
     "sync": false
