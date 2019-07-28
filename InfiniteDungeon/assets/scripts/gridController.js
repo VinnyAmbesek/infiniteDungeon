@@ -72,10 +72,13 @@ var gridController = cc.Class({
 		this.clicks = 0;
 		this.dangers = 0;
 		this.treasures = 0;
+		this.clickable = 0;
 		this.feedback.node.opacity = 0;
+		this.running = false;
+		this.timeToRun = 0.5;
+		this.size = 10;
 
-		let size = 10;
-		this.initGrid(size);
+		this.initGrid(this.size);
 	},
 
 	saveGame(){
@@ -171,6 +174,7 @@ var gridController = cc.Class({
 		if (tile.status == 2) return;
 		if (tile.status == 1) return;
 		tile.status = 1;
+		this.clickable++;
 		let cell = this.gridUI[x][y];
 		let sprite = cell.getComponent(cc.Sprite);
 		sprite.spriteFrame = this.open;
@@ -183,11 +187,35 @@ var gridController = cc.Class({
 		cell.getComponent(cc.Button).clickEvents.push(eventHandler);
 	},
 
+	startRunning: function(){
+		this.running = true;
+		this.timeToRun = 0.5;
+	},
+
+	run: function(size){
+		if (this.clickable > 1){
+			this.running = false;
+			return
+		}
+		cc.log("running");
+		let node = {};
+
+		for(var i = 0; i < size; i++){
+			for(var j = 0; j < size; j++){
+				let cell = this.gridUI[i][j];
+				if (cell.tile && cell.tile.status == 1) node.target = cell;
+			}
+		}
+
+		if (node.target != null) this.gridClick(node);
+	},
+
 	gridClick: function(node){
 		if (node.target.used) return;
 		if (window.gameSession.hp < 1) return;
 		// mark tiles walked to avoid tile replay
 		node.target.used = true;
+		this.clickable--;
 
 		// show tile
 		let tile = node.target.tile;
@@ -215,9 +243,11 @@ var gridController = cc.Class({
 
 		// verify content
 		if(tile.content == 1) {
+			this.running = false;
 			this.giveTreasure(Math.floor((Math.random() * 100) + 1));
 		}
 		if(tile.content == 2) {
+			this.running = false;
 			this.fightDanger(Math.floor((Math.random() * 6) + 1));
 			// victory xp
 			if (window.gameSession.hp > 0) {
@@ -757,6 +787,14 @@ var gridController = cc.Class({
 		if (this.feedback.node.opacity > 0) {
 			this.feedback.node.opacity -= dt*100
 			if (this.feedback.node.opacity < 0) this.feedback.node.opacity = 0;
+		}
+
+		if (this.running){
+			this.timeToRun -= dt;
+			if (this.timeToRun < 0) {
+				this.run(this.size);
+				this.timeToRun = 0.5;
+			}
 		}
 	},
 });
