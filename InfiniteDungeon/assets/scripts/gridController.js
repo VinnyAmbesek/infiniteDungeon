@@ -586,7 +586,16 @@ var gridController = cc.Class({
 				this.buildMaze(pop.x, pop.y);
 			} 
 		} else {
-			if (tile.tile == 0) tile.tile = 4;
+			if (tile.tile == 0) {
+				tile.tile = 4;
+				// chance to have trap or treasure
+				let chance = Math.floor((Math.random() * 100) + 1);
+				if (chance <=5) {
+					tile.content = Math.floor((Math.random() * 2) + 1);
+					if (tile.content == 1) this.treasures++;
+					if (tile.content == 2) this.dangers++;
+				}
+			}
 			// make a path in random direction
 			let path = Math.floor((Math.random() * dir) + 1);
 			this.makePath(x, y, path);
