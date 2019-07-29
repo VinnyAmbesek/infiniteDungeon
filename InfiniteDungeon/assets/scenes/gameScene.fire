@@ -366,6 +366,35 @@
     },
     "open": {
       "__uuid__": "060afe75-af91-447c-99e1-7d117db8ff74"
+    },
+    "danger": [
+      {
+        "__uuid__": "0b072e82-a5a1-4ecf-a1ca-2f236db25541"
+      },
+      {
+        "__uuid__": "1dc886e2-91ec-4d61-a1cb-f3b320439950"
+      },
+      {
+        "__uuid__": "241c0576-640a-45fc-90c5-bba457321bdc"
+      },
+      {
+        "__uuid__": "3e60d899-a5bd-4fa4-8981-074e2fd1cfef"
+      },
+      {
+        "__uuid__": "ad4de47c-c818-4bb9-9294-c51337a8e063"
+      },
+      {
+        "__uuid__": "60ea0875-b070-4dc0-b055-7da38b7ab7ff"
+      }
+    ],
+    "chest": {
+      "__uuid__": "b21c9de4-8352-405c-abbe-4a3d40eea082"
+    },
+    "stair_down": {
+      "__uuid__": "0c90e2fa-5392-412a-a3ef-3982b63d88d0"
+    },
+    "stair_up": {
+      "__uuid__": "ca1a3165-b972-4a4a-87da-20413d28de31"
     }
   },
   {

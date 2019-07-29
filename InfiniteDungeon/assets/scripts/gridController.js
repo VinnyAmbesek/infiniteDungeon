@@ -30,7 +30,12 @@ var gridController = cc.Class({
 		threeway: cc.SpriteFrame,
 		fourway: cc.SpriteFrame,
 		unknown: cc.SpriteFrame,
-		open: cc.SpriteFrame
+		open: cc.SpriteFrame,
+
+		danger: [cc.SpriteFrame],
+		chest: cc.SpriteFrame,
+		stair_down: cc.SpriteFrame,
+		stair_up: cc.SpriteFrame,
 		// foo: {
 		//	 // ATTRIBUTES:
 		//	 default: null,		// The default value will be used only when the component attaching
@@ -136,6 +141,7 @@ var gridController = cc.Class({
 		this.fillGrid(size);
 
 		this.showClickZones(this.entrance.x, this.entrance.y);
+		this.revealSubSprite(this.entrance.x, this.entrance.y);
 	},
 
 	showClickZones: function(x, y){
@@ -238,7 +244,9 @@ var gridController = cc.Class({
 		}
 		if(tile.content == this.enumContent["danger"]) {
 			this.running = false;
-			this.fightDanger(Math.floor((Math.random() * 6) + 1));
+			let index = Math.floor((Math.random() * 6) + 1);
+			this.fightDanger(index);
+			this.findSubSprite(tile, index)
 			// victory xp
 			if (window.gameSession.hp > 0) {
 				window.gameSession.xp += window.gameSession.level*25
@@ -248,6 +256,8 @@ var gridController = cc.Class({
 			}
 		};
 
+		this.revealSubSprite(tile.x,tile.y);
+
 		this.dungeonXP.string = "XP: " + window.gameSession.xp;
 
 		if (tile.tile == this.enumTile["exit"]){
@@ -256,6 +266,14 @@ var gridController = cc.Class({
 			this.running = false;
 			this.nextButton.active = true;
 		}
+	},
+
+	revealSubSprite: function(x,y){
+		let tile = this.grid[x][y];
+		let cell = this.gridUI[x][y];
+		let content = cell.getChildByName("content");
+		content.rotation = 360 - cell.rotation;
+		if (tile.subsprite) content.getComponent(cc.Sprite).spriteFrame = tile.subsprite;
 	},
 
 	fightDanger: function(danger){
@@ -364,6 +382,7 @@ var gridController = cc.Class({
 				let tile = this.grid[i][j];
 				this.makeWall(tile);
 				this.findSprite(tile);
+				this.findSubSprite(tile, -1);
 
 				let cell = cc.instantiate(this.tilePrefab);
 				this.gridUI[i][j] = cell;
@@ -374,15 +393,25 @@ var gridController = cc.Class({
 					sprite.spriteFrame = tile.sprite;	
 				} else if (tile.status == this.enumStatus["hidden"]) {
 					sprite.spriteFrame = this.unknown;
-				} 
+				}
 			}
 		}
 	},
 
+	findSubSprite: function(tile, index){
+		if (tile.tile == this.enumTile["entrance"]) {
+			tile.subsprite = this.stair_up;
+		} else if (tile.tile == this.enumTile["exit"]) {
+			tile.subsprite = this.stair_down;
+		} else if (tile.content == this.enumContent["treasure"]) {
+			tile.subsprite = this.chest;
+		} else if (tile.content == this.enumContent["danger"] && index > -1) {
+			tile.subsprite = this.danger[index-1];
+		}
+	},
+
 	findSprite: function(tile){
-		if (tile.tile == this.enumTile["entrance"] || tile.tile == this.enumTile["exit"]) {
-			this.showDoor(tile);
-		} else if (tile.tile == this.enumTile["deadend"]){
+		if (tile.tile == this.enumTile["deadend"]){
 			this.showDeadend(tile);
 		} else {
 			let paths = 0;
@@ -391,7 +420,9 @@ var gridController = cc.Class({
 			if (tile.east == this.enumSides["open"]) paths++;
 			if (tile.west == this.enumSides["open"]) paths++;
 			
-			if (paths == 2 && ( (tile.north == this.enumSides["open"] && tile.south == this.enumSides["open"]) || (tile.east == this.enumSides["open"] && tile.west == this.enumSides["open"]))){
+			if (paths == 1){
+				this.showDeadend(tile);
+			} else if (paths == 2 && ( (tile.north == this.enumSides["open"] && tile.south == this.enumSides["open"]) || (tile.east == this.enumSides["open"] && tile.west == this.enumSides["open"]))){
 				this.showLine(tile);
 			} else if (paths == 2) {
 				this.showCurve(tile);
@@ -470,8 +501,7 @@ var gridController = cc.Class({
 		} else{
 			tile.content = this.enumContent["treasure"];
 			this.treasures++;
-		}
-		
+		}	
 	},
 	showLine: function(tile){
 		// 1 sprite, 2 directions
