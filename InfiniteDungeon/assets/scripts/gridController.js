@@ -723,26 +723,15 @@ var gridController = cc.Class({
 
 	makeDoors: function(x1, y1, x2, y2){
 		// entrance
-		this.setTile(x1, y1, 1);
-		this.setTileStatus(x1, y1, 2);
-		this.entrance = {};
-		this.entrance.x = x1;
-		this.entrance.y = y1;
+		let tile = this.grid[x1][y1];
+		tile.tile = this.enumTile["entrance"];
+		tile.status = this.enumStatus["visible"];
+		this.entrance = {x: x1, y: y1};
 
 		// exit
-		this.setTile(x2, y2, 2);
-		//this.setTileStatus(x2, y2, 2);
-		this.exit = {};
-		this.exit.x = x2;
-		this.exit.y = y2;
-	},
-
-	setTile: function(x, y, tile){
-		this.grid[x][y].tile = tile;
-	},
-
-	setTileStatus: function(x, y, status){
-		this.grid[x][y].status = status;
+		tile = this.grid[x2][y2];
+		tile.tile = this.enumTile["exit"];
+		this.exit = {x: x2, y: y2};
 	},
 
 	showFeedback: function(text, color){
