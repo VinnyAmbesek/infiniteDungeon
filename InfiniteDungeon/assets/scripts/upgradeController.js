@@ -88,7 +88,6 @@ var upgradeController = cc.Class({
 		let button = cc.instantiate(this.button);
 		button.parent = this.grid;
 		this.secretPassage = button;
-		cc.log(this.secretPassage);
 
 		// fill data
 		button.getChildByName("Name").getComponent(cc.Label).string = "Secret Passage";

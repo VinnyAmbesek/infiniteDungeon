@@ -69,6 +69,7 @@ var gridController = cc.Class({
 
 		this.saveGame();
 
+		// init variables
 		this.clicks = 0;
 		this.dangers = 0;
 		this.treasures = 0;
@@ -90,7 +91,7 @@ var gridController = cc.Class({
 		window.gameSession.upgrades.iceMax, window.gameSession.upgrades.acidMin, window.gameSession.upgrades.acidMax, window.gameSession.upgrades.electricityMin,
 		window.gameSession.upgrades.electricityMax, window.gameSession.upgrades.spikesMin, window.gameSession.upgrades.spikesMax, window.gameSession.upgrades.poisonMin,
 		window.gameSession.upgrades.poisonMax, window.gameSession.upgrades.potionMin, window.gameSession.upgrades.potionMax, window.gameSession.upgrades.hpMax,
-		window.gameSession.upgrades.levelMax, window.gameSession.upgrades.info);
+		window.gameSession.upgrades.levelMin, window.gameSession.upgrades.info);
 
 		if (window.gameSession.xp > minXP) {
 			this.upgradePopup.active = true;
@@ -265,32 +266,6 @@ var gridController = cc.Class({
 			// show next level button
 			this.nextButton.active = true;
 		}
-	},
-
-	iDied: function(){
-		this.closePopup();
-		// back to level
-		window.gameSession.level = window.gameSession.levelMin;
-
-		// restore hp
-		window.gameSession.hp = window.gameSession.hpMax;
-
-		// reset inventory
-		window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fireMin, window.gameSession.inventory.fireMax);
-		window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.iceMin, window.gameSession.inventory.iceMax);
-		window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acidMin, window.gameSession.inventory.acidMax);
-		window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricityMin, window.gameSession.inventory.electricityMax);
-		window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikesMin, window.gameSession.inventory.spikesMax);
-		window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poisonMin, window.gameSession.inventory.poisonMax);
-		window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potionMin, window.gameSession.inventory.potionMax);
-
-		// restart scene
-		cc.director.loadScene("gameScene");
-	},
-
-	closePopup: function(){
-		this.deathPopup.active = false;
-		this.upgradePopup.active = false;
 	},
 
 	fightDanger: function(danger){
