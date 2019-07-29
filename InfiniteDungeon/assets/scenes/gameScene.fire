@@ -2448,6 +2448,27 @@
     },
     "dungeonXP": {
       "__id__": 17
+    },
+    "inventoryFire": {
+      "__id__": 20
+    },
+    "inventoryIce": {
+      "__id__": 22
+    },
+    "inventoryAcid": {
+      "__id__": 24
+    },
+    "inventoryElectricity": {
+      "__id__": 26
+    },
+    "inventorySpikes": {
+      "__id__": 28
+    },
+    "inventoryPoison": {
+      "__id__": 30
+    },
+    "inventoryPotion": {
+      "__id__": 34
     }
   },
   {

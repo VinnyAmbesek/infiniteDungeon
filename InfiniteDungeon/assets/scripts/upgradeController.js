@@ -17,6 +17,14 @@ var upgradeController = cc.Class({
 		button: cc.Prefab,
 
 		dungeonXP: cc.Label,
+
+		inventoryFire: cc.Label,
+		inventoryIce: cc.Label,
+		inventoryAcid: cc.Label,
+		inventoryElectricity: cc.Label,
+		inventorySpikes: cc.Label,
+		inventoryPoison: cc.Label,
+		inventoryPotion: cc.Label,
 		// foo: {
 		//	 // ATTRIBUTES:
 		//	 default: null,		// The default value will be used only when the component attaching
@@ -59,24 +67,24 @@ var upgradeController = cc.Class({
 	setButtons: function(){
 		if (! window.gameSession) return;
 
-		this.createButton("Fire Protection", "fireMin");
-		this.createButton("Ice Protection", "iceMin");
-		this.createButton("Acid Protection", "acidMin");
-		this.createButton("Electricity Protection", "electricityMin");
-		this.createButton("Spikes Protection", "spikesMin");
-		this.createButton("Poison Protection", "poisonMin");
+		this.createButton("Fire Protection", "fireMin", "fire");
+		this.createButton("Ice Protection", "iceMin", "ice");
+		this.createButton("Acid Protection", "acidMin", "acid");
+		this.createButton("Electricity Protection", "electricityMin", "electricity");
+		this.createButton("Spikes Protection", "spikesMin", "spikes");
+		this.createButton("Poison Protection", "poisonMin", "poison");
 
-		this.createButton("Fire Pocket", "fireMax");
-		this.createButton("Ice Pocket", "iceMax");
-		this.createButton("Acid Pocket", "acidMax");
-		this.createButton("Electricity Pocket", "electricityMax");
-		this.createButton("Spikes Pocket", "spikesMax");
-		this.createButton("Poison Pocket", "poisonMax");
+		this.createButton("Fire Pocket", "fireMax", null);
+		this.createButton("Ice Pocket", "iceMax", null);
+		this.createButton("Acid Pocket", "acidMax", null);
+		this.createButton("Electricity Pocket", "electricityMax", null);
+		this.createButton("Spikes Pocket", "spikesMax", null);
+		this.createButton("Poison Pocket", "poisonMax", null);
 
-		this.createButton("Starting Potion", "potionMin");
-		this.createButton("Potion Pocket", "potionMax");
+		this.createButton("Starting Potion", "potionMin", "potion");
+		this.createButton("Potion Pocket", "potionMax", null);
 
-		this.createButton("Max HP", "hpMax");
+		this.createButton("Max HP", "hpMax", null);
 
 		this.createSecretPassageButton();
 		this.checkSecretPassage();
@@ -102,7 +110,6 @@ var upgradeController = cc.Class({
         eventHandler.component = "upgradeController";
         eventHandler.handler = "upgradeSecretPassage";
 		button.getComponent(cc.Button).clickEvents.push(eventHandler);
-
 	},
 
 	upgradeSecretPassage(event){
@@ -130,7 +137,7 @@ var upgradeController = cc.Class({
 		}
 	},
 
-	createButton(name, field){
+	createButton(name, field, item){
 		let button = cc.instantiate(this.button);
 		button.parent = this.grid;
 
@@ -144,6 +151,7 @@ var upgradeController = cc.Class({
 		button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades[field];
 
 		button.field = field;
+		button.item = item;
 
 		//add click event
 
@@ -152,7 +160,6 @@ var upgradeController = cc.Class({
         eventHandler.component = "upgradeController";
         eventHandler.handler = "upgrade";
 		button.getComponent(cc.Button).clickEvents.push(eventHandler);
-
 	},
 
 	upgrade(event){
@@ -167,6 +174,7 @@ var upgradeController = cc.Class({
 			if (window.gameSession.inventory[field] != null) {
 				window.gameSession.inventory[field] += 1;
 				button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.inventory[field];
+				if (button.item) this.giveItem(button.item);
 			} else {
 				window.gameSession[field] += 1;
 				button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession[field];
@@ -177,6 +185,19 @@ var upgradeController = cc.Class({
 
 			this.saveGame();
 		}
+	},
+
+	giveItem: function(item){
+		let inv = this.jsUcfirst(item);
+
+		if (window.gameSession.inventory[item] +1 <= window.gameSession.inventory[item+"Max"]){
+			window.gameSession.inventory[item]++;
+			this["inventory"+inv].string = inv + ": " + window.gameSession.inventory[item];
+		}
+	},
+
+	jsUcfirst: function(string){
+		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
 
 	saveGame(){
