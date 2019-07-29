@@ -31,7 +31,7 @@ cc.Class({
     },
 
     iDied: function(){
-        this.deathPopup.active = false;
+        this.close();
         // back to level
         window.gameSession.level = window.gameSession.levelMin;
 
@@ -57,6 +57,16 @@ cc.Class({
 
     start () {
 
+    },
+
+    close: function() {
+        this.node.active = false;
+        window.gameGlobals.popup = false;
+    },
+
+    open: function() {
+        this.node.active = true;
+        window.gameGlobals.popup = true;
     },
 
     // update (dt) {},

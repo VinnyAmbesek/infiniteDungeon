@@ -41,6 +41,7 @@ cc.Class({
 
     initSession: function(){
         this.loadGame();
+        window.gameGlobals = {};
 
         // verify if have gamesave or if it needs to be upgraded
         if (window.gameSession != null) return;

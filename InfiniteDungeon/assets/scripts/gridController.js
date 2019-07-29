@@ -92,6 +92,7 @@ var gridController = cc.Class({
 
 		if (window.gameSession.xp > minXP) {
 			this.upgradePopup.active = true;
+			window.gameGlobals.popup = true;
 		}
 	},
 
@@ -207,6 +208,7 @@ var gridController = cc.Class({
 	gridClick: function(node){
 		if (node.target.used) return;
 		if (window.gameSession.hp < 1) return;
+		if (window.gameGlobals.popup) return;
 		// mark tiles walked to avoid tile replay
 		node.target.used = true;
 		this.clickable--;
@@ -252,6 +254,7 @@ var gridController = cc.Class({
 				window.gameSession.xp += window.gameSession.level*25
 			} else {
 				this.deathPopup.active = true;
+				window.gameGlobals.popup = true;
 				this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
 			}
 		};
@@ -583,9 +586,9 @@ var gridController = cc.Class({
 				let chance = Math.floor((Math.random() * 100) + 1);
 				if (chance <=5) {
 					let chance = Math.floor((Math.random() * 100) + 1);
-					let level = Math.min(25, window.gameSession.level);
+					let level = Math.min(50, window.gameSession.level);
 					if (chance <= 25+level) {
-						// 25% de chance de perigo +1% por level, max 50%
+						// 25% de chance de perigo +1% por level, max 75%
 						tile.content = this.enumContent["danger"];
 						this.dangers++;
 					} else{
