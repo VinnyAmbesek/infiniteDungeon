@@ -296,99 +296,67 @@ var gridController = cc.Class({
 	fightDanger: function(danger){
 		this.dangers--;
 		let damage = Math.floor(window.gameSession.level/10 + 1);
+		let feedback;
+		let effect;
+		let field;
+		let item;
 		switch(danger) {
 			case 1:
 				// code block
-				this.showFeedback("Fire Trap", new cc.Color(255,0,0));
-				this.lastDanger = "burned";
-				if (window.gameSession.inventory.fire > 0){
-					window.gameSession.inventory.fire -= damage;
-					if (window.gameSession.inventory.fire < 0 ) {
-						window.gameSession.hp += window.gameSession.inventory.fire;
-						window.gameSession.inventory.fire = 0;
-					}
-					this.inventoryFire.string = "Fire: " + window.gameSession.inventory.fire;
-				} else {
-					window.gameSession.hp -= damage;
-				}
+				feedback = "Fire Trap";
+				effect = "burned";
+				field = "fire";
+				item = "Fire"
 				break;
 			case 2:
 				// code block
-				this.showFeedback("Freezing Trap", new cc.Color(255,0,0));
-				this.lastDanger = "frozen";
-				if (window.gameSession.inventory.ice > 0){
-					window.gameSession.inventory.ice -= damage;
-					if (window.gameSession.inventory.ice < 0 ) {
-						window.gameSession.hp += window.gameSession.inventory.ice;
-						window.gameSession.inventory.ice = 0;
-					}
-					this.inventoryIce.string = "Ice: " + window.gameSession.inventory.ice;
-				} else {
-					window.gameSession.hp -= damage;
-				}
+				feedback = "Freezing Trap";
+				effect = "frozen";
+				field = "ice"
+				item = "Ice";
 				break;
 			case 3:
 				// code block
-				this.showFeedback("Acid Trap", new cc.Color(255,0,0));
-				this.lastDanger = "dissolved";
-				if (window.gameSession.inventory.acid > 0){
-					window.gameSession.inventory.acid -= damage;
-					if (window.gameSession.inventory.acid < 0 ) {
-						window.gameSession.hp += window.gameSession.inventory.acid;
-						window.gameSession.inventory.acid = 0;
-					}
-					this.inventoryAcid.string = "Acid: " + window.gameSession.inventory.acid;
-				} else {
-					window.gameSession.hp -= damage;
-				}
+				feedback = "Acid Trap";
+				effect = "dissolved";
+				field = "acid"
+				item = "Acid";
 				break;
 			case 4:
 				// code block
-				this.showFeedback("Electricity Trap", new cc.Color(255,0,0));
-				this.lastDanger = "electrocuted";
-				if (window.gameSession.inventory.electricity > 0){
-					window.gameSession.inventory.electricity -= damage;
-					if (window.gameSession.inventory.electricity < 0 ) {
-						window.gameSession.hp += window.gameSession.inventory.electricity;
-						window.gameSession.inventory.electricity = 0;
-					}
-					this.inventoryElectricity.string = "Electricity: " + window.gameSession.inventory.electricity;
-				} else {
-					window.gameSession.hp -= damage;
-				}
+				feedback = "Electricity Trap";
+				effect = "electrocuted";
+				field = "electricity"
+				item = "Electricity";
 				break;
 			case 5:
 				// code block
-				this.showFeedback("Floor Spikes Trap", new cc.Color(255,0,0));
-				this.lastDanger = "impaled";
-				if (window.gameSession.inventory.spikes > 0){
-					window.gameSession.inventory.spikes -= damage;
-					if (window.gameSession.inventory.spikes < 0 ) {
-						window.gameSession.hp += window.gameSession.inventory.spikes;
-						window.gameSession.inventory.spikes = 0;
-					}
-					this.inventorySpikes.string = "Spikes: " + window.gameSession.inventory.spikes;
-				} else {
-					window.gameSession.hp -= damage;
-				}
+				feedback = "Floor Spikes Trap";
+				effect = "impaled";
+				field = "spikes"
+				item = "Spikes";
 				break;
 			case 6:
 				// code block
-				this.showFeedback("Poisoned Dart Trap", new cc.Color(255,0,0));
-				this.lastDanger = "poisoned";
-				if (window.gameSession.inventory.poison > 0){
-					window.gameSession.inventory.poison -= damage;
-					if (window.gameSession.inventory.poison < 0 ) {
-						window.gameSession.hp += window.gameSession.inventory.poison;
-						window.gameSession.inventory.poison = 0;
-					}
-					this.inventoryPoison.string = "Poison: " + window.gameSession.inventory.poison;
-				} else {
-					window.gameSession.hp -= damage;
-				}
+				feedback = "Poisoned Dart Trap";
+				effect = "poisoned";
+				field = "poison"
+				item = "Poison";
 				break;
 			default:
 				// code block
+		}
+		this.showFeedback(feedback, new cc.Color(255,0,0));
+		this.lastDanger = effect;
+		if (window.gameSession.inventory[field] > 0){
+			window.gameSession.inventory[field] -= damage;
+			if (window.gameSession.inventory[field] < 0 ) {
+				window.gameSession.hp += window.gameSession.inventory[field];
+				window.gameSession.inventory[field] = 0;
+			}
+			this["inventory"+item].string = item + ": " + window.gameSession.inventory[field];
+		} else {
+			window.gameSession.hp -= damage;
 		}
 
 		this.dungeonHP.string = "HP: " + window.gameSession.hp;
@@ -716,7 +684,7 @@ var gridController = cc.Class({
 		} else if (tile.west == this.enumSides["undefined"]){
 			tile.west = this.enumSides["wall"];
 		}
-		
+
 		return paths;
 	},
 
@@ -754,18 +722,22 @@ var gridController = cc.Class({
 		let dir = Math.floor((Math.random() * 4) + 1);
 		switch(dir) {
 			case 1:
+				// north - south
 				this.makeDoors(0, Math.floor((Math.random() * size)), size-1, Math.floor((Math.random() * size)));
 				break;
 			case 2:
+				// south - north
 				this.makeDoors(size-1, Math.floor((Math.random() * size)), 0, Math.floor((Math.random() * size)));
 				break;
 			case 3:
+				// east - west
 				this.makeDoors(Math.floor((Math.random() * size)), 0, Math.floor((Math.random() * size)), size-1);
 				break;
 			case 4:
+				// west - east
 				this.makeDoors(Math.floor((Math.random() * size)), size-1, Math.floor((Math.random() * size)), 0);
 				break;
-		  default:
+			default:
 				// code block
 		}
 	},
