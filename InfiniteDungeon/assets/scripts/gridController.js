@@ -20,14 +20,6 @@ var gridController = cc.Class({
 		dungeonLevel: cc.Label,
 		dungeonXP: cc.Label,
 		feedback: cc.Label,
-
-		inventoryFire: cc.Label,
-		inventoryIce: cc.Label,
-		inventoryAcid: cc.Label,
-		inventoryElectricity: cc.Label,
-		inventorySpikes: cc.Label,
-		inventoryPoison: cc.Label,
-		inventoryPotion: cc.Label,
 		deathMessage: cc.Label,
 
 		door_corner: cc.SpriteFrame,
@@ -102,14 +94,6 @@ var gridController = cc.Class({
 		this.dungeonLevel.string = "Floor: " + window.gameSession.level;
 		this.dungeonXP.string = "XP: " + window.gameSession.xp;
 		this.dungeonHP.string = "HP: " + window.gameSession.hp;
-
-		this.inventoryPotion.string = "Potion: " + window.gameSession.inventory.potion;
-		this.inventoryFire.string = "Fire: " + window.gameSession.inventory.fire;
-		this.inventoryIce.string = "Ice: " + window.gameSession.inventory.ice;
-		this.inventoryAcid.string = "Acid: " + window.gameSession.inventory.acid;
-		this.inventoryElectricity.string = "Electricity: " + window.gameSession.inventory.electricity;
-		this.inventorySpikes.string = "Spikes: " + window.gameSession.inventory.spikes;
-		this.inventoryPoison.string = "Poison: " + window.gameSession.inventory.poison;
 	},
 
 	initGrid: function (size){
@@ -238,7 +222,6 @@ var gridController = cc.Class({
 			window.gameSession.hp++;
 			this.showFeedback("Used potion", new cc.Color(0,255,0));
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
-			this.inventoryPotion.string = "Potion: " + window.gameSession.inventory.potion;
 		}
 		
 		// extra xp for clean map
@@ -336,7 +319,6 @@ var gridController = cc.Class({
 				window.gameSession.hp += window.gameSession.inventory[field];
 				window.gameSession.inventory[field] = 0;
 			}
-			this["inventory"+item].string = item + ": " + window.gameSession.inventory[field];
 		} else {
 			window.gameSession.hp -= damage;
 		}
@@ -347,31 +329,24 @@ var gridController = cc.Class({
 	giveTreasure: function(prize){
 		if (prize <= 10) {
 			window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potion+1, window.gameSession.inventory.potionMax);
-			this.inventoryPotion.string = "Potion: " + window.gameSession.inventory.potion;
 			this.showFeedback("Got Potion", new cc.Color(0,255,0));
 		} else if (prize <= 25 ) {
 			window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fire+1, window.gameSession.inventory.fireMax);
-			this.inventoryFire.string = "Fire: " + window.gameSession.inventory.fire;
 			this.showFeedback("Got Fire Protection", new cc.Color(0,255,0));
 		} else if (prize <= 40 ) {
 			window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.ice+1, window.gameSession.inventory.iceMax);
-			this.inventoryIce.string = "Ice: " + window.gameSession.inventory.ice;
 			this.showFeedback("Got Ice Protection", new cc.Color(0,255,0));
 		} else if (prize <= 55 ) {
 			window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acid+1, window.gameSession.inventory.acidMax);
-			this.inventoryAcid.string = "Acid: " + window.gameSession.inventory.acid;
 			this.showFeedback("Got Acid Protection", new cc.Color(0,255,0));
 		} else if (prize <= 70 ) {
 			window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricity+1, window.gameSession.inventory.electricityMax);
-			this.inventoryElectricity.string = "Electricity: " + window.gameSession.inventory.electricity;
 			this.showFeedback("Got Electricity Protection", new cc.Color(0,255,0));
 		} else if (prize <= 85 ) {
 			window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikes+1, window.gameSession.inventory.spikesMax);
-			this.inventorySpikes.string = "Spikes: " + window.gameSession.inventory.spikes;
 			this.showFeedback("Got Spikes Protection", new cc.Color(0,255,0));
 		} else if (prize <= 100 ) {
 			window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poison+1, window.gameSession.inventory.poisonMax);
-			this.inventoryPoison.string = "Poison: " + window.gameSession.inventory.poison;
 			this.showFeedback("Got Poison Protection", new cc.Color(0,255,0));
 		}
 	},

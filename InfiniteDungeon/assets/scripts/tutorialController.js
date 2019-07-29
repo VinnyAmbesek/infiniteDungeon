@@ -42,6 +42,7 @@ cc.Class({
     initSession: function(){
         this.loadGame();
 
+        // verify if have gamesave or if it needs to be upgraded
         if (window.gameSession != null) return;
 
         window.gameSession = {};
@@ -108,7 +109,7 @@ cc.Class({
         window.gameSession.upgrades.potionMax = 1000;
 
         window.gameSession.upgrades.hpMax = 1000;
-        
+
         window.gameSession.upgrades.levelMin = 1000;
         window.gameSession.upgrades.info = 1000;
     },
@@ -129,6 +130,10 @@ cc.Class({
     skip: function(){
         cc.director.loadScene("gameScene");
     },
+
+    upgradeV2: function(){
+        //
+    }
 
     // update (dt) {},
 });

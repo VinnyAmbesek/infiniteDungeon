@@ -188,25 +188,22 @@ var upgradeController = cc.Class({
 	},
 
 	giveItem: function(item){
-		let inv = this.jsUcfirst(item);
-
 		if (window.gameSession.inventory[item] +1 <= window.gameSession.inventory[item+"Max"]){
 			window.gameSession.inventory[item]++;
-			this["inventory"+inv].string = inv + ": " + window.gameSession.inventory[item];
 		}
-	},
-
-	jsUcfirst: function(string){
-		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
 
 	saveGame(){
 		cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
 	},
 
-	close: function(argument) {
-		this.node.active = false;
-	},
+    close: function() {
+        this.node.active = false;
+    },
+
+    open: function() {
+        this.node.active = true;
+    },
 
 	// update (dt) {},
 });
