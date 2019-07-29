@@ -661,25 +661,25 @@ var gridController = cc.Class({
 	findPath: function(tile){
 		let paths = 0;
 		// for each direction verify if can go, if not create wall
-		if (tile.north == this.enumSides["undefined"] && this.canGoNorth(tile)){ 
+		if (tile.north == this.enumSides["undefined"] && this.isPathFree("north", tile, tile.x-1, tile.y)){ 
 			paths++
 		} else if (tile.north == this.enumSides["undefined"]){
 			tile.north = this.enumSides["wall"];
 		}
 
-		if (tile.south == this.enumSides["undefined"] && this.canGoSouth(tile)){ 
+		if (tile.south == this.enumSides["undefined"] && this.isPathFree("south", tile, tile.x+1, tile.y)){ 
 			paths++
 		} else if (tile.south == this.enumSides["undefined"]){
 			tile.south = this.enumSides["wall"];
 		}
 
-		if (tile.east == this.enumSides["undefined"] && this.canGoEast(tile)){ 
+		if (tile.east == this.enumSides["undefined"] && this.isPathFree("east", tile, tile.x, tile.y+1)){ 
 			paths++
 		} else if (tile.east == this.enumSides["undefined"]){
 			tile.east = this.enumSides["wall"];
 		}
 
-		if (tile.west == this.enumSides["undefined"] && this.canGoWest(tile)){ 
+		if (tile.west == this.enumSides["undefined"] && this.isPathFree("west", tile, tile.x, tile.y-1)){ 
 			paths++
 		} else if (tile.west == this.enumSides["undefined"]){
 			tile.west = this.enumSides["wall"];
@@ -688,30 +688,9 @@ var gridController = cc.Class({
 		return paths;
 	},
 
-	canGoNorth: function(tile){
-		if(tile.north == this.enumSides["block"]) return false;
-		let adj = this.grid[tile.x-1][tile.y];
-		if (adj.tile == this.enumTile["deadend"] || adj.tile == this.enumTile["corridor"]) return false;
-		if (adj.tile == this.enumTile["undefined"] || adj.tile == this.enumTile["exit"]) return true;
-		return false;
-	},
-	canGoSouth: function(tile){
-		if(tile.south == this.enumSides["block"]) return false;
-		let adj = this.grid[tile.x+1][tile.y];
-		if (adj.tile == this.enumTile["deadend"] || adj.tile == this.enumTile["corridor"]) return false;
-		if (adj.tile == this.enumTile["undefined"] || adj.tile == this.enumTile["exit"]) return true;
-		return false;
-	},
-	canGoEast: function(tile){
-		if(tile.east == this.enumSides["block"]) return false;
-		let adj = this.grid[tile.x][tile.y+1];
-		if (adj.tile == this.enumTile["deadend"] || adj.tile == this.enumTile["corridor"]) return false;
-		if (adj.tile == this.enumTile["undefined"] || adj.tile == this.enumTile["exit"]) return true;
-		return false;
-	},
-	canGoWest: function(tile){
-		if(tile.west == this.enumSides["block"]) return false;
-		let adj = this.grid[tile.x][tile.y-1];
+	isPathFree: function(dir, tile, x, y){
+		if(tile[dir] == this.enumSides["block"]) return false;
+		let adj = this.grid[x][y];
 		if (adj.tile == this.enumTile["deadend"] || adj.tile == this.enumTile["corridor"]) return false;
 		if (adj.tile == this.enumTile["undefined"] || adj.tile == this.enumTile["exit"]) return true;
 		return false;
