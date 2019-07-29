@@ -25,6 +25,8 @@ var upgradeController = cc.Class({
 		inventorySpikes: cc.Label,
 		inventoryPoison: cc.Label,
 		inventoryPotion: cc.Label,
+
+		popups: [cc.Node],
 		// foo: {
 		//	 // ATTRIBUTES:
 		//	 default: null,		// The default value will be used only when the component attaching
@@ -203,6 +205,9 @@ var upgradeController = cc.Class({
     },
 
     open: function() {
+    	for (var i = 0; i < this.popups.length; i++) {
+    		this.popups[i].active = false;
+    	}
         this.node.active = true;
         window.gameGlobals.popup = true;
     },
