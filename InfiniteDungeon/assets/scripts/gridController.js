@@ -58,7 +58,7 @@ var gridController = cc.Class({
 		this.enumSides = {undefined: 0, block: 1, wall: 2, open: 3};
 		this.enumTile = {undefined: 0, entrance: 1, exit: 2, deadend: 3,corridor: 4};
 		this.enumStatus = {hidden: 0, flashing: 1, visible: 2};
-		this.enumContent = {empty: 0, treasure: 1, danger: 2};
+		this.enumContent = {empty: 0, treasure: 1, danger: 2, darkness: 3};
 		this.enumSprite = {entrance: 0, exit: 1, deadend: 2, curve: 3, line: 4, threeway: 5, fourway: 6};
 
 		this.initUI();
@@ -77,6 +77,19 @@ var gridController = cc.Class({
 		this.size = 10;
 
 		this.initGrid(this.size);
+
+		// define entrance and exit
+		this.setDoorDirection(this.size);
+
+		// make maze
+		this.buildStack = new Array();
+		this.buildMaze(this.entrance.x, this.entrance.y);
+
+		// put tiles on grid
+		this.fillGrid(this.size);
+
+		this.showClickZones(this.entrance.x, this.entrance.y);
+		this.revealSubSprite(this.entrance.x, this.entrance.y);
 	},
 
 	saveGame(){
@@ -100,6 +113,14 @@ var gridController = cc.Class({
 		this.dungeonLevel.string = "Floor: " + window.gameSession.level;
 		this.dungeonXP.string = "XP: " + window.gameSession.xp;
 		this.dungeonHP.string = "HP: " + window.gameSession.hp;
+	},
+
+	cleanGrid: function (size){
+		for(var i = 0; i < size; i++){
+			for(var j = 0; j < size; j++){
+				this.gridUI[i][j].destroy();
+			}
+		}
 	},
 
 	initGrid: function (size){
@@ -133,16 +154,6 @@ var gridController = cc.Class({
 				if(j == size-1) this.grid[i][j].east = this.enumSides["block"];
 			}
 		}
-		// define entrance and exit
-		this.setDoorDirection(size);
-		// make maze
-		this.buildStack = new Array();
-		this.buildMaze(this.entrance.x, this.entrance.y);
-		// put tiles on grid
-		this.fillGrid(size);
-
-		this.showClickZones(this.entrance.x, this.entrance.y);
-		this.revealSubSprite(this.entrance.x, this.entrance.y);
 	},
 
 	showClickZones: function(x, y){
@@ -257,7 +268,34 @@ var gridController = cc.Class({
 				window.gameGlobals.popup = true;
 				this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
 			}
-		};
+		}
+		if(tile.content == this.enumContent["darkness"]){
+			this.running = false;
+			let x = node.target.tile.x;
+			let y = node.target.tile.y;
+
+			this.cleanGrid(this.size);
+
+			this.initGrid(this.size);
+
+			// define entrance and exit
+			this.setDoorDirection(this.size);
+
+			// make maze
+			this.buildStack = new Array();
+			this.buildMaze(this.entrance.x, this.entrance.y);
+
+			let entrance = this.grid[this.entrance.x][this.entrance.y];
+			entrance.status = this.enumStatus["hidden"];
+
+			let tile = this.grid[x][y];
+			tile.status = this.enumStatus["visible"];
+		
+			// put tiles on grid
+			this.fillGrid(this.size);
+
+			this.showClickZones(x, y);
+		}
 
 		this.revealSubSprite(tile.x,tile.y);
 
@@ -587,7 +625,11 @@ var gridController = cc.Class({
 				if (chance <=5) {
 					let chance = Math.floor((Math.random() * 100) + 1);
 					let level = Math.min(50, window.gameSession.level);
-					if (chance <= 25+level) {
+					let mod = window.gameSession.level % 10;
+					if (mod == 0 && chance <= 1){
+						// 1% chance of dungeon moving from 10 to 10 levels
+						tile.content = this.enumContent["darkness"];
+					} else if (chance <= 25+level) {
 						// 25% de chance de perigo +1% por level, max 75%
 						tile.content = this.enumContent["danger"];
 						this.dangers++;
