@@ -156,24 +156,29 @@ var gridController = cc.Class({
 
 	showClickZones: function(x, y){
 		let tile = this.grid[x][y];
+		let zones = 0;
 		if (tile.north == this.enumSides["open"]) {
-			this.addClickFunction(x-1,y);
+			if (this.addClickFunction(x-1,y)) zones++;
 		}
 		if (tile.south == this.enumSides["open"]) {
-			this.addClickFunction(x+1,y);
+			if (this.addClickFunction(x+1,y)) zones++;
 		}
 		if (tile.east == this.enumSides["open"]) {
-			this.addClickFunction(x,y+1);
+			if (this.addClickFunction(x,y+1)) zones++;
 		}
 		if (tile.west == this.enumSides["open"]) {
-			this.addClickFunction(x,y-1);
+			if (this.addClickFunction(x,y-1)) zones++;
 		}
+		if (zones > 1) this.running = false;
 	},
 
 	addClickFunction: function(x,y){
 		let tile = this.grid[x][y];
 		if (tile.status == this.enumStatus["visible"]) return false;
-		if (tile.status == this.enumStatus["flashing"]) return true;
+		if (tile.status == this.enumStatus["flashing"]) {
+			this.lastClickZone = this.gridUI[x][y];
+			return true;
+		}
 		tile.status = this.enumStatus["flashing"];
 		this.clickable++;
 		let cell = this.gridUI[x][y];
@@ -186,6 +191,7 @@ var gridController = cc.Class({
         eventHandler.handler = "gridClick";
         cell.tile = tile;
 		cell.getComponent(cc.Button).clickEvents.push(eventHandler);
+		this.lastClickZone = cell;
 		return true;
 	},
 
@@ -195,17 +201,14 @@ var gridController = cc.Class({
 	},
 
 	run: function(size){
-		if (this.clickable > 1){
-			this.running = false;
-			return
-		}
 		let node = {};
 
-		for(var i = 0; i < size; i++){
-			for(var j = 0; j < size; j++){
-				let cell = this.gridUI[i][j];
-				if (cell.tile && cell.tile.status == this.enumStatus["flashing"]) node.target = cell;
-			}
+		if (this.lastClickZone){
+			node.target = this.lastClickZone;
+			this.lastClickZone = null;
+		} else {
+			this.running = false;
+			return;
 		}
 
 		if (node.target != null) this.gridClick(node);
@@ -218,12 +221,15 @@ var gridController = cc.Class({
 		node.target.used = true;
 		this.clickable--;
 
+		this.startRunning();
+
 		// show tile
 		let tile = node.target.tile;
 		tile.status = this.enumStatus["visible"];
 		let sprite = node.target.getComponent(cc.Sprite);
 		sprite.spriteFrame = tile.sprite;
 
+		// open new clickzones
 		this.showClickZones(tile.x, tile.y);
 
 		// use a potion
@@ -242,7 +248,7 @@ var gridController = cc.Class({
 		// gain exploration xp
 		window.gameSession.xp += window.gameSession.level;
 
-		// verify content
+		// verify room content
 		if(tile.content == this.enumContent["treasure"]) {
 			this.running = false;
 			this.giveTreasure(Math.floor((Math.random() * 100) + 1));
@@ -264,6 +270,7 @@ var gridController = cc.Class({
 		if (tile.tile == this.enumTile["exit"]){
 			// found exit
 			// show next level button
+			this.running = false;
 			this.nextButton.active = true;
 		}
 	},
@@ -724,8 +731,8 @@ var gridController = cc.Class({
 		if (this.running){
 			this.timeToRun -= dt;
 			if (this.timeToRun < 0) {
+				this.startRunning();
 				this.run(this.size);
-				this.timeToRun = 0.5;
 			}
 		}
 	},
