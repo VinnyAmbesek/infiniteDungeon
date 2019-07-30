@@ -10,6 +10,7 @@ var gridController = cc.Class({
 
 	properties: {
 		tilePrefab: cc.Prefab,
+		tile15Prefab: cc.Prefab,
 
 		gridNode: cc.Node,
 		nextButton: cc.Node,
@@ -77,6 +78,10 @@ var gridController = cc.Class({
 		this.running = false;
 		this.timeToRun = 0.5;
 		this.size = 10;
+		if (window.gameSession.level > 50){
+			this.size = 15;
+			this.tilePrefab = this.tile15Prefab;
+		}
 
 		this.initGrid(this.size);
 

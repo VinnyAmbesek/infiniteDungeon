@@ -155,6 +155,8 @@ cc.Class({
         window.gameSession.traps = 0;
         window.gameSession.treasureHunter = false;
         window.gameSession.trapFinder = false;
+        
+        window.gameSession.saveVersion = {major: 0, minor: 2, fix: 0};
         //
     }
 
