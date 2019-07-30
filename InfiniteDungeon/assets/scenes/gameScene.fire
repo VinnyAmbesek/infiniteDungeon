@@ -316,6 +316,9 @@
     "tile15Prefab": {
       "__uuid__": "b3551e5a-b594-44f2-9593-ac7d45a0d5d1"
     },
+    "tile20Prefab": {
+      "__uuid__": "ebc7395f-bb41-4ffb-937d-c56f9eeef950"
+    },
     "gridNode": {
       "__id__": 5
     },
