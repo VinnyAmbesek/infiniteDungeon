@@ -40,6 +40,10 @@ cc.Class({
         let saveVersion = {major: 0, minor: 2, fix: 0};
     },
 
+    verifyUpdate: function(saved){
+        if (saved.major == 0 && saved.minor == 1) this.updateV2();
+    },
+
     initSession: function(){
         this.loadGame();
         window.gameGlobals = {};
@@ -48,7 +52,7 @@ cc.Class({
         if (window.gameSession != null) {
             if (! window.gameSession.saveVersion)  window.gameSession.saveVersion = {major: 0, minor: 1, fix: 0};
             // if is old saveVersion update save
-            
+            this.verifyUpdate(window.gameSession.saveVersion);
 
             return
         }
@@ -146,7 +150,7 @@ cc.Class({
         cc.director.loadScene("gameScene");
     },
 
-    upgradeV2: function(){
+    updateV2: function(){
         window.gameSession.treasures = 0;
         window.gameSession.traps = 0;
         window.gameSession.treasureHunter = false;
