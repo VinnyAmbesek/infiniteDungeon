@@ -137,6 +137,8 @@ var upgradeController = cc.Class({
 
 			this.saveGame();
 		}
+
+		this.checkSecretPassage();
 	},
 
 	createButton(name, field, item){
