@@ -656,13 +656,13 @@ var gridController = cc.Class({
 				let chance = Math.floor((Math.random() * 100) + 1);
 				if (chance <=5) {
 					let chance = Math.floor((Math.random() * 100) + 1);
-					let level = Math.min(50, window.gameSession.level);
+					let level = Math.min(25, window.gameSession.level);
 					let mod = window.gameSession.level % 10;
 					if (mod == 0 && chance <= 1){
 						// 1% chance of dungeon moving from 10 to 10 levels
 						tile.content = this.enumContent["darkness"];
 					} else if (chance <= 25+level) {
-						// 25% de chance de perigo +1% por level, max 75%
+						// 25% de chance de perigo +1% por level, max 50%
 						tile.content = this.enumContent["danger"];
 						this.dangers++;
 						this.trapFinder.string = "Traps: " + this.dangers;
