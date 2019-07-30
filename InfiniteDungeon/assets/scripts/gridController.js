@@ -19,6 +19,8 @@ var gridController = cc.Class({
 		dungeonHP: cc.Label,
 		dungeonLevel: cc.Label,
 		dungeonXP: cc.Label,
+		trapFinder: cc.Label,
+		treasureHunter: cc.Label,
 		feedback: cc.Label,
 		deathMessage: cc.Label,
 
@@ -90,6 +92,11 @@ var gridController = cc.Class({
 
 		this.showClickZones(this.entrance.x, this.entrance.y);
 		this.revealSubSprite(this.entrance.x, this.entrance.y);
+
+		// show upgrades
+		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
+		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
+
 	},
 
 	saveGame(){
@@ -119,7 +126,7 @@ var gridController = cc.Class({
 		this.clicks = 0;
 		this.dangers = 0;
 		this.treasures = 0;
-		
+
 		for(var i = 0; i < size; i++){
 			for(var j = 0; j < size; j++){
 				this.gridUI[i][j].destroy();
@@ -228,6 +235,9 @@ var gridController = cc.Class({
 		node.target.used = true;
 		this.clickable--;
 
+		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
+		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
+
 		this.startRunning();
 
 		// show tile
@@ -322,7 +332,9 @@ var gridController = cc.Class({
 	},
 
 	fightDanger: function(danger){
+		window.gameSession.traps++;
 		this.dangers--;
+		this.trapFinder.string = "Traps: " + this.dangers;
 		let damage = Math.floor(window.gameSession.level/10 + 1);
 		let feedback;
 		let effect;
@@ -390,6 +402,9 @@ var gridController = cc.Class({
 	},
 
 	giveTreasure: function(prize){
+		this.treasures--;
+		this.treasureHunter.string = "Treasures: " + this.treasures;
+		window.gameSession.treasures++;
 		if (prize <= 10) {
 			window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potion+1, window.gameSession.inventory.potionMax);
 			this.showFeedback("Got Potion", new cc.Color(0,255,0));
@@ -543,9 +558,11 @@ var gridController = cc.Class({
 			// 25% de chance de perigo +1% por level, max 50%
 			tile.content = this.enumContent["danger"];
 			this.dangers++;
+			this.trapFinder.string = "Traps: " + this.dangers;
 		} else{
 			tile.content = this.enumContent["treasure"];
 			this.treasures++;
+			this.treasureHunter.string = "Treasures: " + this.treasures;
 		}	
 	},
 	showLine: function(tile){
@@ -637,9 +654,11 @@ var gridController = cc.Class({
 						// 25% de chance de perigo +1% por level, max 75%
 						tile.content = this.enumContent["danger"];
 						this.dangers++;
+						this.trapFinder.string = "Traps: " + this.dangers;
 					} else{
 						tile.content = this.enumContent["treasure"];
 						this.treasures++;
+						this.treasureHunter.string = "Treasures: " + this.treasures;
 					}
 				}
 			}

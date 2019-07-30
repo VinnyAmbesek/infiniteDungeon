@@ -37,6 +37,7 @@ cc.Class({
     start () {
         this.index = 0;
         this.initSession();
+        let saveVersion = {major: 0, minor: 2, fix: 0};
     },
 
     initSession: function(){
@@ -44,20 +45,30 @@ cc.Class({
         window.gameGlobals = {};
 
         // verify if have gamesave or if it needs to be upgraded
-        if (window.gameSession != null) return;
+        if (window.gameSession != null) {
+            if (! window.gameSession.saveVersion)  window.gameSession.saveVersion = {major: 0, minor: 1, fix: 0};
+            // if is old saveVersion update save
+            
+
+            return
+        }
+        //if no save data, create save data
 
         window.gameSession = {};
-
-        window.gameSession.level = 1;
-        window.gameSession.levelMin = 1;
-        window.gameSession.levelMax = 1;
-
-        window.gameSession.info = 0;
 
         window.gameSession.xp = 0;
 
         window.gameSession.hp = 3;
         window.gameSession.hpMax = 3;
+
+        // progress data
+        window.gameSession.level = 1;
+        window.gameSession.levelMin = 1;
+        window.gameSession.levelMax = 1;
+        window.gameSession.treasures = 0;
+        window.gameSession.treasureHunter = false;
+        window.gameSession.traps = 0;
+        window.gameSession.trapFinder = false;
 
         // inventory
         window.gameSession.inventory = {};
@@ -113,6 +124,9 @@ cc.Class({
 
         window.gameSession.upgrades.levelMin = 1000;
         window.gameSession.upgrades.info = 1000;
+
+        //save version
+        window.gameSession.saveVersion = saveVersion;
     },
 
     loadGame: function(){
@@ -133,6 +147,10 @@ cc.Class({
     },
 
     upgradeV2: function(){
+        window.gameSession.treasures = 0;
+        window.gameSession.traps = 0;
+        window.gameSession.treasureHunter = false;
+        window.gameSession.trapFinder = false;
         //
     }
 

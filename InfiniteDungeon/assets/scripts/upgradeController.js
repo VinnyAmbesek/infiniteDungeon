@@ -54,16 +54,8 @@ var upgradeController = cc.Class({
 
 	onEnable (){
 		this.checkSecretPassage();
-		
-	},
-
-	checkSecretPassage: function(){
-		if (window.gameSession.levelMin+5 < window.gameSession.levelMax && this.secretPassage) {
-			// show secret passage upgrade
-			this.secretPassage.active = true;
-		} else if (this.secretPassage) {
-			this.secretPassage.active = false;
-		}
+		this.checkTrapFinder();
+		this.checkTreasureHunter();
 	},
 
 	setButtons: function(){
@@ -90,8 +82,113 @@ var upgradeController = cc.Class({
 
 		this.createSecretPassageButton();
 		this.checkSecretPassage();
+
+		this.createTrapFinderButton();
+		this.checkTrapFinder();
+
+		this.createTreasureHunterButton();
+		this.checkTreasureHunter();
 		
-		//createButton("Information", "info");
+	},
+
+	createTreasureHunterButton(){
+		let button = cc.instantiate(this.button);
+		button.parent = this.grid;
+		this.treasureHunter = button;
+
+		// fill data
+		button.getChildByName("Name").getComponent(cc.Label).string = "Treasure Hunter";
+		button.getChildByName("Value").getComponent(cc.Label).string = 0;
+		button.getChildByName("Price").getComponent(cc.Label).string = 10000;
+
+		//add click event
+
+		let eventHandler = new cc.Component.EventHandler();
+        eventHandler.target = this.node;
+        eventHandler.component = "upgradeController";
+        eventHandler.handler = "upgradeTreasureHunter";
+		button.getComponent(cc.Button).clickEvents.push(eventHandler);
+	},
+
+	checkTreasureHunter: function(){
+		if (window.gameSession.treasures > 99 && !(window.gameSession.treasureHunter) && this.treasureHunter) {
+			// show trap finder upgrade
+			this.treasureHunter.active = true;
+		} else if (this.treasureHunter) {
+			this.treasureHunter.active = false;
+		}
+	},
+
+	upgradeTreasureHunter(event){
+		let button = event.target;
+
+		if (window.gameSession.xp >= 10000) {
+			// take xp
+			window.gameSession.xp -= 10000;
+			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+
+			// do upgrade
+			window.gameSession.treasureHunter = true;
+			
+			button.getChildByName("Value").getComponent(cc.Label).string = 1;
+			
+			// increase next xp cost
+			button.getChildByName("Price").getComponent(cc.Label).string = 10000;
+
+			this.saveGame();
+		}
+
+		this.checkTreasureHunter();
+	},
+
+	createTrapFinderButton(){
+		let button = cc.instantiate(this.button);
+		button.parent = this.grid;
+		this.trapFinder = button;
+
+		// fill data
+		button.getChildByName("Name").getComponent(cc.Label).string = "Trap Finder";
+		button.getChildByName("Value").getComponent(cc.Label).string = 0;
+		button.getChildByName("Price").getComponent(cc.Label).string = 10000;
+
+		//add click event
+
+		let eventHandler = new cc.Component.EventHandler();
+        eventHandler.target = this.node;
+        eventHandler.component = "upgradeController";
+        eventHandler.handler = "upgradeTrapFinder";
+		button.getComponent(cc.Button).clickEvents.push(eventHandler);
+	},
+
+	checkTrapFinder: function(){
+		if (window.gameSession.traps > 99 && !(window.gameSession.trapFinder) && this.trapFinder) {
+			// show trap finder upgrade
+			this.trapFinder.active = true;
+		} else if (this.trapFinder) {
+			this.trapFinder.active = false;
+		}
+	},
+
+	upgradeTrapFinder(event){
+		let button = event.target;
+
+		if (window.gameSession.xp >= 10000) {
+			// take xp
+			window.gameSession.xp -= 10000;
+			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+
+			// do upgrade
+			window.gameSession.trapFinder = true;
+			
+			button.getChildByName("Value").getComponent(cc.Label).string = 1;
+			
+			// increase next xp cost
+			button.getChildByName("Price").getComponent(cc.Label).string = 10000;
+
+			this.saveGame();
+		}
+
+		this.checkTrapFinder();
 	},
 
 	createSecretPassageButton(){
@@ -112,6 +209,15 @@ var upgradeController = cc.Class({
         eventHandler.component = "upgradeController";
         eventHandler.handler = "upgradeSecretPassage";
 		button.getComponent(cc.Button).clickEvents.push(eventHandler);
+	},
+
+	checkSecretPassage: function(){
+		if (window.gameSession.levelMin+5 < window.gameSession.levelMax && this.secretPassage) {
+			// show secret passage upgrade
+			this.secretPassage.active = true;
+		} else if (this.secretPassage) {
+			this.secretPassage.active = false;
+		}
 	},
 
 	upgradeSecretPassage(event){
