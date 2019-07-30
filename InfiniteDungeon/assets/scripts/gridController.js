@@ -116,6 +116,10 @@ var gridController = cc.Class({
 	},
 
 	cleanGrid: function (size){
+		this.clicks = 0;
+		this.dangers = 0;
+		this.treasures = 0;
+		
 		for(var i = 0; i < size; i++){
 			for(var j = 0; j < size; j++){
 				this.gridUI[i][j].destroy();
