@@ -36,15 +36,15 @@ cc.Class({
     // onLoad () {},
     start () {
         this.index = 0;
-        this.initSession();
         let saveVersion = {major: 0, minor: 2, fix: 0};
+        this.initSession(saveVersion);
     },
 
     verifyUpdate: function(saved){
         if (saved.major == 0 && saved.minor == 1) this.updateV2();
     },
 
-    initSession: function(){
+    initSession: function(saveVersion){
         this.loadGame();
         window.gameGlobals = {};
 

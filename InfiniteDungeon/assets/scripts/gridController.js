@@ -12,11 +12,14 @@ var gridController = cc.Class({
 		tilePrefab: cc.Prefab,
 		tile15Prefab: cc.Prefab,
 		tile20Prefab: cc.Prefab,
+		feedbackPrefab: cc.Prefab,
 
 		gridNode: cc.Node,
 		nextButton: cc.Node,
 		upgradePopup: cc.Node,
 		deathPopup: cc.Node,
+		canvas: cc.Node,
+		inventoryButton: cc.Node,
 
 		dungeonHP: cc.Label,
 		dungeonLevel: cc.Label,
@@ -119,7 +122,7 @@ var gridController = cc.Class({
 		window.gameSession.upgrades.iceMax, window.gameSession.upgrades.acidMin, window.gameSession.upgrades.acidMax, window.gameSession.upgrades.electricityMin,
 		window.gameSession.upgrades.electricityMax, window.gameSession.upgrades.spikesMin, window.gameSession.upgrades.spikesMax, window.gameSession.upgrades.poisonMin,
 		window.gameSession.upgrades.poisonMax, window.gameSession.upgrades.potionMin, window.gameSession.upgrades.potionMax, window.gameSession.upgrades.hpMax,
-		window.gameSession.upgrades.levelMin, window.gameSession.upgrades.info);
+		window.gameSession.upgrades.levelMin);
 
 		if (window.gameSession.xp > minXP) {
 			this.upgradePopup.active = true;
@@ -238,12 +241,12 @@ var gridController = cc.Class({
 		if (node.target != null) this.gridClick(node);
 	},
 
-	gridClick: function(node){
-		if (node.target.used) return;
+	gridClick: function(event){
+		if (event.target.used) return;
 		if (window.gameSession.hp < 1) return;
 		if (window.gameGlobals.popup) return;
 		// mark tiles walked to avoid tile replay
-		node.target.used = true;
+		event.target.used = true;
 		this.clickable--;
 
 		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
@@ -252,9 +255,9 @@ var gridController = cc.Class({
 		this.startRunning();
 
 		// show tile
-		let tile = node.target.tile;
+		let tile = event.target.tile;
 		tile.status = this.enumStatus["visible"];
-		let sprite = node.target.getComponent(cc.Sprite);
+		let sprite = event.target.getComponent(cc.Sprite);
 		sprite.spriteFrame = tile.sprite;
 
 		// open new clickzones
@@ -264,30 +267,32 @@ var gridController = cc.Class({
 		if (window.gameSession.hp < window.gameSession.hpMax && window.gameSession.inventory.potion > 0) {
 			window.gameSession.inventory.potion--;
 			window.gameSession.hp++;
-			this.showFeedback("Used potion", new cc.Color(0,255,0));
+			this.showFeedback("Used potion", new cc.Color(0,255,0), event.target);
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
+			this.showFeedback("+1HP", new cc.Color(0,255,0), this.dungeonHP.node);
 		}
 		
+		let xp = 0;
 		// extra xp for clean map
 		this.clicks++;
-		if (this.clicks == 99) window.gameSession.xp += window.gameSession.level*101;
+		if (this.clicks == 99) xp += window.gameSession.level*101;
 
 		// gain exploration xp
-		window.gameSession.xp += window.gameSession.level;
+		xp += window.gameSession.level;
 
 		// verify room content
 		if(tile.content == this.enumContent["treasure"]) {
 			this.running = false;
-			this.giveTreasure(Math.floor((Math.random() * 100) + 1));
+			this.giveTreasure(Math.floor((Math.random() * 100) + 1), event.target);
 		}
 		if(tile.content == this.enumContent["danger"]) {
 			this.running = false;
 			let index = Math.floor((Math.random() * 6) + 1);
-			this.fightDanger(index);
+			this.fightDanger(index, event.target);
 			this.findSubSprite(tile, index)
 			// victory xp
 			if (window.gameSession.hp > 0) {
-				window.gameSession.xp += window.gameSession.level*25
+				xp += window.gameSession.level*25
 			} else {
 				this.deathPopup.active = true;
 				window.gameGlobals.popup = true;
@@ -296,8 +301,8 @@ var gridController = cc.Class({
 		}
 		if(tile.content == this.enumContent["darkness"]){
 			this.running = false;
-			let x = node.target.tile.x;
-			let y = node.target.tile.y;
+			let x = event.target.tile.x;
+			let y = event.target.tile.y;
 
 			this.cleanGrid(this.size);
 
@@ -324,7 +329,10 @@ var gridController = cc.Class({
 
 		this.revealSubSprite(tile.x,tile.y);
 
+		// show xp gain
+		window.gameSession.xp += xp;
 		this.dungeonXP.string = "XP: " + window.gameSession.xp;
+		this.showFeedback("+" + xp + "XP", new cc.Color(0,255,0), this.dungeonXP.node);
 
 		if (tile.tile == this.enumTile["exit"]){
 			// found exit
@@ -342,11 +350,11 @@ var gridController = cc.Class({
 		if (tile.subsprite) content.getComponent(cc.Sprite).spriteFrame = tile.subsprite;
 	},
 
-	fightDanger: function(danger){
+	fightDanger: function(danger, node){
 		window.gameSession.traps++;
 		this.dangers--;
 		this.trapFinder.string = "Traps: " + this.dangers;
-		let damage = Math.floor(window.gameSession.level/10 + 1);
+		let strength = Math.floor(window.gameSession.level/10 + 1);
 		let feedback;
 		let effect;
 		let field;
@@ -397,46 +405,55 @@ var gridController = cc.Class({
 			default:
 				// code block
 		}
-		this.showFeedback(feedback, new cc.Color(255,0,0));
+		this.showFeedback(feedback, new cc.Color(255,0,0), node);
 		this.lastDanger = effect;
+
 		if (window.gameSession.inventory[field] > 0){
-			window.gameSession.inventory[field] -= damage;
-			if (window.gameSession.inventory[field] < 0 ) {
-				window.gameSession.hp += window.gameSession.inventory[field];
-				window.gameSession.inventory[field] = 0;
-			}
-		} else {
-			window.gameSession.hp -= damage;
+			let shield = window.gameSession.inventory[field];
+			let protection = Math.min(strength, shield);
+
+			// lose shields up to strength of danger
+			window.gameSession.inventory[field] -= protection;
+
+			// danger strength is reduced by spent shields
+			strength -= protection;
+
+			this.showFeedback("-" + protection + " " + item + " Shield", new cc.Color(255,0,0), this.dungeonLevel.node);
 		}
 
-		this.dungeonHP.string = "HP: " + window.gameSession.hp;
+		// receives strength in damage
+		if (strength>0) {
+			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node);
+			window.gameSession.hp -= strength;
+			this.dungeonHP.string = "HP: " + window.gameSession.hp;
+		}
 	},
 
-	giveTreasure: function(prize){
+	giveTreasure: function(prize, node){
 		this.treasures--;
 		this.treasureHunter.string = "Treasures: " + this.treasures;
 		window.gameSession.treasures++;
 		if (prize <= 10) {
 			window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potion+1, window.gameSession.inventory.potionMax);
-			this.showFeedback("Got Potion", new cc.Color(0,255,0));
+			this.showFeedback("Got Potion", new cc.Color(0,255,0), node);
 		} else if (prize <= 25 ) {
 			window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fire+1, window.gameSession.inventory.fireMax);
-			this.showFeedback("Got Fire Protection", new cc.Color(0,255,0));
+			this.showFeedback("Got Fire Shield", new cc.Color(0,255,0), node);
 		} else if (prize <= 40 ) {
 			window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.ice+1, window.gameSession.inventory.iceMax);
-			this.showFeedback("Got Ice Protection", new cc.Color(0,255,0));
+			this.showFeedback("Got Ice Shield", new cc.Color(0,255,0), node);
 		} else if (prize <= 55 ) {
 			window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acid+1, window.gameSession.inventory.acidMax);
-			this.showFeedback("Got Acid Protection", new cc.Color(0,255,0));
+			this.showFeedback("Got Acid Shield", new cc.Color(0,255,0), node);
 		} else if (prize <= 70 ) {
 			window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricity+1, window.gameSession.inventory.electricityMax);
-			this.showFeedback("Got Electricity Protection", new cc.Color(0,255,0));
+			this.showFeedback("Got Electricity Shield", new cc.Color(0,255,0), node);
 		} else if (prize <= 85 ) {
 			window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikes+1, window.gameSession.inventory.spikesMax);
-			this.showFeedback("Got Spikes Protection", new cc.Color(0,255,0));
+			this.showFeedback("Got Spikes Shield", new cc.Color(0,255,0), node);
 		} else if (prize <= 100 ) {
 			window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poison+1, window.gameSession.inventory.poisonMax);
-			this.showFeedback("Got Poison Protection", new cc.Color(0,255,0));
+			this.showFeedback("Got Poison Shield", new cc.Color(0,255,0), node);
 		}
 	},
 
@@ -800,18 +817,30 @@ var gridController = cc.Class({
 		this.exit = {x: x2, y: y2};
 	},
 
-	showFeedback: function(text, color){
-		this.feedback.string = text;
-		this.feedback.node.opacity = 255;
-		this.feedback.node.color = color;
+	showFeedback: function(text, color, parent){
+		//this.feedback.node.opacity = 255;
+
+		let feedback = cc.instantiate(this.feedbackPrefab);
+		feedback.parent = this.canvas;
+		feedback.color = color;
+		
+		let position = parent.parent.convertToWorldSpaceAR(parent.position);
+		position = this.canvas.convertToNodeSpaceAR(position);
+		feedback.x = position.x;
+		feedback.y = position.y;
+
+		feedback.getComponent(cc.Label).string = text;
+
+		// move up and change opacity
+		let action = cc.spawn(cc.moveBy(1, cc.v2(0,100)), cc.fadeOut(1));
+		feedback.runAction( cc.sequence(action, cc.callFunc(this.removeFeedback, this, feedback)));
+	},
+
+	removeFeedback: function(feedback){
+		feedback.destroy();
 	},
 
 	update (dt) {
-		if (this.feedback.node.opacity > 0) {
-			this.feedback.node.opacity -= dt*100
-			if (this.feedback.node.opacity < 0) this.feedback.node.opacity = 0;
-		}
-
 		if (this.running){
 			this.timeToRun -= dt;
 			if (this.timeToRun < 0) {
