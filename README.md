@@ -1,5 +1,5 @@
 # [Infinite Dungeon]
-Infinite Dungeon is a game where you explore an endless maze. The maze is alive, and changes when you explore it. 
+[Infinite Dungeon] is a game where you explore an endless maze. The maze is alive, and changes when you explore it. 
 
 # Rules:
 ## Experience
@@ -8,9 +8,9 @@ Infinite Dungeon is a game where you explore an endless maze. The maze is alive,
 - For each trap you survive you will get survival XP as if you explored a quarter of the floor.
 
 ## Treasures
-- There are 7 kinds of treasure. Protection itens and potions. 
+- There are 7 kinds of treasure. Protection items and potions. 
 - You will automatically use a potion when you have damage.
-- Protection itens will help you against traps. 
+- Protection items will help you against traps. 
 
 ## Traps
 - There are 6 kinds of traps. If you fall into a trap you take one point of damage. 
@@ -21,13 +21,13 @@ Infinite Dungeon is a game where you explore an endless maze. The maze is alive,
 ## Death
 - When you HP goes under 1 you die. 
 - When you die you can start a new dungeon. 
-- All itens are lost. 
+- All items are lost. 
 - XP and upgrades are not lost. 
 
 ## Upgrades
 - You can trade XP for upgrades. 
-- Starting upgrades: increase your initial itens when you start a new game. 
-- Pocket upgrades: increases the maximum amount of itens you can carry. 
+- Starting upgrades: increase your initial items when you start a new game. 
+- Pocket upgrades: increases the maximum number of items you can carry. 
 - HP upgrade: increases you maximum HP. 
 - Secret upgrades: only appear after a secret action is completed. 
 
