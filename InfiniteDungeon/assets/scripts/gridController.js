@@ -134,6 +134,8 @@ var gridController = cc.Class({
 	},
 
 	cleanGrid: function (size){
+		this.nextButton.active = false;
+		
 		this.clicks = 0;
 		this.dangers = 0;
 		this.treasures = 0;
@@ -579,7 +581,7 @@ var gridController = cc.Class({
 		// mark if has treasure or danger
 		let chance = Math.floor((Math.random() * 100) + 1);
 		let level = Math.min(25, window.gameSession.level);
-		if (chance <= 25+level) {
+		if (chance <= 25+level && tile.content == this.enumContent["empty"]) {
 			// 25% de chance de perigo +1% por level, max 50%
 			tile.content = this.enumContent["danger"];
 			this.dangers++;
@@ -668,7 +670,7 @@ var gridController = cc.Class({
 				tile.tile = this.enumTile["corridor"];
 				// chance to have trap or treasure
 				let chance = Math.floor((Math.random() * 100) + 1);
-				if (chance <=5) {
+				if (chance <=5 && tile.content == this.enumContent["empty"]) {
 					let chance = Math.floor((Math.random() * 100) + 1);
 					let level = Math.min(25, window.gameSession.level);
 					let mod = window.gameSession.level % 10;
