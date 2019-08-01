@@ -27,6 +27,8 @@ var upgradeController = cc.Class({
 		inventoryPotion: cc.Label,
 
 		popups: [cc.Node],
+
+		icons: [cc.SpriteFrame],
 		// foo: {
 		//	 // ATTRIBUTES:
 		//	 default: null,		// The default value will be used only when the component attaching
@@ -61,24 +63,24 @@ var upgradeController = cc.Class({
 	setButtons: function(){
 		if (! window.gameSession) return;
 
-		this.createButton("Fire Protection", "fireMin", "fire");
-		this.createButton("Ice Protection", "iceMin", "ice");
-		this.createButton("Acid Protection", "acidMin", "acid");
-		this.createButton("Electricity Protection", "electricityMin", "electricity");
-		this.createButton("Spikes Protection", "spikesMin", "spikes");
-		this.createButton("Poison Protection", "poisonMin", "poison");
+		this.createButton("Fire Protection", "fireMin", "fire", "Starting amount of Fire Shields", 0);
+		this.createButton("Ice Protection", "iceMin", "ice", "Starting amount of Ice Shields", 0);
+		this.createButton("Acid Protection", "acidMin", "acid", "Starting amount of Acid Shields", 0);
+		this.createButton("Electricity Protection", "electricityMin", "electricity", "Starting amount of Electricity Shields", 0);
+		this.createButton("Spikes Protection", "spikesMin", "spikes", "Starting amount of Spikes Shields", 0);
+		this.createButton("Poison Protection", "poisonMin", "poison", "Starting amount of Poison Shields", 0);
 
-		this.createButton("Fire Pocket", "fireMax", null);
-		this.createButton("Ice Pocket", "iceMax", null);
-		this.createButton("Acid Pocket", "acidMax", null);
-		this.createButton("Electricity Pocket", "electricityMax", null);
-		this.createButton("Spikes Pocket", "spikesMax", null);
-		this.createButton("Poison Pocket", "poisonMax", null);
+		this.createButton("Fire Pocket", "fireMax", null, "Maximum amount of Fire Shields", 1);
+		this.createButton("Ice Pocket", "iceMax", null, "Maximum amount of Ice Shields", 1);
+		this.createButton("Acid Pocket", "acidMax", null, "Maximum amount of Acid Shields", 1);
+		this.createButton("Electricity Pocket", "electricityMax", null, "Maximum amount of Electricity Shields", 1);
+		this.createButton("Spikes Pocket", "spikesMax", null, "Maximum amount of Spikes Shields", 1);
+		this.createButton("Poison Pocket", "poisonMax", null, "Maximum amount of Poison Shields", 1);
 
-		this.createButton("Starting Potion", "potionMin", "potion");
-		this.createButton("Potion Pocket", "potionMax", null);
+		this.createButton("Starting Potion", "potionMin", "potion", "Starting amount of Potions", 3);
+		this.createButton("Potion Pocket", "potionMax", null, "Maximum amount of Potions", 1);
 
-		this.createButton("Max HP", "hpMax", null);
+		this.createButton("Health Points", "hpMax", null, "Increases maximum HP", 2);
 
 		this.createSecretPassageButton();
 		this.checkSecretPassage();
@@ -98,8 +100,10 @@ var upgradeController = cc.Class({
 
 		// fill data
 		button.getChildByName("Name").getComponent(cc.Label).string = "Treasure Hunter";
+		button.getChildByName("Description").getComponent(cc.Label).string = "Find how many chests exist in a floor.";
 		button.getChildByName("Value").getComponent(cc.Label).string = 0;
-		button.getChildByName("Price").getComponent(cc.Label).string = 10000;
+		button.getChildByName("Price").getComponent(cc.Label).string = "10000XP";
+		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[4];
 
 		//add click event
 
@@ -133,7 +137,7 @@ var upgradeController = cc.Class({
 			button.getChildByName("Value").getComponent(cc.Label).string = 1;
 			
 			// increase next xp cost
-			button.getChildByName("Price").getComponent(cc.Label).string = 10000;
+			button.getChildByName("Price").getComponent(cc.Label).string = "10000XP";
 
 			this.saveGame();
 		}
@@ -148,8 +152,10 @@ var upgradeController = cc.Class({
 
 		// fill data
 		button.getChildByName("Name").getComponent(cc.Label).string = "Trap Finder";
+		button.getChildByName("Description").getComponent(cc.Label).string = "Find how many traps exist in a floor.";
 		button.getChildByName("Value").getComponent(cc.Label).string = 0;
-		button.getChildByName("Price").getComponent(cc.Label).string = 10000;
+		button.getChildByName("Price").getComponent(cc.Label).string = "10000XP";
+		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[4];
 
 		//add click event
 
@@ -183,7 +189,7 @@ var upgradeController = cc.Class({
 			button.getChildByName("Value").getComponent(cc.Label).string = 1;
 			
 			// increase next xp cost
-			button.getChildByName("Price").getComponent(cc.Label).string = 10000;
+			button.getChildByName("Price").getComponent(cc.Label).string = "10000XP";
 
 			this.saveGame();
 		}
@@ -198,10 +204,11 @@ var upgradeController = cc.Class({
 
 		// fill data
 		button.getChildByName("Name").getComponent(cc.Label).string = "Secret Passage";
+		button.getChildByName("Description").getComponent(cc.Label).string = "The floor you start back when you die.";
 		button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.levelMin;
 		if (! window.gameSession.upgrades.levelMin) window.gameSession.upgrades.levelMin = 1000;
-		button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelMin;
-
+		button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelMin + "XP";
+		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[4];
 		//add click event
 
 		let eventHandler = new cc.Component.EventHandler();
@@ -239,7 +246,7 @@ var upgradeController = cc.Class({
 			
 			// increase next xp cost
 			window.gameSession.upgrades.levelMin += 1000;
-			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelMin;
+			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelMin + "XP";
 
 			this.saveGame();
 		}
@@ -247,18 +254,20 @@ var upgradeController = cc.Class({
 		this.checkSecretPassage();
 	},
 
-	createButton(name, field, item){
+	createButton(name, field, item, desc, id){
 		let button = cc.instantiate(this.button);
 		button.parent = this.grid;
 
 		// fill data
 		button.getChildByName("Name").getComponent(cc.Label).string = name;
+		button.getChildByName("Description").getComponent(cc.Label).string = desc;
 		if (window.gameSession.inventory[field] != null) {
 			button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.inventory[field];
 		} else {
 			button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession[field];
 		}
-		button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades[field];
+		button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades[field] + "XP";
+		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[id];
 
 		button.field = field;
 		button.item = item;
@@ -291,7 +300,7 @@ var upgradeController = cc.Class({
 			}
 			// increase next xp cost
 			window.gameSession.upgrades[field] += 1000;
-			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades[field];
+			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades[field] + "XP";
 
 			this.saveGame();
 		}

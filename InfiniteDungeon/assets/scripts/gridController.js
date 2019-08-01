@@ -121,8 +121,7 @@ var gridController = cc.Class({
 		let minXP = Math.min(window.gameSession.upgrades.fireMin, window.gameSession.upgrades.fireMax, window.gameSession.upgrades.iceMin,
 		window.gameSession.upgrades.iceMax, window.gameSession.upgrades.acidMin, window.gameSession.upgrades.acidMax, window.gameSession.upgrades.electricityMin,
 		window.gameSession.upgrades.electricityMax, window.gameSession.upgrades.spikesMin, window.gameSession.upgrades.spikesMax, window.gameSession.upgrades.poisonMin,
-		window.gameSession.upgrades.poisonMax, window.gameSession.upgrades.potionMin, window.gameSession.upgrades.potionMax, window.gameSession.upgrades.hpMax,
-		window.gameSession.upgrades.levelMin);
+		window.gameSession.upgrades.poisonMax, window.gameSession.upgrades.potionMin, window.gameSession.upgrades.potionMax, window.gameSession.upgrades.hpMax);
 
 		if (window.gameSession.xp > minXP) {
 			this.upgradePopup.active = true;
@@ -819,6 +818,7 @@ var gridController = cc.Class({
 
 	showFeedback: function(text, color, parent){
 		//this.feedback.node.opacity = 255;
+		let duration = 2.0;
 
 		let feedback = cc.instantiate(this.feedbackPrefab);
 		feedback.parent = this.canvas;
@@ -832,7 +832,7 @@ var gridController = cc.Class({
 		feedback.getComponent(cc.Label).string = text;
 
 		// move up and change opacity
-		let action = cc.spawn(cc.moveBy(1, cc.v2(0,100)), cc.fadeOut(1));
+		let action = cc.spawn(cc.moveBy(duration, cc.v2(0,100)), cc.fadeOut(duration));
 		feedback.runAction( cc.sequence(action, cc.callFunc(this.removeFeedback, this, feedback)));
 	},
 
