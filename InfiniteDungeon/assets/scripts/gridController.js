@@ -26,7 +26,6 @@ var gridController = cc.Class({
 		dungeonXP: cc.Label,
 		trapFinder: cc.Label,
 		treasureHunter: cc.Label,
-		feedback: cc.Label,
 		deathMessage: cc.Label,
 
 		door_corner: cc.SpriteFrame,
@@ -78,7 +77,6 @@ var gridController = cc.Class({
 		this.dangers = 0;
 		this.treasures = 0;
 		this.clickable = 0;
-		this.feedback.node.opacity = 0;
 		this.running = false;
 		this.timeToRun = 0.5;
 		this.size = 10;
@@ -817,7 +815,6 @@ var gridController = cc.Class({
 	},
 
 	showFeedback: function(text, color, parent){
-		//this.feedback.node.opacity = 255;
 		let duration = 2.0;
 
 		let feedback = cc.instantiate(this.feedbackPrefab);
