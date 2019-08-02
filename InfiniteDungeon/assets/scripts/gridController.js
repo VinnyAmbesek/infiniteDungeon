@@ -92,6 +92,7 @@ var gridController = cc.Class({
 			this.size = 20;
 			this.tilePrefab = this.tile20Prefab;
 		}
+		this.gridSize = this.size * this.size - 1;
 
 		this.initGrid(this.size);
 
@@ -278,7 +279,7 @@ var gridController = cc.Class({
 		let xp = 0;
 		// extra xp for clean map
 		this.clicks++;
-		if (this.clicks == 99) xp += window.gameSession.level*101;
+		if (this.clicks == this.gridSize) xp += window.gameSession.level*101;
 
 		// gain exploration xp
 		xp += window.gameSession.level;
