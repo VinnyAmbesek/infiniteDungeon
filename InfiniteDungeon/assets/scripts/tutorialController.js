@@ -188,7 +188,7 @@ cc.Class({
 
     updateV3: function(){
         window.gameSession.tracker = false;
-        
+
         window.gameSession.inventory.melee = 1;
         window.gameSession.inventory.ranged = 1;
         window.gameSession.inventory.magic = 1;
@@ -238,7 +238,7 @@ cc.Class({
         window.gameSession.stats.xp = 0;
         window.gameSession.stats.tiles = 0;
         
-        //window.gameSession.saveVersion = {major: 0, minor: 3, fix: 0};
+        window.gameSession.saveVersion = {major: 0, minor: 3, fix: 0};
     }
 
     // update (dt) {},

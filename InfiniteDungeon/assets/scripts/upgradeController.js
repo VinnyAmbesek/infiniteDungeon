@@ -139,6 +139,7 @@ var upgradeController = cc.Class({
 		if (window.gameSession.xp >= 5000) {
 			// take xp
 			window.gameSession.xp -= 5000;
+			window.gameSession.stats.xp += 5000;
 			this.dungeonXP.string = "XP: " + window.gameSession.xp;
 
 			// do upgrade
@@ -207,6 +208,7 @@ var upgradeController = cc.Class({
 		if (window.gameSession.xp >= window.gameSession.upgrades.levelMin) {
 			// take xp
 			window.gameSession.xp -= window.gameSession.upgrades.levelMin;
+			window.gameSession.stats.xp += window.gameSession.upgrades.levelMin;
 			this.dungeonXP.string = "XP: " + window.gameSession.xp;
 
 			// do upgrade
@@ -262,6 +264,7 @@ var upgradeController = cc.Class({
 		if (window.gameSession.xp >= window.gameSession.upgrades[field]) {
 			// take xp
 			window.gameSession.xp -= window.gameSession.upgrades[field];
+			window.gameSession.stats.xp += window.gameSession.upgrades[field];
 			this.dungeonXP.string = "XP: " + window.gameSession.xp;
 			// do upgrade
 			if (window.gameSession.inventory[field] != null) {

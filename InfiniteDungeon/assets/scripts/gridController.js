@@ -247,12 +247,21 @@ var gridController = cc.Class({
 	},
 
 	gridClick: function(event){
-		if (event.target.used) return;
 		if (window.gameSession.hp < 1) return;
 		if (window.gameGlobals.popup) return;
+
+		// click on exit tile a second time to go to next floor
+		if (event.target.tile.tile == this.enumTile["exit"] && event.target.used){
+			this.nextLevel();
+			return;
+		} else if (event.target.used) {
+			return;
+		}
+
 		// mark tiles walked to avoid tile replay
 		event.target.used = true;
 		this.clickable--;
+		window.gameSession.stats.tiles++;
 
 		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
 		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
@@ -272,6 +281,7 @@ var gridController = cc.Class({
 		// use a potion
 		if (window.gameSession.hp < window.gameSession.hpMax && window.gameSession.inventory.potion > 0) {
 			window.gameSession.inventory.potion--;
+			window.gameSession.stats.items.potion++;
 			window.gameSession.hp++;
 			this.showFeedback("Used potion", new cc.Color(0,255,0), event.target);
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
@@ -341,7 +351,6 @@ var gridController = cc.Class({
 			// victory xp
 			if (window.gameSession.hp > 0) {
 				xp += window.gameSession.level*25;
-				window.gameSession.stats.kills++;
 			} else {
 				this.deathPopup.active = true;
 				window.gameGlobals.popup = true;
@@ -377,7 +386,6 @@ var gridController = cc.Class({
 				// victory xp
 				if (window.gameSession.hp > 0) {
 					xp += window.gameSession.level*25;
-					window.gameSession.stats.kills++;
 				} else {
 					this.deathPopup.active = true;
 					window.gameGlobals.popup = true;
@@ -439,7 +447,14 @@ var gridController = cc.Class({
 		if (strength>0) {
 			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node);
 			window.gameSession.hp -= strength;
+			window.gameSession.stats.damage[field] += strength;
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
+		}
+
+		if (window.gameSession.hp > 0) {
+			window.gameSession.stats.kills[field]++;
+		} else {
+			window.gameSession.stats.death[field]++;
 		}
 	},
 
@@ -506,6 +521,7 @@ var gridController = cc.Class({
 
 			// lose shields up to strength of danger
 			window.gameSession.inventory[field] -= protection;
+			window.gameSession.stats.items[field] += protection; 
 
 			// danger strength is reduced by spent shields
 			strength -= protection;
@@ -517,7 +533,11 @@ var gridController = cc.Class({
 		if (strength>0) {
 			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node);
 			window.gameSession.hp -= strength;
+			window.gameSession.stats.damage[field] += strength;
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
+		}
+		if (window.gameSession.hp < 0) {
+			window.gameSession.stats.death[field]++;
 		}
 	},
 
