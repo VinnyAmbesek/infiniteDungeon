@@ -673,7 +673,7 @@ var gridController = cc.Class({
 		// mark if has treasure or danger
 		let chance = Math.floor((Math.random() * 100) + 1);
 		let level = Math.min(25, window.gameSession.level);
-		if (chance <= 25+level && tile.content == this.enumContent["empty"] && tile.tile != this.enumTile["entrance"] && tile.tile != this.enumTile["exit") {
+		if (chance <= 25+level && tile.content == this.enumContent["empty"] && tile.tile != this.enumTile["entrance"] && tile.tile != this.enumTile["exit"]) {
 			// 25% de chance de perigo +1% por level, max 50%
 			tile.content = this.enumContent["danger"];
 			this.dangers++;

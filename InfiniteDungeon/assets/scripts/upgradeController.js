@@ -119,7 +119,7 @@ var upgradeController = cc.Class({
 	},
 
 	checkTreasureHunter: function(){
-		if (window.gameSession.treasures > 99 && !(window.gameSession.treasureHunter) && this.treasureHunter) {
+		if (window.gameSession.treasures > 49 && !(window.gameSession.treasureHunter) && this.treasureHunter) {
 			// show trap finder upgrade
 			this.treasureHunter.active = true;
 		} else if (this.treasureHunter) {
@@ -171,7 +171,7 @@ var upgradeController = cc.Class({
 	},
 
 	checkTrapFinder: function(){
-		if (window.gameSession.traps > 99 && !(window.gameSession.trapFinder) && this.trapFinder) {
+		if (window.gameSession.traps > 49 && !(window.gameSession.trapFinder) && this.trapFinder) {
 			// show trap finder upgrade
 			this.trapFinder.active = true;
 		} else if (this.trapFinder) {
