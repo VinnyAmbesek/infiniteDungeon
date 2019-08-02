@@ -112,6 +112,7 @@ var gridController = cc.Class({
 		// show upgrades
 		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
 		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
+		if(window.gameSession.tracker) this.tracker.node.active = true;
 
 	},
 
@@ -255,6 +256,7 @@ var gridController = cc.Class({
 
 		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
 		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
+		if(window.gameSession.tracker) this.tracker.node.active = true;
 
 		this.startRunning();
 

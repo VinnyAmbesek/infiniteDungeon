@@ -56,8 +56,10 @@ var upgradeController = cc.Class({
 
 	onEnable (){
 		this.checkSecretPassage();
-		this.checkTrapFinder();
-		this.checkTreasureHunter();
+		this.checkSpecialButton(window.gameSession.traps, window.gameSession.trapFinder, this.trapFinder);
+		this.checkSpecialButton(window.gameSession.treasures, window.gameSession.treasureHunter, this.treasureHunter);
+		let kills = window.gameSession.stats.kills.melee + window.gameSession.stats.kills.ranged + window.gameSession.stats.kills.magic;
+		this.checkSpecialButton(kills, window.gameSession.tracker, this.tracker);
 	},
 
 	setButtons: function(){
@@ -89,24 +91,28 @@ var upgradeController = cc.Class({
 		this.createSecretPassageButton();
 		this.checkSecretPassage();
 
-		this.createTrapFinderButton();
-		this.checkTrapFinder();
+		this.createSpecialButton("trapFinder","Trap Finder","Find how many traps exist in a floor.","upgradeTrapFinder");
+		this.checkSpecialButton(window.gameSession.traps, window.gameSession.trapFinder, this.trapFinder);
 
-		this.createTreasureHunterButton();
-		this.checkTreasureHunter();
+		this.createSpecialButton("treasureHunter","Treasure Hunter","Find how many chests exist in a floor.","upgradeTreasureHunter");		
+		this.checkSpecialButton(window.gameSession.treasures, window.gameSession.treasureHunter, this.treasureHunter);
+
+		this.createSpecialButton("tracker","Tracker","Find how many enemies are in a floor.","upgradeTracker");
+		let kills = window.gameSession.stats.kills.melee + window.gameSession.stats.kills.ranged + window.gameSession.stats.kills.magic;
+		this.checkSpecialButton(kills, window.gameSession.tracker, this.tracker);
 		
 	},
 
-	createTreasureHunterButton(){
+	createSpecialButton: function(me, name, desc, callback){
 		let button = cc.instantiate(this.button);
 		button.parent = this.grid;
-		this.treasureHunter = button;
+		this[me] = button;
 
 		// fill data
-		button.getChildByName("Name").getComponent(cc.Label).string = "Treasure Hunter";
-		button.getChildByName("Description").getComponent(cc.Label).string = "Find how many chests exist in a floor.";
+		button.getChildByName("Name").getComponent(cc.Label).string = name;
+		button.getChildByName("Description").getComponent(cc.Label).string = desc;
 		button.getChildByName("Value").getComponent(cc.Label).string = 0;
-		button.getChildByName("Price").getComponent(cc.Label).string = "10000XP";
+		button.getChildByName("Price").getComponent(cc.Label).string = "5000XP";
 		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[4];
 
 		//add click event
@@ -114,91 +120,55 @@ var upgradeController = cc.Class({
 		let eventHandler = new cc.Component.EventHandler();
         eventHandler.target = this.node;
         eventHandler.component = "upgradeController";
-        eventHandler.handler = "upgradeTreasureHunter";
+        eventHandler.handler = callback;
 		button.getComponent(cc.Button).clickEvents.push(eventHandler);
 	},
 
-	checkTreasureHunter: function(){
-		if (window.gameSession.treasures > 49 && !(window.gameSession.treasureHunter) && this.treasureHunter) {
+	checkSpecialButton: function(req, upgrade, me){
+		if (req > 49 && !(upgrade) && me) {
 			// show trap finder upgrade
-			this.treasureHunter.active = true;
-		} else if (this.treasureHunter) {
-			this.treasureHunter.active = false;
+			me.active = true;
+		} else if (me) {
+			me.active = false;
 		}
 	},
 
-	upgradeTreasureHunter(event){
+	upgradeSpecial: function(event, upgrade){
 		let button = event.target;
 
-		if (window.gameSession.xp >= 10000) {
+		if (window.gameSession.xp >= 5000) {
 			// take xp
-			window.gameSession.xp -= 10000;
+			window.gameSession.xp -= 5000;
 			this.dungeonXP.string = "XP: " + window.gameSession.xp;
 
 			// do upgrade
-			window.gameSession.treasureHunter = true;
+			upgrade = true;
 			
 			button.getChildByName("Value").getComponent(cc.Label).string = 1;
 			
 			// increase next xp cost
-			button.getChildByName("Price").getComponent(cc.Label).string = "10000XP";
+			button.getChildByName("Price").getComponent(cc.Label).string = "5000XP";
 
 			this.saveGame();
 		}
 
-		this.checkTreasureHunter();
-	},
-
-	createTrapFinderButton(){
-		let button = cc.instantiate(this.button);
-		button.parent = this.grid;
-		this.trapFinder = button;
-
-		// fill data
-		button.getChildByName("Name").getComponent(cc.Label).string = "Trap Finder";
-		button.getChildByName("Description").getComponent(cc.Label).string = "Find how many traps exist in a floor.";
-		button.getChildByName("Value").getComponent(cc.Label).string = 0;
-		button.getChildByName("Price").getComponent(cc.Label).string = "10000XP";
-		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[4];
-
-		//add click event
-
-		let eventHandler = new cc.Component.EventHandler();
-        eventHandler.target = this.node;
-        eventHandler.component = "upgradeController";
-        eventHandler.handler = "upgradeTrapFinder";
-		button.getComponent(cc.Button).clickEvents.push(eventHandler);
-	},
-
-	checkTrapFinder: function(){
-		if (window.gameSession.traps > 49 && !(window.gameSession.trapFinder) && this.trapFinder) {
-			// show trap finder upgrade
-			this.trapFinder.active = true;
-		} else if (this.trapFinder) {
-			this.trapFinder.active = false;
-		}
+		this.checkSpecialButton(req, upgrade, me);
 	},
 
 	upgradeTrapFinder(event){
-		let button = event.target;
+		this.upgradeSpecial(event, window.gameSession.trapFinder);
+		this.checkSpecialButton(window.gameSession.traps, window.gameSession.trapFinder, this.trapFinder);
+	},
 
-		if (window.gameSession.xp >= 10000) {
-			// take xp
-			window.gameSession.xp -= 10000;
-			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+	upgradeTreasureHunter(event){
+		this.upgradeSpecial(event, window.gameSession.treasureHunter);
+		this.checkSpecialButton(window.gameSession.treasures, window.gameSession.treasureHunter, this.treasureHunter);
+	},
 
-			// do upgrade
-			window.gameSession.trapFinder = true;
-			
-			button.getChildByName("Value").getComponent(cc.Label).string = 1;
-			
-			// increase next xp cost
-			button.getChildByName("Price").getComponent(cc.Label).string = "10000XP";
-
-			this.saveGame();
-		}
-
-		this.checkTrapFinder();
+	upgradeTracker(event){
+		this.upgradeSpecial(event, window.gameSession.tracker);
+		let kills = window.gameSession.stats.kills.melee + window.gameSession.stats.kills.ranged + window.gameSession.stats.kills.magic;
+		this.checkSpecialButton(kills, window.gameSession.tracker ,this.tracker);
 	},
 
 	createSecretPassageButton(){

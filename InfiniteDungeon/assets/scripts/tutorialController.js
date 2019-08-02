@@ -49,6 +49,7 @@ cc.Class({
         window.gameSession.treasureHunter = false;
         window.gameSession.traps = 0;
         window.gameSession.trapFinder = false;
+        window.gameSession.tracker = false;
 
         // inventory
         window.gameSession.inventory = {};
@@ -186,6 +187,8 @@ cc.Class({
     },
 
     updateV3: function(){
+        window.gameSession.tracker = false;
+        
         window.gameSession.inventory.melee = 1;
         window.gameSession.inventory.ranged = 1;
         window.gameSession.inventory.magic = 1;
