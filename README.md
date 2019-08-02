@@ -1,5 +1,5 @@
 # [Infinite Dungeon]
-[Infinite Dungeon] is a game where you explore an endless maze. The maze is alive, and changes when you explore it. 
+[Infinite Dungeon] is a game where you explore an endless maze. The maze is alive, and changes while you explore it. 
 
 # Rules:
 ## Experience
@@ -18,6 +18,14 @@
 - For each protection item you have against the trap you decrease the damage in 1. 
 - The chance of traps increases the further you go. 
 
+## Combat
+- There are 3 kinds of weapons: sword (melee), bow (ranged) and wand (magic). 
+- Each weapon is effective against a kind of enemy.
+- If your weapon skill is equal or greater than the enemy level, you beat it without receiving damage. 
+- If your weapon skill is less than the enemy level you receive damage based on the difference. 
+- Each 5 levels you fight a sub boss, a little stronger than the enemies of that level. 
+- Each 10 levels you fight a boss, a lot stronger than the enemies of that level. 
+
 ## Death
 - When you HP goes under 1 you die. 
 - When you die you can start a new dungeon. 
@@ -30,9 +38,10 @@
 - Pocket upgrades: increases the maximum number of items you can carry. 
 - HP upgrade: increases you maximum HP. 
 - Secret upgrades: only appear after a secret action is completed. 
+- Weapon upgrades: increase your skill with the weapon.
 
 ## Dungeon Moves
-- Each floor multiple of 10 has a chance of reorganizing the floor while you are at it. 
+- Each floor multiple of 5 has a chance of reorganizing the floor while you are at it. 
 - If that happens, all tiles go black, and the exit and entrance change position. 
 
   [Infinite Dungeon]: <https://vinnyambesek.github.io/infiniteDungeon/>

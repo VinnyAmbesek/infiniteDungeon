@@ -26,6 +26,7 @@ var gridController = cc.Class({
 		dungeonXP: cc.Label,
 		trapFinder: cc.Label,
 		treasureHunter: cc.Label,
+		tracker: cc.Label,
 		deathMessage: cc.Label,
 
 		door_corner: cc.SpriteFrame,
@@ -39,6 +40,7 @@ var gridController = cc.Class({
 		open: cc.SpriteFrame,
 
 		danger: [cc.SpriteFrame],
+		monster: [cc.SpriteFrame],
 		chest: cc.SpriteFrame,
 		stair_down: cc.SpriteFrame,
 		stair_up: cc.SpriteFrame,
@@ -64,7 +66,7 @@ var gridController = cc.Class({
 		this.enumSides = {undefined: 0, block: 1, wall: 2, open: 3};
 		this.enumTile = {undefined: 0, entrance: 1, exit: 2, deadend: 3,corridor: 4};
 		this.enumStatus = {hidden: 0, flashing: 1, visible: 2};
-		this.enumContent = {empty: 0, treasure: 1, danger: 2, darkness: 3};
+		this.enumContent = {empty: 0, treasure: 1, danger: 2, darkness: 3, monster: 4};
 		this.enumSprite = {entrance: 0, exit: 1, deadend: 2, curve: 3, line: 4, threeway: 5, fourway: 6};
 
 		this.initUI();
@@ -76,6 +78,7 @@ var gridController = cc.Class({
 		this.clicks = 0;
 		this.dangers = 0;
 		this.treasures = 0;
+		this.monsters = 0;
 		this.clickable = 0;
 		this.running = false;
 		this.timeToRun = 0.5;
@@ -135,10 +138,11 @@ var gridController = cc.Class({
 
 	cleanGrid: function (size){
 		this.nextButton.active = false;
-		
+
 		this.clicks = 0;
 		this.dangers = 0;
 		this.treasures = 0;
+		this.monsters = 0;
 
 		for(var i = 0; i < size; i++){
 			for(var j = 0; j < size; j++){
@@ -288,10 +292,11 @@ var gridController = cc.Class({
 			this.running = false;
 			let index = Math.floor((Math.random() * 6) + 1);
 			this.fightDanger(index, event.target);
-			this.findSubSprite(tile, index)
+			this.findSubSprite(tile, index);
 			// victory xp
 			if (window.gameSession.hp > 0) {
 				xp += window.gameSession.level*25
+				window.gameSession.traps++;
 			} else {
 				this.deathPopup.active = true;
 				window.gameGlobals.popup = true;
@@ -325,6 +330,21 @@ var gridController = cc.Class({
 
 			this.showClickZones(x, y);
 		}
+		if(tile.content == this.enumContent["monster"]) {
+			this.running = false;
+			let index = Math.floor((Math.random() * 3) + 1);
+			this.fightMonster(index, event.target, 0);
+			this.findSubSprite(tile, index)
+			// victory xp
+			if (window.gameSession.hp > 0) {
+				xp += window.gameSession.level*25;
+				window.gameSession.stats.kills++;
+			} else {
+				this.deathPopup.active = true;
+				window.gameGlobals.popup = true;
+				this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
+			}
+		}
 
 		this.revealSubSprite(tile.x,tile.y);
 
@@ -338,6 +358,29 @@ var gridController = cc.Class({
 			// show next level button
 			this.running = false;
 			this.nextButton.active = true;
+
+			let boss = 0;
+			if (window.gameSession.level%10 == 0) {
+				boss = 2;
+			} else if (window.gameSession.level%5 == 0) {
+				boss = 1;
+			}
+
+			if (boss > 0){
+				this.monsters++;
+				let index = Math.floor((Math.random() * 3) + 1);
+				this.fightMonster(index, event.target, boss);
+				this.findSubSprite(tile, index);
+				// victory xp
+				if (window.gameSession.hp > 0) {
+					xp += window.gameSession.level*25;
+					window.gameSession.stats.kills++;
+				} else {
+					this.deathPopup.active = true;
+					window.gameGlobals.popup = true;
+					this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
+				}
+			}
 		}
 	},
 
@@ -349,8 +392,55 @@ var gridController = cc.Class({
 		if (tile.subsprite) content.getComponent(cc.Sprite).spriteFrame = tile.subsprite;
 	},
 
+	fightMonster: function(monster, node, boss){
+		this.monsters--;
+		this.tracker.string = "Enemies: " + this.monsters;
+		let strength = Math.floor(window.gameSession.level/5) + 1 + boss;
+		let feedback;
+		let effect;
+		let field;
+		switch(monster) {
+			case 1:
+				// code block
+				feedback = "Fought Orc";
+				effect = "murdered";
+				field = "melee";
+				break;
+			case 2:
+				// code block
+				feedback = "Fought Cockatrice";
+				effect = "petrified";
+				field = "ranged"
+				break;
+			case 3:
+				// code block
+				feedback = "Fought Ghost";
+				effect = "drained of life";
+				field = "magic"
+				break;
+			default:
+				// code block
+		}
+		if (boss > 1) {
+			feedback = feedback + " Boss";
+		} else if (boss > 0) {
+			feedback = feedback + " Sub-boss";
+		}
+
+		this.showFeedback(feedback, new cc.Color(255,0,0), node);
+		this.lastDanger = effect;
+
+		strength -= Math.min(strength, window.gameSession.inventory[field]);
+
+		// receives strength in damage
+		if (strength>0) {
+			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node);
+			window.gameSession.hp -= strength;
+			this.dungeonHP.string = "HP: " + window.gameSession.hp;
+		}
+	},
+
 	fightDanger: function(danger, node){
-		window.gameSession.traps++;
 		this.dangers--;
 		this.trapFinder.string = "Traps: " + this.dangers;
 		let strength = Math.floor(window.gameSession.level/10 + 1);
@@ -494,6 +584,8 @@ var gridController = cc.Class({
 			tile.subsprite = this.chest;
 		} else if (tile.content == this.enumContent["danger"] && index > -1) {
 			tile.subsprite = this.danger[index-1];
+		} else if (tile.content == this.enumContent["monster"] && index > -1) {
+			tile.subsprite = this.monster[index-1];
 		}
 	},
 
@@ -581,12 +673,12 @@ var gridController = cc.Class({
 		// mark if has treasure or danger
 		let chance = Math.floor((Math.random() * 100) + 1);
 		let level = Math.min(25, window.gameSession.level);
-		if (chance <= 25+level && tile.content == this.enumContent["empty"]) {
+		if (chance <= 25+level && tile.content == this.enumContent["empty"] && tile.tile != this.enumTile["entrance"] && tile.tile != this.enumTile["exit") {
 			// 25% de chance de perigo +1% por level, max 50%
 			tile.content = this.enumContent["danger"];
 			this.dangers++;
 			this.trapFinder.string = "Traps: " + this.dangers;
-		} else{
+		} else if (tile.content == this.enumContent["empty"]){
 			tile.content = this.enumContent["treasure"];
 			this.treasures++;
 			this.treasureHunter.string = "Treasures: " + this.treasures;
@@ -673,7 +765,7 @@ var gridController = cc.Class({
 				if (chance <=5 && tile.content == this.enumContent["empty"]) {
 					let chance = Math.floor((Math.random() * 100) + 1);
 					let level = Math.min(25, window.gameSession.level);
-					let mod = window.gameSession.level % 10;
+					let mod = window.gameSession.level % 5;
 					if (mod == 0 && chance <= 1){
 						// 1% chance of dungeon moving from 10 to 10 levels
 						tile.content = this.enumContent["darkness"];
@@ -687,6 +779,10 @@ var gridController = cc.Class({
 						this.treasures++;
 						this.treasureHunter.string = "Treasures: " + this.treasures;
 					}
+				} else if (chance <=8 && tile.content == this.enumContent["empty"]) {
+					tile.content = this.enumContent["monster"];
+					this.monsters++;
+					this.tracker.string = "Enemies: " + this.monsters;
 				}
 			}
 			// make a path in random direction

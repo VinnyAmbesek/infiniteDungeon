@@ -82,6 +82,10 @@ var upgradeController = cc.Class({
 
 		this.createButton("Health Points", "hpMax", null, "Increases maximum HP", 2);
 
+		this.createButton("Sword Skill", "melee", null, "Increases skill with swords", 5);
+		this.createButton("Bow Skill", "ranged", null, "Increases skill with bows", 6);
+		this.createButton("Wand Skill", "magic", null, "Increases skill with wands", 7);
+
 		this.createSecretPassageButton();
 		this.checkSecretPassage();
 

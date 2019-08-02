@@ -1,34 +1,9 @@
-// Learn cc.Class:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/class.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/class.html
-// Learn Attribute:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/life-cycle-callbacks.html
-
 cc.Class({
     extends: cc.Component,
 
     properties: {
         sprite: cc.Sprite,
         tutorial: [cc.SpriteFrame]
-        // foo: {
-        //     // ATTRIBUTES:
-        //     default: null,        // The default value will be used only when the component attaching
-        //                           // to a node for the first time
-        //     type: cc.SpriteFrame, // optional, default is typeof default
-        //     serializable: true,   // optional, default is true
-        // },
-        // bar: {
-        //     get () {
-        //         return this._bar;
-        //     },
-        //     set (value) {
-        //         this._bar = value;
-        //     }
-        // },
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -42,6 +17,7 @@ cc.Class({
 
     verifyUpdate: function(saved){
         if (saved.major == 0 && saved.minor == 1) this.updateV2();
+        if (saved.major == 0 && saved.minor == 2) this.updateV3();
     },
 
     initSession: function(saveVersion){
@@ -105,6 +81,10 @@ cc.Class({
         window.gameSession.inventory.potionMin = 0;
         window.gameSession.inventory.potionMax = 3;
 
+        window.gameSession.inventory.melee = 1;
+        window.gameSession.inventory.ranged = 1;
+        window.gameSession.inventory.magic = 1;
+
         // upgrades
         window.gameSession.upgrades = {};
 
@@ -128,6 +108,52 @@ cc.Class({
 
         window.gameSession.upgrades.levelMin = 1000;
         window.gameSession.upgrades.info = 1000;
+
+        window.gameSession.upgrades.melee = 1000;
+        window.gameSession.upgrades.ranged = 1000;
+        window.gameSession.upgrades.magic = 1000;
+
+        //stats
+        window.gameSession.stats = {};
+        
+        window.gameSession.stats.death = {};
+        window.gameSession.stats.death.fire = 0;
+        window.gameSession.stats.death.ice = 0;
+        window.gameSession.stats.death.acid = 0;
+        window.gameSession.stats.death.electricity = 0;
+        window.gameSession.stats.death.spikes = 0;
+        window.gameSession.stats.death.poison = 0;
+        window.gameSession.stats.death.melee = 0;
+        window.gameSession.stats.death.ranged = 0;
+        window.gameSession.stats.death.magic = 0;
+
+        window.gameSession.stats.damage = {};
+        window.gameSession.stats.damage.fire = 0;
+        window.gameSession.stats.damage.ice = 0;
+        window.gameSession.stats.damage.acid = 0;
+        window.gameSession.stats.damage.electricity = 0;
+        window.gameSession.stats.damage.spikes = 0;
+        window.gameSession.stats.damage.poison = 0;
+        window.gameSession.stats.damage.melee = 0;
+        window.gameSession.stats.damage.ranged = 0;
+        window.gameSession.stats.damage.magic = 0;
+
+        window.gameSession.stats.items = {};
+        window.gameSession.stats.items.fire = 0;
+        window.gameSession.stats.items.ice = 0;
+        window.gameSession.stats.items.acid = 0;
+        window.gameSession.stats.items.electricity = 0;
+        window.gameSession.stats.items.spikes = 0;
+        window.gameSession.stats.items.poison = 0;
+        window.gameSession.stats.items.potion = 0;
+
+        window.gameSession.stats.kills = {};
+        window.gameSession.stats.kills.melee = 0;
+        window.gameSession.stats.kills.ranged = 0;
+        window.gameSession.stats.kills.magic = 0;
+
+        window.gameSession.stats.xp = 0;
+        window.gameSession.stats.tiles = 0;
 
         //save version
         window.gameSession.saveVersion = saveVersion;
@@ -157,7 +183,59 @@ cc.Class({
         window.gameSession.trapFinder = false;
         
         window.gameSession.saveVersion = {major: 0, minor: 2, fix: 0};
-        //
+    },
+
+    updateV3: function(){
+        window.gameSession.inventory.melee = 1;
+        window.gameSession.inventory.ranged = 1;
+        window.gameSession.inventory.magic = 1;
+
+        window.gameSession.upgrades.melee = 1000;
+        window.gameSession.upgrades.ranged = 1000;
+        window.gameSession.upgrades.magic = 1000;
+
+        window.gameSession.stats = {};
+        
+        window.gameSession.stats.death = {};
+        window.gameSession.stats.death.fire = 0;
+        window.gameSession.stats.death.ice = 0;
+        window.gameSession.stats.death.acid = 0;
+        window.gameSession.stats.death.electricity = 0;
+        window.gameSession.stats.death.spikes = 0;
+        window.gameSession.stats.death.poison = 0;
+        window.gameSession.stats.death.melee = 0;
+        window.gameSession.stats.death.ranged = 0;
+        window.gameSession.stats.death.magic = 0;
+
+        window.gameSession.stats.damage = {};
+        window.gameSession.stats.damage.fire = 0;
+        window.gameSession.stats.damage.ice = 0;
+        window.gameSession.stats.damage.acid = 0;
+        window.gameSession.stats.damage.electricity = 0;
+        window.gameSession.stats.damage.spikes = 0;
+        window.gameSession.stats.damage.poison = 0;
+        window.gameSession.stats.damage.melee = 0;
+        window.gameSession.stats.damage.ranged = 0;
+        window.gameSession.stats.damage.magic = 0;
+
+        window.gameSession.stats.items = {};
+        window.gameSession.stats.items.fire = 0;
+        window.gameSession.stats.items.ice = 0;
+        window.gameSession.stats.items.acid = 0;
+        window.gameSession.stats.items.electricity = 0;
+        window.gameSession.stats.items.spikes = 0;
+        window.gameSession.stats.items.poison = 0;
+        window.gameSession.stats.items.potion = 0;
+
+        window.gameSession.stats.kills = {};
+        window.gameSession.stats.kills.melee = 0;
+        window.gameSession.stats.kills.ranged = 0;
+        window.gameSession.stats.kills.magic = 0;
+
+        window.gameSession.stats.xp = 0;
+        window.gameSession.stats.tiles = 0;
+        
+        //window.gameSession.saveVersion = {major: 0, minor: 3, fix: 0};
     }
 
     // update (dt) {},
