@@ -78,7 +78,9 @@ var gridController = cc.Class({
 		this.treasures = 0;
 		this.monsters = 0;
 		this.clickable = 0;
+		this.dungeonMoves = 0;
 		this.running = false;
+		this.hitTrap = false;
 		this.timeToRun = 0.5;
 		let tileQTD = Math.min(Math.floor(window.gameSession.level/10), 10);
 		this.size = 10 + tileQTD;
@@ -110,7 +112,6 @@ var gridController = cc.Class({
 		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
 		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
 		if(window.gameSession.tracker) this.tracker.node.active = true;
-
 	},
 
 	saveGame(){
@@ -281,9 +282,9 @@ var gridController = cc.Class({
 			window.gameSession.stats.items.potion++;
 			window.gameSession.stats.items.total++;
 			window.gameSession.hp++;
-			this.showFeedback("Used potion", new cc.Color(0,255,0), event.target);
+			this.showFeedback("Used potion", new cc.Color(0,255,0), event.target, true);
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
-			this.showFeedback("+1HP", new cc.Color(0,255,0), this.dungeonHP.node);
+			this.showFeedback("+1HP", new cc.Color(0,255,0), this.dungeonHP.node, false);
 		}
 		
 		let xp = 0;
@@ -315,6 +316,9 @@ var gridController = cc.Class({
 			}
 		}
 		if(tile.content == this.enumContent["darkness"]){
+			this.showFeedback("Dungeon Moves!", new cc.Color(255,0,0), this.dungeonLevel, true);
+			this.dungeonMoves++;
+			if (this.dungeonMoves> 1) window.gameSession.stats.unique.darkness = true;
 			this.running = false;
 			let x = event.target.tile.x;
 			let y = event.target.tile.y;
@@ -361,7 +365,7 @@ var gridController = cc.Class({
 		// show xp gain
 		window.gameSession.xp += xp;
 		this.dungeonXP.string = "XP: " + window.gameSession.xp;
-		this.showFeedback("+" + xp + "XP", new cc.Color(0,255,0), this.dungeonXP.node);
+		this.showFeedback("+" + xp + "XP", new cc.Color(0,255,0), this.dungeonXP.node, false);
 
 		if (tile.tile == this.enumTile["exit"]){
 			// found exit
@@ -436,14 +440,15 @@ var gridController = cc.Class({
 			feedback = feedback + " Sub-boss";
 		}
 
-		this.showFeedback(feedback, new cc.Color(255,0,0), node);
+		this.showFeedback(feedback, new cc.Color(255,0,0), node, true);
 		this.lastDanger = effect;
 
+		if ((strength - window.gameSession.inventory[field]) < -9) window.gameSession.stats.unique.overkill = true;
 		strength -= Math.min(strength, window.gameSession.inventory[field]);
 
 		// receives strength in damage
 		if (strength>0) {
-			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node);
+			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node, false);
 			window.gameSession.hp -= strength;
 			window.gameSession.stats.damage[field] += strength;
 			window.gameSession.stats.damage.total += strength;
@@ -454,6 +459,8 @@ var gridController = cc.Class({
 			window.gameSession.stats.kills[field]++;
 			window.gameSession.stats.kills.total++;
 		} else {
+			if (window.gameSession.hp < -9) window.gameSession.stats.unique.truedeath = true;
+			if (window.gameSession.death) window.gameSession.stats.unique.already = true;
 			window.gameSession.stats.death[field]++;
 			window.gameSession.stats.death.total++;
 		}
@@ -461,12 +468,18 @@ var gridController = cc.Class({
 
 	fightDanger: function(danger, node){
 		this.dangers--;
+		this.hitTrap = true;
 		this.trapFinder.string = "Traps: " + this.dangers;
 		let strength = Math.floor(window.gameSession.level/10 + 1);
 		let feedback;
 		let effect;
 		let field;
 		let item;
+
+		if (window.gameSession.hp <2 && (window.gameSession.inventory.fire + window.gameSession.inventory.ice + window.gameSession.inventory.acid + window.gameSession.inventory.electricity + window.gameSession.inventory.spikes + window.gameSession.inventory.poison) <1){
+			window.gameSession.stats.unique.daredevil = true;
+		}
+
 		switch(danger) {
 			case 1:
 				// code block
@@ -513,7 +526,7 @@ var gridController = cc.Class({
 			default:
 				// code block
 		}
-		this.showFeedback(feedback, new cc.Color(255,0,0), node);
+		this.showFeedback(feedback, new cc.Color(255,0,0), node, true);
 		this.lastDanger = effect;
 		window.gameSession.stats.traps[field]++;
 
@@ -529,18 +542,20 @@ var gridController = cc.Class({
 			// danger strength is reduced by spent shields
 			strength -= protection;
 
-			this.showFeedback("-" + protection + " " + item + " Shield", new cc.Color(255,0,0), this.dungeonLevel.node);
+			this.showFeedback("-" + protection + " " + item + " Shield", new cc.Color(255,0,0), this.dungeonLevel.node, true);
 		}
 
 		// receives strength in damage
 		if (strength>0) {
-			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node);
+			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node, false);
 			window.gameSession.hp -= strength;
 			window.gameSession.stats.damage[field] += strength;
 			window.gameSession.stats.damage.total += strength;
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
 		}
 		if (window.gameSession.hp < 0) {
+			if (window.gameSession.hp < -9) window.gameSession.stats.unique.truedeath = true;
+			if (window.gameSession.death) window.gameSession.stats.unique.already = true;
 			window.gameSession.stats.death[field]++;
 			window.gameSession.stats.death.total++;
 		}
@@ -552,30 +567,32 @@ var gridController = cc.Class({
 		window.gameSession.stats.items.chests++;
 		if (prize <= 10) {
 			window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potion+1, window.gameSession.inventory.potionMax);
-			this.showFeedback("Got Potion", new cc.Color(0,255,0), node);
+			this.showFeedback("Got Potion", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 25 ) {
 			window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fire+1, window.gameSession.inventory.fireMax);
-			this.showFeedback("Got Fire Shield", new cc.Color(0,255,0), node);
+			this.showFeedback("Got Fire Shield", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 40 ) {
 			window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.ice+1, window.gameSession.inventory.iceMax);
-			this.showFeedback("Got Ice Shield", new cc.Color(0,255,0), node);
+			this.showFeedback("Got Ice Shield", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 55 ) {
 			window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acid+1, window.gameSession.inventory.acidMax);
-			this.showFeedback("Got Acid Shield", new cc.Color(0,255,0), node);
+			this.showFeedback("Got Acid Shield", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 70 ) {
 			window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricity+1, window.gameSession.inventory.electricityMax);
-			this.showFeedback("Got Electricity Shield", new cc.Color(0,255,0), node);
+			this.showFeedback("Got Electricity Shield", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 85 ) {
 			window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikes+1, window.gameSession.inventory.spikesMax);
-			this.showFeedback("Got Spikes Shield", new cc.Color(0,255,0), node);
+			this.showFeedback("Got Spikes Shield", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 100 ) {
 			window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poison+1, window.gameSession.inventory.poisonMax);
-			this.showFeedback("Got Poison Shield", new cc.Color(0,255,0), node);
+			this.showFeedback("Got Poison Shield", new cc.Color(0,255,0), node, true);
 		}
 	},
 
 	nextLevel: function(){
 		if (window.gameSession.hp < 1) return; 
+		window.gameSession.death = false;
+		if (!this.hitTrap) window.gameSession.stats.unique.lucky = true;
 		window.gameSession.level++;
 		if (window.gameSession.level > window.gameSession.stats.levelMax) window.gameSession.stats.levelMax = window.gameSession.level;
 		cc.director.loadScene("gameScene");
@@ -947,7 +964,7 @@ var gridController = cc.Class({
 		this.exit = {x: x2, y: y2};
 	},
 
-	showFeedback: function(text, color, parent){
+	showFeedback: function(text, color, parent, stay){
 		let duration = 2.0;
 
 		let feedback = cc.instantiate(this.feedbackPrefab);
@@ -962,8 +979,14 @@ var gridController = cc.Class({
 		feedback.getComponent(cc.Label).string = text;
 
 		// move up and change opacity
-		let action = cc.spawn(cc.moveBy(duration, cc.v2(0,100)), cc.fadeOut(duration));
-		feedback.runAction( cc.sequence(action, cc.callFunc(this.removeFeedback, this, feedback)));
+		let action;
+		if (stay){
+			action = cc.sequence(cc.moveBy(duration, cc.v2(0,100)), cc.fadeOut(duration), cc.callFunc(this.removeFeedback, this, feedback))
+		} else {
+			action = cc.sequence(cc.spawn(cc.moveBy(duration, cc.v2(0,100)), cc.fadeOut(duration)), cc.callFunc(this.removeFeedback, this, feedback))
+		}
+		
+		feedback.runAction( action );
 	},
 
 	removeFeedback: function(feedback){

@@ -12,6 +12,13 @@ var achievementController = cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onEnable () {
+        this.updateSpecialButton("truedeath");
+        this.updateSpecialButton("daredevil");
+        this.updateSpecialButton("already");
+        this.updateSpecialButton("overkill");
+        this.updateSpecialButton("darkness");
+        this.updateSpecialButton("lucky");
+
         this.updateButton(this["levelMax"], null, "levelMax", 100);
         this.updateButton(this["xp"], null, "xp", 0.01);
         this.updateButton(this["tiles"], null, "tiles", 0.1);
@@ -63,6 +70,13 @@ var achievementController = cc.Class({
     },
 
     start () {
+        this.createSpecialButton("True Death", "Get to -10HP", "truedeath", 1);
+        this.createSpecialButton("Daredevil", "Face a trap with 1HP and 0 shields", "daredevil", 1);
+        this.createSpecialButton("Already back?", "Die, then die again in the next floor", "already", 1);
+        this.createSpecialButton("Overkill", "Get an enemy to -10HP", "overkill", 1);
+        this.createSpecialButton("Stop Moving!", "Get 'Dungeon Moves' twice in a floor", "darkness", 1);
+        this.createSpecialButton("Lucky", "Cross a floor without hitting any trap", "lucky", 1);
+
         this.createButton("Explorer", "Deepest floor you went", null, "levelMax", 1, 100);
         this.createButton("High level", "Total XP spent", null, "xp", 1, 0.01);
         this.createButton("Runner", "Tiles walked", null, "tiles", 1, 0.1);
@@ -111,6 +125,95 @@ var achievementController = cc.Class({
         this.createButton("Shaky hand", "Total deaths in melee combat", "death", "melee", 1, 10);
         this.createButton("Bad Sight", "Total deaths in ranged combat", "death", "ranged", 1, 10);
         this.createButton("Curled Tongue", "Total deaths in magic combat", "death", "magic", 1, 10);
+    },
+
+    createSpecialButton(name, desc, field, id){
+        let sub = "unique";
+        let stat = 0;
+        if (window.gameSession.stats.unique[field]) stat = 1;
+        let buttonName = sub + field;
+
+        let value = 10000;
+        let progress = stat/1;
+        let completion = stat + " / 1";
+
+        let button = cc.instantiate(this.button);
+        button.parent = this.list;
+        button.progress = progress;
+        button.prize = value;
+        button.sub = sub;
+        button.field = field;
+        button.mult = 1;
+        button.id = id;
+
+        // fill data
+        button.getChildByName("Name").getComponent(cc.Label).string = name;
+        button.getChildByName("Description").getComponent(cc.Label).string = desc;
+        button.getChildByName("Value").getComponent(cc.Label).string = value + "XP";
+        button.getChildByName("Progress").getComponent(cc.ProgressBar).progress = progress;
+        button.getChildByName("Completion").getComponent(cc.Label).string = completion;
+        if (! window.gameSession.achievements.unique[field]) {
+            button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[0];
+        } else {
+            button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[id];
+        }
+        
+        //add click event
+        let eventHandler = new cc.Component.EventHandler();
+        eventHandler.target = this.node;
+        eventHandler.component = "achievementController";
+        eventHandler.handler = "getSpecialPrize";
+        button.getComponent(cc.Button).clickEvents.push(eventHandler);
+
+        //save button
+        this[buttonName] = button;
+    },
+
+    getSpecialPrize(event){
+        let button = event.target;
+        let progress = button.progress;
+        let sub = button.sub;
+        let field = button.field;
+
+        //give prize
+        if (progress >= 1 && !(window.gameSession.achievements.unique[field])) {
+            window.gameSession.xp += button.prize;
+            this.dungeonXP.string = "XP: " + window.gameSession.xp;
+
+            // update achievement level
+            window.gameSession.achievements.unique[field] = true;
+        }
+
+        // update button
+        this.updateSpecialButton(field);
+
+        this.saveGame();
+    },
+
+    updateSpecialButton(field){
+        let button = this["unique" + field]
+        if (!button) return;
+
+        let stat = 0;
+        if (window.gameSession.stats.unique[field]) stat = 1;
+
+        let value = 10000;
+        let progress = stat/1;
+        let completion = stat + " / 1";
+
+
+        button.progress = progress;
+        button.prize = value;
+
+        button.getChildByName("Value").getComponent(cc.Label).string = value + "XP";
+        button.getChildByName("Progress").getComponent(cc.ProgressBar).progress = progress;
+        button.getChildByName("Completion").getComponent(cc.Label).string = completion;
+
+        if (! window.gameSession.achievements.unique[field]) {
+            button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[0];
+        } else {
+            button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[button.id];
+        }
     },
 
     createButton(name, desc, sub, field, id, mult){

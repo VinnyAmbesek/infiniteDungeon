@@ -114,6 +114,8 @@ cc.Class({
         //stats
         window.gameSession.stats = {};
 
+        window.gameSession.stats.unique = {};
+
         window.gameSession.stats.death = {};
         window.gameSession.stats.death.total = 0;
         window.gameSession.stats.death.fire = 0;
@@ -170,6 +172,8 @@ cc.Class({
 
         //achievements
         window.gameSession.achievements = {};
+
+        window.gameSession.achievements.unique = {};
 
         window.gameSession.achievements.death = {};
         window.gameSession.achievements.death.total = 0;
@@ -319,6 +323,8 @@ cc.Class({
         window.gameSession.stats.traps.spikes = 0;
         window.gameSession.stats.traps.poison = 0;
 
+        window.gameSession.stats.unique = {};
+
         window.gameSession.stats.levelMax = window.gameSession.levelMax;
         window.gameSession.stats.xp = 0;
         window.gameSession.stats.tiles = 0;
@@ -375,6 +381,8 @@ cc.Class({
         window.gameSession.achievements.traps.electricity = 0;
         window.gameSession.achievements.traps.spikes = 0;
         window.gameSession.achievements.traps.poison = 0;
+
+        window.gameSession.achievements.unique = {};
 
         window.gameSession.achievements.levelMax = 0;
         window.gameSession.achievements.xp = 0;

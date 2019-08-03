@@ -38,6 +38,9 @@ cc.Class({
         // restore hp
         window.gameSession.hp = window.gameSession.hpMax;
 
+        // mark death
+        window.gameSession.death = true;
+
         // reset inventory
         window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fireMin, window.gameSession.inventory.fireMax);
         window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.iceMin, window.gameSession.inventory.iceMax);
