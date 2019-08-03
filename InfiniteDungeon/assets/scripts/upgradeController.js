@@ -56,10 +56,9 @@ var upgradeController = cc.Class({
 
 	onEnable (){
 		this.checkSecretPassage();
-		this.checkSpecialButton(window.gameSession.traps, window.gameSession.trapFinder, this.trapFinder);
-		this.checkSpecialButton(window.gameSession.treasures, window.gameSession.treasureHunter, this.treasureHunter);
-		let kills = window.gameSession.stats.kills.melee + window.gameSession.stats.kills.ranged + window.gameSession.stats.kills.magic;
-		this.checkSpecialButton(kills, window.gameSession.tracker, this.tracker);
+		this.checkSpecialButton(window.gameSession.stats.traps.total, window.gameSession.trapFinder, this.trapFinder);
+		this.checkSpecialButton(window.gameSession.stats.items.chests, window.gameSession.treasureHunter, this.treasureHunter);
+		this.checkSpecialButton(window.gameSession.stats.kills.total, window.gameSession.tracker, this.tracker);
 	},
 
 	setButtons: function(){
@@ -92,14 +91,13 @@ var upgradeController = cc.Class({
 		this.checkSecretPassage();
 
 		this.createSpecialButton("trapFinder","Trap Finder","Find how many traps exist in a floor.","upgradeTrapFinder");
-		this.checkSpecialButton(window.gameSession.traps, window.gameSession.trapFinder, this.trapFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.total, window.gameSession.trapFinder, this.trapFinder);
 
 		this.createSpecialButton("treasureHunter","Treasure Hunter","Find how many chests exist in a floor.","upgradeTreasureHunter");		
-		this.checkSpecialButton(window.gameSession.treasures, window.gameSession.treasureHunter, this.treasureHunter);
+		this.checkSpecialButton(window.gameSession.stats.items.chests, window.gameSession.treasureHunter, this.treasureHunter);
 
 		this.createSpecialButton("tracker","Tracker","Find how many enemies are in a floor.","upgradeTracker");
-		let kills = window.gameSession.stats.kills.melee + window.gameSession.stats.kills.ranged + window.gameSession.stats.kills.magic;
-		this.checkSpecialButton(kills, window.gameSession.tracker, this.tracker);
+		this.checkSpecialButton(window.gameSession.stats.kills.total, window.gameSession.tracker, this.tracker);
 		
 	},
 
@@ -143,7 +141,7 @@ var upgradeController = cc.Class({
 			this.dungeonXP.string = "XP: " + window.gameSession.xp;
 
 			// do upgrade
-			upgrade = true;
+			window.gameSession[upgrade] = true;
 			
 			button.getChildByName("Value").getComponent(cc.Label).string = 1;
 			
@@ -152,24 +150,21 @@ var upgradeController = cc.Class({
 
 			this.saveGame();
 		}
-
-		this.checkSpecialButton(req, upgrade, me);
 	},
 
 	upgradeTrapFinder(event){
-		this.upgradeSpecial(event, window.gameSession.trapFinder);
-		this.checkSpecialButton(window.gameSession.traps, window.gameSession.trapFinder, this.trapFinder);
+		this.upgradeSpecial(event, "trapFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.total, window.gameSession.trapFinder, this.trapFinder);
 	},
 
 	upgradeTreasureHunter(event){
-		this.upgradeSpecial(event, window.gameSession.treasureHunter);
-		this.checkSpecialButton(window.gameSession.treasures, window.gameSession.treasureHunter, this.treasureHunter);
+		this.upgradeSpecial(event, "treasureHunter");
+		this.checkSpecialButton(window.gameSession.stats.items.chests, window.gameSession.treasureHunter, this.treasureHunter);
 	},
 
 	upgradeTracker(event){
-		this.upgradeSpecial(event, window.gameSession.tracker);
-		let kills = window.gameSession.stats.kills.melee + window.gameSession.stats.kills.ranged + window.gameSession.stats.kills.magic;
-		this.checkSpecialButton(kills, window.gameSession.tracker ,this.tracker);
+		this.upgradeSpecial(event, "tracker");
+		this.checkSpecialButton(window.gameSession.stats.kills.total, window.gameSession.tracker ,this.tracker);
 	},
 
 	createSecretPassageButton(){
@@ -194,7 +189,7 @@ var upgradeController = cc.Class({
 	},
 
 	checkSecretPassage: function(){
-		if (window.gameSession.levelMin+5 < window.gameSession.levelMax && this.secretPassage) {
+		if (window.gameSession.levelMin+5 < window.gameSession.stats.levelMax && this.secretPassage) {
 			// show secret passage upgrade
 			this.secretPassage.active = true;
 		} else if (this.secretPassage) {
@@ -249,7 +244,6 @@ var upgradeController = cc.Class({
 		button.item = item;
 
 		//add click event
-
 		let eventHandler = new cc.Component.EventHandler();
         eventHandler.target = this.node;
         eventHandler.component = "upgradeController";

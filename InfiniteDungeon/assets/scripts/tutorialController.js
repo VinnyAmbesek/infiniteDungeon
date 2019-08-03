@@ -44,10 +44,7 @@ cc.Class({
         // progress data
         window.gameSession.level = 1;
         window.gameSession.levelMin = 1;
-        window.gameSession.levelMax = 1;
-        window.gameSession.treasures = 0;
         window.gameSession.treasureHunter = false;
-        window.gameSession.traps = 0;
         window.gameSession.trapFinder = false;
         window.gameSession.tracker = false;
 
@@ -116,8 +113,9 @@ cc.Class({
 
         //stats
         window.gameSession.stats = {};
-        
+
         window.gameSession.stats.death = {};
+        window.gameSession.stats.death.total = 0;
         window.gameSession.stats.death.fire = 0;
         window.gameSession.stats.death.ice = 0;
         window.gameSession.stats.death.acid = 0;
@@ -129,6 +127,7 @@ cc.Class({
         window.gameSession.stats.death.magic = 0;
 
         window.gameSession.stats.damage = {};
+        window.gameSession.stats.damage.total = 0;
         window.gameSession.stats.damage.fire = 0;
         window.gameSession.stats.damage.ice = 0;
         window.gameSession.stats.damage.acid = 0;
@@ -140,6 +139,8 @@ cc.Class({
         window.gameSession.stats.damage.magic = 0;
 
         window.gameSession.stats.items = {};
+        window.gameSession.stats.items.chests = 0;
+        window.gameSession.stats.items.total = 0;
         window.gameSession.stats.items.fire = 0;
         window.gameSession.stats.items.ice = 0;
         window.gameSession.stats.items.acid = 0;
@@ -149,12 +150,80 @@ cc.Class({
         window.gameSession.stats.items.potion = 0;
 
         window.gameSession.stats.kills = {};
+        window.gameSession.stats.kills.total = 0;
         window.gameSession.stats.kills.melee = 0;
         window.gameSession.stats.kills.ranged = 0;
         window.gameSession.stats.kills.magic = 0;
 
+        window.gameSession.stats.traps = {};
+        window.gameSession.stats.traps.total = 0;
+        window.gameSession.stats.traps.fire = 0;
+        window.gameSession.stats.traps.ice = 0;
+        window.gameSession.stats.traps.acid = 0;
+        window.gameSession.stats.traps.electricity = 0;
+        window.gameSession.stats.traps.spikes = 0;
+        window.gameSession.stats.traps.poison = 0;
+
+        window.gameSession.stats.levelMax = 0;
         window.gameSession.stats.xp = 0;
         window.gameSession.stats.tiles = 0;
+
+        //achievements
+        window.gameSession.achievements = {};
+
+        window.gameSession.achievements.death = {};
+        window.gameSession.achievements.death.total = 0;
+        window.gameSession.achievements.death.fire = 0;
+        window.gameSession.achievements.death.ice = 0;
+        window.gameSession.achievements.death.acid = 0;
+        window.gameSession.achievements.death.electricity = 0;
+        window.gameSession.achievements.death.spikes = 0;
+        window.gameSession.achievements.death.poison = 0;
+        window.gameSession.achievements.death.melee = 0;
+        window.gameSession.achievements.death.ranged = 0;
+        window.gameSession.achievements.death.magic = 0;
+
+        window.gameSession.achievements.damage = {};
+        window.gameSession.achievements.damage.total = 0;
+        window.gameSession.achievements.damage.fire = 0;
+        window.gameSession.achievements.damage.ice = 0;
+        window.gameSession.achievements.damage.acid = 0;
+        window.gameSession.achievements.damage.electricity = 0;
+        window.gameSession.achievements.damage.spikes = 0;
+        window.gameSession.achievements.damage.poison = 0;
+        window.gameSession.achievements.damage.melee = 0;
+        window.gameSession.achievements.damage.ranged = 0;
+        window.gameSession.achievements.damage.magic = 0;
+
+        window.gameSession.achievements.items = {};
+        window.gameSession.achievements.items.chests = 0;
+        window.gameSession.achievements.items.total = 0;
+        window.gameSession.achievements.items.fire = 0;
+        window.gameSession.achievements.items.ice = 0;
+        window.gameSession.achievements.items.acid = 0;
+        window.gameSession.achievements.items.electricity = 0;
+        window.gameSession.achievements.items.spikes = 0;
+        window.gameSession.achievements.items.poison = 0;
+        window.gameSession.achievements.items.potion = 0;
+
+        window.gameSession.achievements.kills = {};
+        window.gameSession.achievements.kills.total = 0;
+        window.gameSession.achievements.kills.melee = 0;
+        window.gameSession.achievements.kills.ranged = 0;
+        window.gameSession.achievements.kills.magic = 0;
+
+        window.gameSession.achievements.traps = {};
+        window.gameSession.achievements.traps.total = 0;
+        window.gameSession.achievements.traps.fire = 0;
+        window.gameSession.achievements.traps.ice = 0;
+        window.gameSession.achievements.traps.acid = 0;
+        window.gameSession.achievements.traps.electricity = 0;
+        window.gameSession.achievements.traps.spikes = 0;
+        window.gameSession.achievements.traps.poison = 0;
+
+        window.gameSession.achievements.levelMax = 0;
+        window.gameSession.achievements.xp = 0;
+        window.gameSession.achievements.tiles = 0;
 
         //save version
         window.gameSession.saveVersion = saveVersion;
@@ -197,9 +266,11 @@ cc.Class({
         window.gameSession.upgrades.ranged = 1000;
         window.gameSession.upgrades.magic = 1000;
 
+        //stats
         window.gameSession.stats = {};
-        
+
         window.gameSession.stats.death = {};
+        window.gameSession.stats.death.total = 0;
         window.gameSession.stats.death.fire = 0;
         window.gameSession.stats.death.ice = 0;
         window.gameSession.stats.death.acid = 0;
@@ -211,6 +282,7 @@ cc.Class({
         window.gameSession.stats.death.magic = 0;
 
         window.gameSession.stats.damage = {};
+        window.gameSession.stats.damage.total = 0;
         window.gameSession.stats.damage.fire = 0;
         window.gameSession.stats.damage.ice = 0;
         window.gameSession.stats.damage.acid = 0;
@@ -222,6 +294,8 @@ cc.Class({
         window.gameSession.stats.damage.magic = 0;
 
         window.gameSession.stats.items = {};
+        window.gameSession.stats.items.chests = window.gameSession.treasures;
+        window.gameSession.stats.items.total = 0;
         window.gameSession.stats.items.fire = 0;
         window.gameSession.stats.items.ice = 0;
         window.gameSession.stats.items.acid = 0;
@@ -231,12 +305,80 @@ cc.Class({
         window.gameSession.stats.items.potion = 0;
 
         window.gameSession.stats.kills = {};
+        window.gameSession.stats.kills.total = 0;
         window.gameSession.stats.kills.melee = 0;
         window.gameSession.stats.kills.ranged = 0;
         window.gameSession.stats.kills.magic = 0;
 
+        window.gameSession.stats.traps = {};
+        window.gameSession.stats.traps.total = window.gameSession.traps;
+        window.gameSession.stats.traps.fire = 0;
+        window.gameSession.stats.traps.ice = 0;
+        window.gameSession.stats.traps.acid = 0;
+        window.gameSession.stats.traps.electricity = 0;
+        window.gameSession.stats.traps.spikes = 0;
+        window.gameSession.stats.traps.poison = 0;
+
+        window.gameSession.stats.levelMax = window.gameSession.levelMax;
         window.gameSession.stats.xp = 0;
         window.gameSession.stats.tiles = 0;
+
+        //achievements
+        window.gameSession.achievements = {};
+
+        window.gameSession.achievements.death = {};
+        window.gameSession.achievements.death.total = 0;
+        window.gameSession.achievements.death.fire = 0;
+        window.gameSession.achievements.death.ice = 0;
+        window.gameSession.achievements.death.acid = 0;
+        window.gameSession.achievements.death.electricity = 0;
+        window.gameSession.achievements.death.spikes = 0;
+        window.gameSession.achievements.death.poison = 0;
+        window.gameSession.achievements.death.melee = 0;
+        window.gameSession.achievements.death.ranged = 0;
+        window.gameSession.achievements.death.magic = 0;
+
+        window.gameSession.achievements.damage = {};
+        window.gameSession.achievements.damage.total = 0;
+        window.gameSession.achievements.damage.fire = 0;
+        window.gameSession.achievements.damage.ice = 0;
+        window.gameSession.achievements.damage.acid = 0;
+        window.gameSession.achievements.damage.electricity = 0;
+        window.gameSession.achievements.damage.spikes = 0;
+        window.gameSession.achievements.damage.poison = 0;
+        window.gameSession.achievements.damage.melee = 0;
+        window.gameSession.achievements.damage.ranged = 0;
+        window.gameSession.achievements.damage.magic = 0;
+
+        window.gameSession.achievements.items = {};
+        window.gameSession.achievements.items.chests = 0;
+        window.gameSession.achievements.items.total = 0;
+        window.gameSession.achievements.items.fire = 0;
+        window.gameSession.achievements.items.ice = 0;
+        window.gameSession.achievements.items.acid = 0;
+        window.gameSession.achievements.items.electricity = 0;
+        window.gameSession.achievements.items.spikes = 0;
+        window.gameSession.achievements.items.poison = 0;
+        window.gameSession.achievements.items.potion = 0;
+
+        window.gameSession.achievements.kills = {};
+        window.gameSession.achievements.kills.total = 0;
+        window.gameSession.achievements.kills.melee = 0;
+        window.gameSession.achievements.kills.ranged = 0;
+        window.gameSession.achievements.kills.magic = 0;
+
+        window.gameSession.achievements.traps = {};
+        window.gameSession.achievements.traps.total = 0;
+        window.gameSession.achievements.traps.fire = 0;
+        window.gameSession.achievements.traps.ice = 0;
+        window.gameSession.achievements.traps.acid = 0;
+        window.gameSession.achievements.traps.electricity = 0;
+        window.gameSession.achievements.traps.spikes = 0;
+        window.gameSession.achievements.traps.poison = 0;
+
+        window.gameSession.achievements.levelMax = 0;
+        window.gameSession.achievements.xp = 0;
+        window.gameSession.achievements.tiles = 0;
         
         window.gameSession.saveVersion = {major: 0, minor: 3, fix: 0};
     }
