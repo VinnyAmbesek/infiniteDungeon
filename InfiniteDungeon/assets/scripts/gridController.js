@@ -615,7 +615,7 @@ var gridController = cc.Class({
 			if (window.gameSession.stats.damage.total % 100 == 0) this.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
 		}
-		if (window.gameSession.hp < 0) {
+		if (window.gameSession.hp <= 0) {
 			if (window.gameSession.hp < -9) {
 				window.gameSession.stats.unique.truedeath = true;
 				if (!window.gameSession.achievements.unique.truedeath) this.showFeedback("Achievement: True Death", new cc.Color(0,255,0), this.dungeonAchievement, true);

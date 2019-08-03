@@ -104,7 +104,7 @@ var achievementController = cc.Class({
         this.createButton("Antidote", "Total poison shields used", "items", "poison", 9, 1);
         this.createButton("Not addicted", "Total potions used", "items", "potion", 10, 1);
 
-        this.createButton("It hurts everywhere", "Total damage taken", "damage", "total", 11, 10);
+        this.createButton("It hurts everywhere", "Total damage taken", "damage", "total", 11, 1);
         this.createButton("Needs some Aloe", "Total fire damage", "damage", "fire", 11, 10);
         this.createButton("I want a blanket", "Total ice damage", "damage", "ice", 11, 10);
         this.createButton("I need a base", "Total acid damage", "damage", "acid", 11, 10);
