@@ -7,6 +7,11 @@
 - For each floor you clear you will get exploration XP as if you explored the floor twice. 
 - For each trap you survive you will get survival XP as if you explored a quarter of the floor.
 
+## Achievements
+- Some actions will win achievements. 
+- Achievements will give bonus experience. 
+- Most achievements have levels, each level giving even more bonus experience. 
+
 ## Treasures
 - There are 7 kinds of treasure. Protection items and potions. 
 - You will automatically use a potion when you have damage.
