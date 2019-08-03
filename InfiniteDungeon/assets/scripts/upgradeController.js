@@ -293,6 +293,7 @@ var upgradeController = cc.Class({
     },
 
     open: function() {
+    	if (window.gameSession.hp < 1) return;
     	for (var i = 0; i < this.popups.length; i++) {
     		this.popups[i].active = false;
     	}

@@ -77,54 +77,54 @@ var achievementController = cc.Class({
         this.createSpecialButton("Stop Moving!", "Get 'Dungeon Moves' twice in a floor", "darkness", 1);
         this.createSpecialButton("Lucky", "Cross a floor without hitting any trap", "lucky", 1);
 
-        this.createButton("Explorer", "Deepest floor you went", null, "levelMax", 1, 100);
-        this.createButton("High level", "Total XP spent", null, "xp", 1, 0.01);
-        this.createButton("Runner", "Tiles walked", null, "tiles", 1, 0.1);
+        this.createButton("Explorer", "Deepest floor you went", null, "levelMax", 2, 100);
+        this.createButton("High level", "Total XP spent", null, "xp", 2, 0.01);
+        this.createButton("Runner", "Tiles walked", null, "tiles", 2, 0.1);
 
-        this.createButton("God of War", "Enemies you defeated", "kills", "total", 1, 1);
-        this.createButton("Warrior", "Enemies you defeated with your sword", "kills", "melee", 1, 1);
-        this.createButton("Archer", "Enemies you defeated with your bow", "kills", "ranged", 1, 1);
-        this.createButton("Archmage", "Enemies you defeated with your wand", "kills", "magic", 1, 1);
+        this.createButton("God of War", "Enemies you defeated", "kills", "total", 3, 1);
+        this.createButton("Warrior", "Enemies you defeated with your sword", "kills", "melee", 3, 1);
+        this.createButton("Archer", "Enemies you defeated with your bow", "kills", "ranged", 4, 1);
+        this.createButton("Archmage", "Enemies you defeated with your wand", "kills", "magic", 5, 1);
 
-        this.createButton("Trap Finder", "Total traps found the hard way", "traps", "total", 1, 1);
-        this.createButton("Getting warmer", "Total fire traps found the hard way", "traps", "fire", 1, 1);
-        this.createButton("Getting colder", "Total ice traps found the hard way", "traps", "ice", 1, 1);
-        this.createButton("Dirty floor", "Total acid traps found the hard way", "traps", "acid", 1, 1);
-        this.createButton("Tesla attack", "Total electricity traps found the hard way", "traps", "electricity", 1, 1);
-        this.createButton("Holed floor", "Total spikes traps found the hard way", "traps", "spikes", 1, 1);
-        this.createButton("Holed wall", "Total poisoned dart traps found the hard way", "traps", "poison", 1, 1);
+        this.createButton("Trap Finder", "Total traps found the hard way", "traps", "total", 6, 1);
+        this.createButton("Getting warmer", "Total fire traps found the hard way", "traps", "fire", 6, 1);
+        this.createButton("Getting colder", "Total ice traps found the hard way", "traps", "ice", 6, 1);
+        this.createButton("Dirty floor", "Total acid traps found the hard way", "traps", "acid", 6, 1);
+        this.createButton("Tesla attack", "Total electricity traps found the hard way", "traps", "electricity", 6, 1);
+        this.createButton("Holed floor", "Total spikes traps found the hard way", "traps", "spikes", 6, 1);
+        this.createButton("Holed wall", "Total poisoned dart traps found the hard way", "traps", "poison", 6, 1);
 
-        this.createButton("Treasure Hunter", "Total chests found", "items", "chests", 1, 1);
-        this.createButton("Spender", "Total items used", "items", "total", 1, 1);
-        this.createButton("Like sunscreen", "Total fire shields used", "items", "fire", 1, 1);
-        this.createButton("A warm blanket", "Total ice shields used", "items", "ice", 1, 1);
-        this.createButton("Still intact", "Total acid shields used", "items", "acid", 1, 1);
-        this.createButton("Fully isolated", "Total electricity shields used", "items", "electricity", 1, 1);
-        this.createButton("Steel boots", "Total spikes shields used", "items", "spikes", 1, 1);
-        this.createButton("Antidote", "Total poison shields used", "items", "poison", 1, 1);
-        this.createButton("Not addicted", "Total potions used", "items", "potion", 1, 1);
+        this.createButton("Treasure Hunter", "Total chests found", "items", "chests", 7, 1);
+        this.createButton("Spender", "Total items used", "items", "total", 8, 1);
+        this.createButton("Like sunscreen", "Total fire shields used", "items", "fire", 9, 1);
+        this.createButton("A warm blanket", "Total ice shields used", "items", "ice", 9, 1);
+        this.createButton("Still intact", "Total acid shields used", "items", "acid", 9, 1);
+        this.createButton("Fully isolated", "Total electricity shields used", "items", "electricity", 9, 1);
+        this.createButton("Steel boots", "Total spikes shields used", "items", "spikes", 9, 1);
+        this.createButton("Antidote", "Total poison shields used", "items", "poison", 9, 1);
+        this.createButton("Not addicted", "Total potions used", "items", "potion", 10, 1);
 
-        this.createButton("It hurts everywhere", "Total damage taken", "damage", "total", 1, 1);
-        this.createButton("Needs some Aloe", "Total fire damage", "damage", "fire", 1, 1);
-        this.createButton("I want a blanket", "Total ice damage", "damage", "ice", 1, 1);
-        this.createButton("I need a base", "Total acid damage", "damage", "acid", 1, 1);
-        this.createButton("I need rubber boots", "Total electricity damage", "damage", "electricity", 1, 1);
-        this.createButton("Not again...", "Total spikes damage", "damage", "spikes", 1, 1);
-        this.createButton("Feeling kind green", "Total poison damage", "damage", "poison", 1, 1);
-        this.createButton("I need a shield", "Total damage in melee combat", "damage", "melee", 1, 1);
-        this.createButton("The problem is the bow", "Total damage in ranged combat", "damage", "ranged", 1, 1);
-        this.createButton("I need a staff", "Total damage in magic combat", "damage", "magic", 1, 1);
+        this.createButton("It hurts everywhere", "Total damage taken", "damage", "total", 11, 1);
+        this.createButton("Needs some Aloe", "Total fire damage", "damage", "fire", 11, 1);
+        this.createButton("I want a blanket", "Total ice damage", "damage", "ice", 11, 1);
+        this.createButton("I need a base", "Total acid damage", "damage", "acid", 11, 1);
+        this.createButton("I need rubber boots", "Total electricity damage", "damage", "electricity", 11, 1);
+        this.createButton("Not again...", "Total spikes damage", "damage", "spikes", 11, 1);
+        this.createButton("Feeling kind green", "Total poison damage", "damage", "poison", 11, 1);
+        this.createButton("I need a shield", "Total damage in melee combat", "damage", "melee", 3, 1);
+        this.createButton("The problem is the bow", "Total damage in ranged combat", "damage", "ranged", 4, 1);
+        this.createButton("I need a staff", "Total damage in magic combat", "damage", "magic", 5, 1);
 
-        this.createButton("Kenny", "Total deaths", "death", "total", 1, 10);
-        this.createButton("Barbecue", "Total burned deaths", "death", "fire", 1, 10);
-        this.createButton("Popsicle", "Total frozen deaths", "death", "ice", 1, 10);
-        this.createButton("Not much left", "Total dissolved deaths", "death", "acid", 1, 10);
-        this.createButton("Full of Energy", "Total electricity deaths", "death", "electricity", 1, 10);
-        this.createButton("Is Vlad here?", "Total impaled deaths", "death", "spikes", 1, 10);
-        this.createButton("Is there an antidote?", "Total poisoned deaths", "death", "poison", 1, 10);
-        this.createButton("Shaky hand", "Total deaths in melee combat", "death", "melee", 1, 10);
-        this.createButton("Bad Sight", "Total deaths in ranged combat", "death", "ranged", 1, 10);
-        this.createButton("Curled Tongue", "Total deaths in magic combat", "death", "magic", 1, 10);
+        this.createButton("Kenny", "Total deaths", "death", "total", 12, 10);
+        this.createButton("Barbecue", "Total burned deaths", "death", "fire", 12, 10);
+        this.createButton("Popsicle", "Total frozen deaths", "death", "ice", 12, 10);
+        this.createButton("Not much left", "Total dissolved deaths", "death", "acid", 12, 10);
+        this.createButton("Full of Energy", "Total electricity deaths", "death", "electricity", 12, 10);
+        this.createButton("Is Vlad here?", "Total impaled deaths", "death", "spikes", 12, 10);
+        this.createButton("Is there an antidote?", "Total poisoned deaths", "death", "poison", 12, 10);
+        this.createButton("Shaky hand", "Total deaths in melee combat", "death", "melee", 12, 10);
+        this.createButton("Bad Sight", "Total deaths in ranged combat", "death", "ranged", 12, 10);
+        this.createButton("Curled Tongue", "Total deaths in magic combat", "death", "magic", 12, 10);
     },
 
     createSpecialButton(name, desc, field, id){
@@ -348,6 +348,7 @@ var achievementController = cc.Class({
     },
 
     open: function() {
+        if (window.gameSession.hp < 1) return;
         for (var i = 0; i < this.popups.length; i++) {
             this.popups[i].active = false;
         }
