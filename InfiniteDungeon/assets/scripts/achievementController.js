@@ -104,27 +104,27 @@ var achievementController = cc.Class({
         this.createButton("Antidote", "Total poison shields used", "items", "poison", 9, 1);
         this.createButton("Not addicted", "Total potions used", "items", "potion", 10, 1);
 
-        this.createButton("It hurts everywhere", "Total damage taken", "damage", "total", 11, 1);
-        this.createButton("Needs some Aloe", "Total fire damage", "damage", "fire", 11, 1);
-        this.createButton("I want a blanket", "Total ice damage", "damage", "ice", 11, 1);
-        this.createButton("I need a base", "Total acid damage", "damage", "acid", 11, 1);
-        this.createButton("I need rubber boots", "Total electricity damage", "damage", "electricity", 11, 1);
-        this.createButton("Not again...", "Total spikes damage", "damage", "spikes", 11, 1);
-        this.createButton("Feeling kind green", "Total poison damage", "damage", "poison", 11, 1);
-        this.createButton("I need a shield", "Total damage in melee combat", "damage", "melee", 3, 1);
-        this.createButton("The problem is the bow", "Total damage in ranged combat", "damage", "ranged", 4, 1);
-        this.createButton("I need a staff", "Total damage in magic combat", "damage", "magic", 5, 1);
+        this.createButton("It hurts everywhere", "Total damage taken", "damage", "total", 11, 10);
+        this.createButton("Needs some Aloe", "Total fire damage", "damage", "fire", 11, 10);
+        this.createButton("I want a blanket", "Total ice damage", "damage", "ice", 11, 10);
+        this.createButton("I need a base", "Total acid damage", "damage", "acid", 11, 10);
+        this.createButton("I need rubber boots", "Total electricity damage", "damage", "electricity", 11, 10);
+        this.createButton("Not again...", "Total spikes damage", "damage", "spikes", 11, 10);
+        this.createButton("Feeling kind green", "Total poison damage", "damage", "poison", 11, 10);
+        this.createButton("I need a shield", "Total damage in melee combat", "damage", "melee", 3, 10);
+        this.createButton("This bow is bad", "Total damage in ranged combat", "damage", "ranged", 4, 10);
+        this.createButton("I need a staff", "Total damage in magic combat", "damage", "magic", 5, 10);
 
-        this.createButton("Kenny", "Total deaths", "death", "total", 12, 10);
-        this.createButton("Barbecue", "Total burned deaths", "death", "fire", 12, 10);
-        this.createButton("Popsicle", "Total frozen deaths", "death", "ice", 12, 10);
-        this.createButton("Not much left", "Total dissolved deaths", "death", "acid", 12, 10);
-        this.createButton("Full of Energy", "Total electricity deaths", "death", "electricity", 12, 10);
-        this.createButton("Is Vlad here?", "Total impaled deaths", "death", "spikes", 12, 10);
-        this.createButton("Is there an antidote?", "Total poisoned deaths", "death", "poison", 12, 10);
-        this.createButton("Shaky hand", "Total deaths in melee combat", "death", "melee", 12, 10);
-        this.createButton("Bad Sight", "Total deaths in ranged combat", "death", "ranged", 12, 10);
-        this.createButton("Curled Tongue", "Total deaths in magic combat", "death", "magic", 12, 10);
+        this.createButton("Kenny", "Total deaths", "death", "total", 12, 100);
+        this.createButton("Barbecue", "Total burned deaths", "death", "fire", 12, 100);
+        this.createButton("Popsicle", "Total frozen deaths", "death", "ice", 12, 100);
+        this.createButton("Not much left", "Total dissolved deaths", "death", "acid", 12, 100);
+        this.createButton("Full of Energy", "Total electricity deaths", "death", "electricity", 12, 100);
+        this.createButton("Is Vlad here?", "Total impaled deaths", "death", "spikes", 12, 100);
+        this.createButton("Is there an antidote?", "Total poisoned deaths", "death", "poison", 12, 100);
+        this.createButton("Shaky hand", "Total deaths in melee combat", "death", "melee", 12, 100);
+        this.createButton("Bad Sight", "Total deaths in ranged combat", "death", "ranged", 12, 100);
+        this.createButton("Curled Tongue", "Total deaths in magic combat", "death", "magic", 12, 100);
     },
 
     createSpecialButton(name, desc, field, id){
@@ -283,15 +283,24 @@ var achievementController = cc.Class({
 
         //give prize
         if (progress >= 1) {
-            window.gameSession.xp += button.prize;
-            this.dungeonXP.string = "XP: " + window.gameSession.xp;
 
             // update achievement level
             if (sub) {
                 window.gameSession.achievements[sub][field]++;
+                if (window.gameSession.achievements[sub][field] > 100) {
+                    window.gameSession.achievements[sub][field] = 100;
+                    window.gameSession.xp -= button.prize;
+                }
             } else {
                 window.gameSession.achievements[field]++;
+                if (window.gameSession.achievements[field] > 100) {
+                    window.gameSession.achievements[field] = 100;
+                    window.gameSession.xp -= button.prize;
+                }
             }
+
+            window.gameSession.xp += button.prize;
+            this.dungeonXP.string = "XP: " + window.gameSession.xp;
         }
 
         // update button

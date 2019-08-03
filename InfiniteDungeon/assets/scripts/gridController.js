@@ -18,6 +18,7 @@ var gridController = cc.Class({
 		deathPopup: cc.Node,
 		canvas: cc.Node,
 		inventoryButton: cc.Node,
+		dungeonAchievement: cc.Node,
 
 		dungeonHP: cc.Label,
 		dungeonLevel: cc.Label,
@@ -260,6 +261,7 @@ var gridController = cc.Class({
 		event.target.used = true;
 		this.clickable--;
 		window.gameSession.stats.tiles++;
+		if (window.gameSession.stats.tiles % 1000 == 0) this.showFeedback("Achievement: Runner", new cc.Color(0,255,0), this.dungeonAchievement, true);
 
 		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
 		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
@@ -280,7 +282,9 @@ var gridController = cc.Class({
 		if (window.gameSession.hp < window.gameSession.hpMax && window.gameSession.inventory.potion > 0) {
 			window.gameSession.inventory.potion--;
 			window.gameSession.stats.items.potion++;
+			if (window.gameSession.stats.items.potion % 100 == 0) this.showFeedback("Achievement: Not addicted", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.items.total++;
+			if (window.gameSession.stats.items.total % 100 == 0) this.showFeedback("Achievement: Spender", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.hp++;
 			this.showFeedback("Used potion", new cc.Color(0,255,0), event.target, true);
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
@@ -309,6 +313,7 @@ var gridController = cc.Class({
 			if (window.gameSession.hp > 0) {
 				xp += window.gameSession.level*25
 				window.gameSession.stats.traps.total++;
+				if (window.gameSession.stats.traps.total % 100 == 0) this.showFeedback("Achievement: Trap Finder", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			} else {
 				this.deathPopup.active = true;
 				window.gameGlobals.popup = true;
@@ -316,9 +321,12 @@ var gridController = cc.Class({
 			}
 		}
 		if(tile.content == this.enumContent["darkness"]){
-			this.showFeedback("Dungeon Moves!", new cc.Color(255,0,0), this.dungeonLevel, true);
+			this.showFeedback("Dungeon Moves!", new cc.Color(255,0,0), this.dungeonLevel.node, true);
 			this.dungeonMoves++;
-			if (this.dungeonMoves> 1) window.gameSession.stats.unique.darkness = true;
+			if (this.dungeonMoves> 1) {
+				window.gameSession.stats.unique.darkness = true
+				if (! window.gameSession.achievements.unique.darkness) this.showFeedback("Achievement: Stop Moving!", new cc.Color(0,255,0), this.dungeonAchievement, true);
+			}
 			this.running = false;
 			let x = event.target.tile.x;
 			let y = event.target.tile.y;
@@ -412,24 +420,36 @@ var gridController = cc.Class({
 		let feedback;
 		let effect;
 		let field;
+		let achivDamage;
+		let achivKills;
+		let achivDeath;
 		switch(monster) {
 			case 1:
 				// code block
 				feedback = "Fought Orc";
 				effect = "murdered";
 				field = "melee";
+				achivDamage = "I need a shield";
+				achivKills = "Warrior";
+				achivDeath = "Shaky Hand";
 				break;
 			case 2:
 				// code block
 				feedback = "Fought Cockatrice";
 				effect = "petrified";
-				field = "ranged"
+				field = "ranged";
+				achivDamage = "This bow is bad";
+				achivKills = "Archer";
+				achivDeath = "Bad Sight";
 				break;
 			case 3:
 				// code block
 				feedback = "Fought Ghost";
 				effect = "drained of life";
-				field = "magic"
+				field = "magic";
+				achivDamage = "I need a staff";
+				achivKills = "Archmage";
+				achivDeath = "Curled Tongue";
 				break;
 			default:
 				// code block
@@ -443,7 +463,10 @@ var gridController = cc.Class({
 		this.showFeedback(feedback, new cc.Color(255,0,0), node, true);
 		this.lastDanger = effect;
 
-		if ((strength - window.gameSession.inventory[field]) < -9) window.gameSession.stats.unique.overkill = true;
+		if ((strength - window.gameSession.inventory[field]) < -9) {
+			window.gameSession.stats.unique.overkill = true;
+			if (!window.gameSession.achievements.unique.overkill) this.showFeedback("Achievement: Overkill", new cc.Color(0,255,0), this.dungeonAchievement, true);
+		}
 		strength -= Math.min(strength, window.gameSession.inventory[field]);
 
 		// receives strength in damage
@@ -451,18 +474,30 @@ var gridController = cc.Class({
 			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node, false);
 			window.gameSession.hp -= strength;
 			window.gameSession.stats.damage[field] += strength;
+			if (window.gameSession.stats.damage[field] % 100 == 0) this.showFeedback("Achievement: " + achivDamage, new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.damage.total += strength;
+			if (window.gameSession.stats.damage.total % 100 == 0) this.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
 		}
 
 		if (window.gameSession.hp > 0) {
 			window.gameSession.stats.kills[field]++;
+			if (window.gameSession.stats.kills[field] % 100 == 0) this.showFeedback("Achievement: " + achivKills, new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.kills.total++;
+			if (window.gameSession.stats.kills.total % 100 == 0) this.showFeedback("Achievement: God of War", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		} else {
-			if (window.gameSession.hp < -9) window.gameSession.stats.unique.truedeath = true;
-			if (window.gameSession.death) window.gameSession.stats.unique.already = true;
+			if (window.gameSession.hp < -9) {
+				window.gameSession.stats.unique.truedeath = true;
+				if (!window.gameSession.achievements.unique.truedeath) this.showFeedback("Achievement: True Death", new cc.Color(0,255,0), this.dungeonAchievement, true);
+			}
+			if (window.gameSession.death) {
+				window.gameSession.stats.unique.already = true;
+				if (!window.gameSession.achievements.unique.already) this.showFeedback("Achievement: Already Back?", new cc.Color(0,255,0), this.dungeonAchievement, true);
+			}
 			window.gameSession.stats.death[field]++;
+			if (window.gameSession.stats.death[field] % 100 == 0) this.showFeedback("Achievement: " + achivDeath, new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.death.total++;
+			if (window.gameSession.stats.death.total % 100 == 0) this.showFeedback("Achievement: Kenny", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		}
 	},
 
@@ -475,9 +510,13 @@ var gridController = cc.Class({
 		let effect;
 		let field;
 		let item;
+		let achivTrap;
+		let achivItem;
+		let achivDeath;
 
 		if (window.gameSession.hp <2 && (window.gameSession.inventory.fire + window.gameSession.inventory.ice + window.gameSession.inventory.acid + window.gameSession.inventory.electricity + window.gameSession.inventory.spikes + window.gameSession.inventory.poison) <1){
 			window.gameSession.stats.unique.daredevil = true;
+			if (!window.gameSession.achievements.unique.daredevil) this.showFeedback("Achievement: Daredevil", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		}
 
 		switch(danger) {
@@ -487,6 +526,9 @@ var gridController = cc.Class({
 				effect = "burned";
 				field = "fire";
 				item = "Fire"
+				achivTrap = "Getting warmer";
+				achivItem = "Like sunscreen";
+				achivDeath = "Barbecue";
 				break;
 			case 2:
 				// code block
@@ -494,6 +536,9 @@ var gridController = cc.Class({
 				effect = "frozen";
 				field = "ice"
 				item = "Ice";
+				achivTrap = "Getting colder";
+				achivItem = "A warm blanket";
+				achivDeath = "Popsicle";
 				break;
 			case 3:
 				// code block
@@ -501,6 +546,9 @@ var gridController = cc.Class({
 				effect = "dissolved";
 				field = "acid"
 				item = "Acid";
+				achivTrap = "Dirty floor";
+				achivItem = "Still intact";
+				achivDeath = "Not much left";
 				break;
 			case 4:
 				// code block
@@ -508,6 +556,9 @@ var gridController = cc.Class({
 				effect = "electrocuted";
 				field = "electricity"
 				item = "Electricity";
+				achivTrap = "Tesla attack";
+				achivItem = "Fully isolated";
+				achivDeath = "Full of Energy";
 				break;
 			case 5:
 				// code block
@@ -515,6 +566,9 @@ var gridController = cc.Class({
 				effect = "impaled";
 				field = "spikes"
 				item = "Spikes";
+				achivTrap = "Holed floor";
+				achivItem = "Steel boots";
+				achivDeath = "Is Vlad here?";
 				break;
 			case 6:
 				// code block
@@ -522,6 +576,9 @@ var gridController = cc.Class({
 				effect = "poisoned";
 				field = "poison"
 				item = "Poison";
+				achivTrap = "Holed wall";
+				achivItem = "Antidote";
+				achivDeath = "Is there an antidote?";
 				break;
 			default:
 				// code block
@@ -529,6 +586,7 @@ var gridController = cc.Class({
 		this.showFeedback(feedback, new cc.Color(255,0,0), node, true);
 		this.lastDanger = effect;
 		window.gameSession.stats.traps[field]++;
+		if (window.gameSession.stats.traps[field] % 100 == 0) this.showFeedback("Achievement: " + achivTrap, new cc.Color(0,255,0), this.dungeonAchievement, true);
 
 		if (window.gameSession.inventory[field] > 0){
 			let shield = window.gameSession.inventory[field];
@@ -537,7 +595,9 @@ var gridController = cc.Class({
 			// lose shields up to strength of danger
 			window.gameSession.inventory[field] -= protection;
 			window.gameSession.stats.items[field] += protection; 
+			if (window.gameSession.stats.items[field] % 100 == 0) this.showFeedback("Achievement: " + achivItem, new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.items.total += protection;
+			if (window.gameSession.stats.items.total % 100 == 0) this.showFeedback("Achievement: Spender", new cc.Color(0,255,0), this.dungeonAchievement, true);
 
 			// danger strength is reduced by spent shields
 			strength -= protection;
@@ -550,14 +610,24 @@ var gridController = cc.Class({
 			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node, false);
 			window.gameSession.hp -= strength;
 			window.gameSession.stats.damage[field] += strength;
+			if (window.gameSession.stats.items[field] % 100 == 0) this.showFeedback("Achievement: " + achivItem, new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.damage.total += strength;
+			if (window.gameSession.stats.damage.total % 100 == 0) this.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
 		}
 		if (window.gameSession.hp < 0) {
-			if (window.gameSession.hp < -9) window.gameSession.stats.unique.truedeath = true;
-			if (window.gameSession.death) window.gameSession.stats.unique.already = true;
+			if (window.gameSession.hp < -9) {
+				window.gameSession.stats.unique.truedeath = true;
+				if (!window.gameSession.achievements.unique.truedeath) this.showFeedback("Achievement: True Death", new cc.Color(0,255,0), this.dungeonAchievement, true);
+			}
+			if (window.gameSession.death) {
+				window.gameSession.stats.unique.already = true;
+				if (!window.gameSession.achievements.unique.already) this.showFeedback("Achievement: Already Back?", new cc.Color(0,255,0), this.dungeonAchievement, true);
+			}
 			window.gameSession.stats.death[field]++;
+			if (window.gameSession.stats.death[field] % 100 == 0) this.showFeedback("Achievement: " + achivDeath, new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.death.total++;
+			if (window.gameSession.stats.death.total % 100 == 0) this.showFeedback("Achievement: Kenny", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		}
 	},
 
@@ -565,6 +635,7 @@ var gridController = cc.Class({
 		this.treasures--;
 		this.treasureHunter.string = "Treasures: " + this.treasures;
 		window.gameSession.stats.items.chests++;
+		if (window.gameSession.stats.items.chests % 100 == 0) this.showFeedback("Achievement: Treasure Hunter", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		if (prize <= 10) {
 			window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potion+1, window.gameSession.inventory.potionMax);
 			this.showFeedback("Got Potion", new cc.Color(0,255,0), node, true);
@@ -592,9 +663,14 @@ var gridController = cc.Class({
 	nextLevel: function(){
 		if (window.gameSession.hp < 1) return; 
 		window.gameSession.death = false;
-		if (!this.hitTrap) window.gameSession.stats.unique.lucky = true;
+		if (!this.hitTrap) {
+			window.gameSession.stats.unique.lucky = true;
+			if (!window.gameSession.achievements.unique.lucky) this.showFeedback("Achievement: Lucky", new cc.Color(0,255,0), this.dungeonAchievement, true);
+		}
+		
 		window.gameSession.level++;
 		if (window.gameSession.level > window.gameSession.stats.levelMax) window.gameSession.stats.levelMax = window.gameSession.level;
+		if (window.gameSession.stats.levelMax % 100 == 0) this.showFeedback("Achievement: Explorer", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		cc.director.loadScene("gameScene");
 	},
 

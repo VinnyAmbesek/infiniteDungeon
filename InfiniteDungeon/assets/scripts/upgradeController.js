@@ -13,8 +13,11 @@ var upgradeController = cc.Class({
 
 	properties: {
 		grid: cc.Node,
+		canvas: cc.Node,
+		dungeonAchievement: cc.Node,
 
 		button: cc.Prefab,
+		feedbackPrefab: cc.Prefab,
 
 		dungeonXP: cc.Label,
 
@@ -138,6 +141,7 @@ var upgradeController = cc.Class({
 			// take xp
 			window.gameSession.xp -= 5000;
 			window.gameSession.stats.xp += 5000;
+			if (window.gameSession.stats.xp % 10000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			this.dungeonXP.string = "XP: " + window.gameSession.xp;
 
 			// do upgrade
@@ -204,6 +208,7 @@ var upgradeController = cc.Class({
 			// take xp
 			window.gameSession.xp -= window.gameSession.upgrades.levelMin;
 			window.gameSession.stats.xp += window.gameSession.upgrades.levelMin;
+			if (window.gameSession.stats.xp % 10000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			this.dungeonXP.string = "XP: " + window.gameSession.xp;
 
 			// do upgrade
@@ -259,6 +264,7 @@ var upgradeController = cc.Class({
 			// take xp
 			window.gameSession.xp -= window.gameSession.upgrades[field];
 			window.gameSession.stats.xp += window.gameSession.upgrades[field];
+			if (window.gameSession.stats.xp % 10000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			this.dungeonXP.string = "XP: " + window.gameSession.xp;
 			// do upgrade
 			if (window.gameSession.inventory[field] != null) {
@@ -300,6 +306,35 @@ var upgradeController = cc.Class({
         this.node.active = true;
         window.gameGlobals.popup = true;
     },
+
+	showFeedback: function(text, color, parent, stay){
+		let duration = 2.0;
+
+		let feedback = cc.instantiate(this.feedbackPrefab);
+		feedback.parent = this.canvas;
+		feedback.color = color;
+		
+		let position = parent.parent.convertToWorldSpaceAR(parent.position);
+		position = this.canvas.convertToNodeSpaceAR(position);
+		feedback.x = position.x;
+		feedback.y = position.y;
+
+		feedback.getComponent(cc.Label).string = text;
+
+		// move up and change opacity
+		let action;
+		if (stay){
+			action = cc.sequence(cc.moveBy(duration, cc.v2(0,100)), cc.fadeOut(duration), cc.callFunc(this.removeFeedback, this, feedback))
+		} else {
+			action = cc.sequence(cc.spawn(cc.moveBy(duration, cc.v2(0,100)), cc.fadeOut(duration)), cc.callFunc(this.removeFeedback, this, feedback))
+		}
+		
+		feedback.runAction( action );
+	},
+
+	removeFeedback: function(feedback){
+		feedback.destroy();
+	},
 
 	// update (dt) {},
 });
