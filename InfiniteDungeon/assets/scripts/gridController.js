@@ -10,8 +10,6 @@ var gridController = cc.Class({
 
 	properties: {
 		tilePrefab: cc.Prefab,
-		tile15Prefab: cc.Prefab,
-		tile20Prefab: cc.Prefab,
 		feedbackPrefab: cc.Prefab,
 
 		gridNode: cc.Node,
@@ -82,16 +80,15 @@ var gridController = cc.Class({
 		this.clickable = 0;
 		this.running = false;
 		this.timeToRun = 0.5;
-		this.size = 10;
-		if (window.gameSession.level > 50){
-			this.size = 15;
-			this.tilePrefab = this.tile15Prefab;
-		}
+		let tileQTD = Math.min(Math.floor(window.gameSession.level/10), 10);
+		this.size = 10 + tileQTD;
+		
+		let tileWidth = [75, 68, 62.1, 57.2, 53, 49.3, 46.1, 43.2, 40.7, 38.5, 36.5];
+		let subtileWidth = [54, 48.9, 44.7, 41.2, 38.1, 35.5, 33.2, 31.1, 29.3, 27.7, 26.2];
 
-		if (window.gameSession.level > 100){
-			this.size = 20;
-			this.tilePrefab = this.tile20Prefab;
-		}
+		this.tileWidth = tileWidth[tileQTD];
+		this.subtileWidth = subtileWidth[tileQTD];
+
 		this.gridSize = this.size * this.size - 1;
 
 		this.initGrid(this.size);
@@ -594,6 +591,13 @@ var gridController = cc.Class({
 
 				let cell = cc.instantiate(this.tilePrefab);
 				this.gridUI[i][j] = cell;
+
+				cell.width = this.tileWidth;
+				cell.height = this.tileWidth;
+				let child = cell.getChildByName("content");
+				child.width = this.subtileWidth;
+				child.height = this.subtileWidth;
+
 				cell.parent = this.gridNode;
 				cell.rotation = tile.rotation;
 				let sprite = cell.getComponent(cc.Sprite);
