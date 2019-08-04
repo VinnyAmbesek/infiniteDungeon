@@ -67,6 +67,7 @@ var gridController = cc.Class({
 		this.enumStatus = {hidden: 0, flashing: 1, visible: 2};
 		this.enumContent = {empty: 0, treasure: 1, danger: 2, darkness: 3, monster: 4};
 		this.enumSprite = {entrance: 0, exit: 1, deadend: 2, curve: 3, line: 4, threeway: 5, fourway: 6};
+		this.enumClass = {undefined: 0, rogue: 1, fighter: 2, wizard: 3};
 
 		this.initUI();
 		this.showUpgrades();

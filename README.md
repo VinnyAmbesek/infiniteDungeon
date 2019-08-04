@@ -46,7 +46,7 @@
 - Weapon upgrades: increase your skill with the weapon.
 
 ## Maze
-- The maze size increaes each 10 levels.
+- The maze size increases each 10 levels.
 - Each floor multiple of 5 has a chance of reorganizing the floor while you are at it. 
 - If that happens, all tiles go black, and the exit and entrance change position. 
 
