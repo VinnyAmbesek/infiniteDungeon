@@ -11,6 +11,7 @@ var gridController = cc.Class({
 	properties: {
 		tilePrefab: cc.Prefab,
 		feedbackPrefab: cc.Prefab,
+		logPrefab: cc.Prefab,
 
 		gridNode: cc.Node,
 		nextButton: cc.Node,
@@ -19,6 +20,7 @@ var gridController = cc.Class({
 		canvas: cc.Node,
 		inventoryButton: cc.Node,
 		dungeonAchievement: cc.Node,
+		feedbackLog: cc.Node,
 
 		dungeonHP: cc.Label,
 		dungeonLevel: cc.Label,
@@ -1083,6 +1085,12 @@ var gridController = cc.Class({
 		}
 		
 		feedback.runAction( action );
+
+		//add to log
+		let log = cc.instantiate(this.logPrefab);
+		log.parent = this.feedbackLog;
+		log.getComponent(cc.Label).string = text;
+		log.color = color;
 	},
 
 	removeFeedback: function(feedback){

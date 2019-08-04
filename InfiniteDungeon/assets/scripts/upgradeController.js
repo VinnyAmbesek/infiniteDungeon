@@ -15,9 +15,11 @@ var upgradeController = cc.Class({
 		grid: cc.Node,
 		canvas: cc.Node,
 		dungeonAchievement: cc.Node,
+		feedbackLog: cc.Node,
 
 		button: cc.Prefab,
 		feedbackPrefab: cc.Prefab,
+		logPrefab: cc.Prefab,
 
 		dungeonXP: cc.Label,
 
@@ -330,6 +332,12 @@ var upgradeController = cc.Class({
 		}
 		
 		feedback.runAction( action );
+
+		//add to log
+		let log = cc.instantiate(this.logPrefab);
+		log.parent = this.feedbackLog;
+		log.getComponent(cc.Label).string = text;
+		log.color = color;
 	},
 
 	removeFeedback: function(feedback){
