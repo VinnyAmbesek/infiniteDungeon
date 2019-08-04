@@ -40,6 +40,7 @@ cc.Class({
 
         // mark death
         window.gameSession.death = true;
+        window.gameSession.job = 0;
 
         // reset inventory
         window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fireMin, window.gameSession.inventory.fireMax);

@@ -17,6 +17,7 @@ var gridController = cc.Class({
 		nextButton: cc.Node,
 		upgradePopup: cc.Node,
 		deathPopup: cc.Node,
+		jobPopup: cc.Node,
 		canvas: cc.Node,
 		inventoryButton: cc.Node,
 		dungeonAchievement: cc.Node,
@@ -59,7 +60,12 @@ var gridController = cc.Class({
 		this.enumClass = {undefined: 0, rogue: 1, fighter: 2, wizard: 3};
 
 		this.initUI();
-		this.showUpgrades();
+		if (window.gameSession.job != 0) {
+			this.showUpgrades();
+		} else {
+			this.showJobSelection();
+		}
+		
 
 		this.saveGame();
 
@@ -122,6 +128,10 @@ var gridController = cc.Class({
 			this.upgradePopup.active = true;
 			window.gameGlobals.popup = true;
 		}
+	},
+
+	showJobSelection: function(){
+		this.jobPopup.active = true;
 	},
 
 	initUI: function(){
@@ -278,16 +288,28 @@ var gridController = cc.Class({
 			if (window.gameSession.stats.items.potion % 100 == 0) this.showFeedback("Achievement: Not addicted", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.items.total++;
 			if (window.gameSession.stats.items.total % 100 == 0) this.showFeedback("Achievement: Spender", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			window.gameSession.hp++;
+			
+
 			this.showFeedback("Used potion", new cc.Color(0,255,0), event.target, true);
+			
+			if (window.gameSession.job == this.enumClass["wizard"]) {
+				window.gameSession.hp+=2;
+				this.showFeedback("+2HP", new cc.Color(0,255,0), this.dungeonHP.node, false);
+			} else {
+				window.gameSession.hp++;
+				this.showFeedback("+1HP", new cc.Color(0,255,0), this.dungeonHP.node, false);
+			}
 			this.dungeonHP.string = "HP: " + window.gameSession.hp;
-			this.showFeedback("+1HP", new cc.Color(0,255,0), this.dungeonHP.node, false);
+			
 		}
 		
 		let xp = 0;
 		// extra xp for clean map
 		this.clicks++;
-		if (this.clicks == this.gridSize) xp += window.gameSession.level*101;
+		if (this.clicks == this.gridSize) {
+			xp += window.gameSession.level*(this.gridSize+1);
+			if (window.gameSession.job == this.enumClass["wizard"]) xp += window.gameSession.level*this.gridSize;
+		}
 
 		// gain exploration xp
 		xp += window.gameSession.level;
@@ -304,7 +326,8 @@ var gridController = cc.Class({
 			this.findSubSprite(tile, index);
 			// victory xp
 			if (window.gameSession.hp > 0) {
-				xp += window.gameSession.level*25
+				xp += window.gameSession.level*25;
+				if (window.gameSession.job == this.enumClass["rogue"]) xp += window.gameSession.level*25;
 				window.gameSession.stats.traps.total++;
 				if (window.gameSession.stats.traps.total % 100 == 0) this.showFeedback("Achievement: Trap Finder", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			} else {
@@ -356,6 +379,7 @@ var gridController = cc.Class({
 			// victory xp
 			if (window.gameSession.hp > 0) {
 				xp += window.gameSession.level*25;
+				if (window.gameSession.job == this.enumClass["fighter"]) xp += window.gameSession.level*25;
 			} else {
 				this.deathPopup.active = true;
 				window.gameGlobals.popup = true;
@@ -375,11 +399,6 @@ var gridController = cc.Class({
 		}
 
 		this.revealSubSprite(tile.x,tile.y);
-
-		// show xp gain
-		window.gameSession.xp += xp;
-		this.dungeonXP.string = "XP: " + window.gameSession.xp;
-		this.showFeedback("+" + xp + "XP", new cc.Color(0,255,0), this.dungeonXP.node, false);
 
 		if (tile.tile == this.enumTile["exit"]){
 			// found exit
@@ -406,6 +425,7 @@ var gridController = cc.Class({
 				// victory xp
 				if (window.gameSession.hp > 0) {
 					xp += window.gameSession.level*25;
+					if (window.gameSession.job == this.enumClass["fighter"]) xp += window.gameSession.level*25;
 				} else {
 					this.deathPopup.active = true;
 					window.gameGlobals.popup = true;
@@ -413,6 +433,11 @@ var gridController = cc.Class({
 				}
 			}
 		}
+
+		// show xp gain
+		window.gameSession.xp += xp;
+		this.dungeonXP.string = "XP: " + window.gameSession.xp;
+		this.showFeedback("+" + xp + "XP", new cc.Color(0,255,0), this.dungeonXP.node, false);
 	},
 
 	revealSubSprite: function(x,y){
@@ -427,6 +452,7 @@ var gridController = cc.Class({
 		this.monsters--;
 		this.tracker.string = "Enemies: " + this.monsters;
 		let strength = Math.floor(window.gameSession.level/5) + 1 + boss;
+		if (window.gameSession.job == this.enumClass["fighter"]) strength--;
 		let feedback;
 		let effect;
 		let field;
@@ -516,6 +542,7 @@ var gridController = cc.Class({
 		this.hitTrap = true;
 		this.trapFinder.string = "Traps: " + this.dangers;
 		let strength = Math.floor(window.gameSession.level/10 + 1);
+		if (window.gameSession.job == this.enumClass["rogue"]) strength--;
 		let feedback;
 		let effect;
 		let field;
