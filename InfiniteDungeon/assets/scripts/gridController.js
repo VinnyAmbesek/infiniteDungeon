@@ -673,29 +673,30 @@ var gridController = cc.Class({
 	giveTreasure: function(prize, node){
 		this.treasures--;
 		this.treasureHunter.string = "Treasures: " + this.treasures;
-		window.gameSession.stats.items.chests++;
+		let reward = 1 + window.gameSession.skills.totalShield;
+		window.gameSession.stats.items.chests += reward;
 		if (window.gameSession.stats.items.chests % 100 == 0) this.showFeedback("Achievement: Treasure Hunter", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		if (prize <= 10) {
 			window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potion+1, window.gameSession.inventory.potionMax);
-			this.showFeedback("Got Potion", new cc.Color(0,255,0), node, true);
+			this.showFeedback("Got " + reward + " Potion", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 25 ) {
 			window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fire+1, window.gameSession.inventory.fireMax);
-			this.showFeedback("Got Fire Shield", new cc.Color(0,255,0), node, true);
+			this.showFeedback("Got " + reward + " Fire Shield", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 40 ) {
 			window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.ice+1, window.gameSession.inventory.iceMax);
-			this.showFeedback("Got Ice Shield", new cc.Color(0,255,0), node, true);
+			this.showFeedback("Got " + reward + " Ice Shield", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 55 ) {
 			window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acid+1, window.gameSession.inventory.acidMax);
-			this.showFeedback("Got Acid Shield", new cc.Color(0,255,0), node, true);
+			this.showFeedback("Got " + reward + " Acid Shield", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 70 ) {
 			window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricity+1, window.gameSession.inventory.electricityMax);
-			this.showFeedback("Got Electricity Shield", new cc.Color(0,255,0), node, true);
+			this.showFeedback("Got " + reward + " Electricity Shield", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 85 ) {
 			window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikes+1, window.gameSession.inventory.spikesMax);
-			this.showFeedback("Got Spikes Shield", new cc.Color(0,255,0), node, true);
+			this.showFeedback("Got " + reward + " Spikes Shield", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 100 ) {
 			window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poison+1, window.gameSession.inventory.poisonMax);
-			this.showFeedback("Got Poison Shield", new cc.Color(0,255,0), node, true);
+			this.showFeedback("Got " + reward + " Poison Shield", new cc.Color(0,255,0), node, true);
 		}
 	},
 

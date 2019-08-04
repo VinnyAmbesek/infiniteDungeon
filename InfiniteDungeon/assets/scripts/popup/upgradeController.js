@@ -46,6 +46,7 @@ var upgradeController = cc.Class({
 		this.checkPermanentShield("electricity");
 		this.checkPermanentShield("spikes");
 		this.checkPermanentShield("poison");
+		this.checkPermanentShield("total");
 	},
 
 	setButtons: function(){
@@ -98,6 +99,8 @@ var upgradeController = cc.Class({
 		this.checkPermanentShield("spikes");
 		this.createPermanentShield("Mithridatism", "Permanent poison shield", "poison", 8);
 		this.checkPermanentShield("poison");
+		this.createPermanentShield("Scavenger", "Increase itens got by chest", "total", 9);
+		this.checkPermanentShield("total");
 		//this.checkPermanentShield();
 	},
 

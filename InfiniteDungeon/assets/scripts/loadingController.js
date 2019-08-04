@@ -396,6 +396,7 @@ cc.Class({
         window.gameSession.skills.electricityShield = 0;
         window.gameSession.skills.spikesShield = 0;
         window.gameSession.skills.poisonShield = 0;
+        window.gameSession.skills.totalShield = 0;
 
         window.gameSession.skills.trapFinder = window.gameSession.trapFinder;
         window.gameSession.skills.fireFinder = false;
