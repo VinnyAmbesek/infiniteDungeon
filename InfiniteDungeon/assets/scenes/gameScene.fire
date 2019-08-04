@@ -749,6 +749,12 @@
     },
     "stair_up": {
       "__uuid__": "ca1a3165-b972-4a4a-87da-20413d28de31"
+    },
+    "lever": {
+      "__uuid__": "9419856e-bc4a-491d-b07b-c2e1ccef6cb2"
+    },
+    "stone": {
+      "__uuid__": "46528876-2cc5-4b78-a244-db5cea85dc65"
     }
   },
   {
@@ -4553,7 +4559,7 @@
       }
     ],
     "_tag": -1,
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 132
@@ -5241,7 +5247,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 756,
-      "height": 3750
+      "height": 3850
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -5267,7 +5273,7 @@
       "__id__": 126
     },
     "_enabled": true,
-    "_N$string": "<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Experience</span></strong></p>\n<p>For each tile you explore you will receive exploration XP based on the floor level.</p>\n<p>For each floor you clear you will get exploration XP as if you explored the floor twice.</p>\n<p>For each trap you survive you will get survival XP as if you explored a quarter of the floor.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Achievements</span></strong></p>\n<p>Some actions will win achievements.</p>\n<p>Achievements will give bonus experience.</p>\n<p>Most achievements have levels, each level giving even more bonus experience.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Treasures</span></strong></p>\n<p>There are 7 kinds of treasure. Protection items and potions.</p>\n<p>You will automatically use a potion when you have damage.</p>\n<p>Protection items will help you against traps.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Traps</span></strong></p>\n<p>There are 6 kinds of traps. If you fall into a trap you take one point of damage.</p>\n<p>Each 10 floors you cross the damage increases in 1.</p>\n<p>For each protection item you have against the trap you decrease the damage in 1.</p>\n<p>The chance of traps increases the further you go.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Combat</span></strong></p>\n<p>There are 3 kinds of weapons: sword (melee), bow (ranged) and wand (magic).</p>\n<p>Each weapon is effective against a kind of enemy.</p>\n<p>If your weapon skill is equal or greater than the enemy level, you beat it without receiving damage.</p>\n<p>If your weapon skill is less than the enemy level you receive damage based on the difference.</p>\n<p>Each 5 levels you fight a sub boss, a little stronger than the enemies of that level.</p>\n<p>Each 10 levels you fight a boss, a lot stronger than the enemies of that level.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Death</span></strong></p>\n<p>When you HP goes under 1 you die.</p>\n<p>When you die you can start a new dungeon.</p>\n<p>All items are lost.</p>\n<p>XP and upgrades are not lost.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Upgrades</span></strong></p>\n<p>You can trade XP for upgrades.</p>\n<p>Starting upgrades: increase your initial items when you start a new game.</p>\n<p>Pocket upgrades: increases the maximum number of items you can carry.</p>\n<p>HP upgrade: increases you maximum HP.</p>\n<p>Secret upgrades: only appear after a secret action is completed.</p>\n<p>Weapon upgrades: increase your skill with the weapon.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Maze</span></strong></p>\n<p>The maze size increases each 10 levels.</p>\n<p>Each floor multiple of 5 has a chance of reorganizing the floor while you are at it.</p>\n<p>If that happens, all tiles go black, and the exit and entrance change position.</p>",
+    "_N$string": "<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Experience</span></strong></p>\n<p>For each tile you explore you will receive exploration XP based on the floor level.</p>\n<p>For each floor you clear you will get exploration XP as if you explored the floor twice.</p>\n<p>For each trap you survive you will get survival XP as if you explored a quarter of the floor.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Achievements</span></strong></p>\n<p>Some actions will win achievements.</p>\n<p>Achievements will give bonus experience.</p>\n<p>Most achievements have levels, each level giving even more bonus experience.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Treasures</span></strong></p>\n<p>There are 7 kinds of treasure. Protection items and potions.</p>\n<p>You will automatically use a potion when you have damage.</p>\n<p>Protection items will help you against traps.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Traps</span></strong></p>\n<p>There are 6 kinds of traps. If you fall into a trap you take one point of damage.</p>\n<p>Each 10 floors you cross the damage increases in 1.</p>\n<p>For each protection item you have against the trap you decrease the damage in 1.</p>\n<p>The chance of traps increases the further you go.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Combat</span></strong></p>\n<p>There are 3 kinds of weapons: sword (melee), bow (ranged) and wand (magic).</p>\n<p>Each weapon is effective against a kind of enemy.</p>\n<p>If your weapon skill is equal or greater than the enemy level, you beat it without receiving damage.</p>\n<p>If your weapon skill is less than the enemy level you receive damage based on the difference.</p>\n<p>Each 5 levels you fight a sub boss, a little stronger than the enemies of that level.</p>\n<p>Each 10 levels you fight a boss, a lot stronger than the enemies of that level.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Death</span></strong></p>\n<p>When you HP goes under 1 you die.</p>\n<p>When you die you can start a new dungeon.</p>\n<p>All items are lost.</p>\n<p>XP and upgrades are not lost.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Upgrades</span></strong></p>\n<p>You can trade XP for upgrades.</p>\n<p>Starting upgrades: increase your initial items when you start a new game.</p>\n<p>Pocket upgrades: increases the maximum number of items you can carry.</p>\n<p>HP upgrade: increases you maximum HP.</p>\n<p>Secret upgrades: only appear after a secret action is completed.</p>\n<p>Weapon upgrades: increase your skill with the weapon.</p>\n<p/>\n<p style=\"margin-bottom: .0001pt;\"><strong><span style=\"font-size: 12.0pt; line-height: 107%;\">Maze</span></strong></p>\n<p>The maze size increases each 10 levels.</p>\n<p>Each floor multiple of 5 has a chance of reorganizing the floor while you are at it.</p>\n<p>If that happens, all tiles go black, and the exit and entrance change position.</p>\n<p>Some floors have locked stairs, find a lever to open them. </p>",
     "_N$horizontalAlign": 0,
     "_N$fontSize": 40,
     "_N$font": null,

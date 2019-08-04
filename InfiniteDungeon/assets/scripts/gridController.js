@@ -43,21 +43,8 @@ var gridController = cc.Class({
 		chest: cc.SpriteFrame,
 		stair_down: cc.SpriteFrame,
 		stair_up: cc.SpriteFrame,
-		// foo: {
-		//	 // ATTRIBUTES:
-		//	 default: null,		// The default value will be used only when the component attaching
-		//						   // to a node for the first time
-		//	 type: cc.SpriteFrame, // optional, default is typeof default
-		//	 serializable: true,   // optional, default is true
-		// },
-		// bar: {
-		//	 get () {
-		//		 return this._bar;
-		//	 },
-		//	 set (value) {
-		//		 this._bar = value;
-		//	 }
-		// },
+		lever: cc.SpriteFrame,
+		stone: cc.SpriteFrame,
 	},
 
 	// onLoad () {},
@@ -65,7 +52,7 @@ var gridController = cc.Class({
 		this.enumSides = {undefined: 0, block: 1, wall: 2, open: 3};
 		this.enumTile = {undefined: 0, entrance: 1, exit: 2, deadend: 3,corridor: 4};
 		this.enumStatus = {hidden: 0, flashing: 1, visible: 2};
-		this.enumContent = {empty: 0, treasure: 1, danger: 2, darkness: 3, monster: 4};
+		this.enumContent = {empty: 0, treasure: 1, danger: 2, darkness: 3, monster: 4, lever: 5};
 		this.enumSprite = {entrance: 0, exit: 1, deadend: 2, curve: 3, line: 4, threeway: 5, fourway: 6};
 		this.enumClass = {undefined: 0, rogue: 1, fighter: 2, wizard: 3};
 
@@ -97,8 +84,11 @@ var gridController = cc.Class({
 
 		this.initGrid(this.size);
 
+		this.closed = window.gameSession.level % 25 == 0;
+
 		// define entrance and exit
 		this.setDoorDirection(this.size);
+		if (this.closed) this.setLever(this.size);
 
 		// make maze
 		this.buildStack = new Array();
@@ -251,7 +241,7 @@ var gridController = cc.Class({
 		if (window.gameGlobals.popup) return;
 
 		// click on exit tile a second time to go to next floor
-		if (event.target.tile.tile == this.enumTile["exit"] && event.target.used){
+		if (event.target.tile.tile == this.enumTile["exit"] && event.target.used && !this.closed){
 			this.nextLevel();
 			return;
 		} else if (event.target.used) {
@@ -337,7 +327,9 @@ var gridController = cc.Class({
 			this.initGrid(this.size);
 
 			// define entrance and exit
+			this.closed = window.gameSession.level % 25 == 0;
 			this.setDoorDirection(this.size);
+			if (this.closed) this.setLever(this.size);
 
 			// make maze
 			this.buildStack = new Array();
@@ -368,6 +360,17 @@ var gridController = cc.Class({
 				this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
 			}
 		}
+		if(tile.content == this.enumContent["lever"]){
+			this.showFeedback("Stairs Unlocked", new cc.Color(0,255,0), this.dungeonLevel.node, true);
+			this.closed = false;
+			let exitTile = this.grid[this.exit.x][this.exit.y];
+			this.findSubSprite(exitTile, -1);
+			// if found lever after exit
+			if (exitTile.status == this.enumStatus["visible"]) {
+				this.revealSubSprite(this.exit.x,this.exit.y);
+				this.nextButton.active = true;
+			}
+		}
 
 		this.revealSubSprite(tile.x,tile.y);
 
@@ -380,7 +383,11 @@ var gridController = cc.Class({
 			// found exit
 			// show next level button
 			this.running = false;
-			this.nextButton.active = true;
+			if (this.closed) {
+				this.showFeedback("Stairs Locked", new cc.Color(255,0,0), this.dungeonLevel.node, true);
+			}else {
+				this.nextButton.active = true;
+			}
 
 			let boss = 0;
 			if (window.gameSession.level%10 == 0) {
@@ -707,6 +714,8 @@ var gridController = cc.Class({
 	findSubSprite: function(tile, index){
 		if (tile.tile == this.enumTile["entrance"]) {
 			tile.subsprite = this.stair_up;
+		} else if (tile.tile == this.enumTile["exit"] && this.closed) {
+			tile.subsprite = this.stone;
 		} else if (tile.tile == this.enumTile["exit"]) {
 			tile.subsprite = this.stair_down;
 		} else if (tile.content == this.enumContent["treasure"]) {
@@ -715,6 +724,8 @@ var gridController = cc.Class({
 			tile.subsprite = this.danger[index-1];
 		} else if (tile.content == this.enumContent["monster"] && index > -1) {
 			tile.subsprite = this.monster[index-1];
+		} else if (tile.content == this.enumContent["lever"]) {
+			tile.subsprite = this.lever;
 		}
 	},
 
@@ -1026,6 +1037,14 @@ var gridController = cc.Class({
 			default:
 				// code block
 		}
+	},
+
+	setLever: function(size){
+		let x = Math.floor((Math.random() * (size-2)) + 1);
+		let y = Math.floor((Math.random() * (size-2)) + 1);
+		let tile = this.grid[x][y];
+		tile.content = this.enumContent["lever"];
+		cc.log(tile);
 	},
 
 	makeDoors: function(x1, y1, x2, y2){

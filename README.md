@@ -49,6 +49,7 @@
 - The maze size increases each 10 levels.
 - Each floor multiple of 5 has a chance of reorganizing the floor while you are at it. 
 - If that happens, all tiles go black, and the exit and entrance change position. 
+- Some floors have locked stairs, find a lever to open them. 
 
 
   [Infinite Dungeon]: <https://vinnyambesek.github.io/infiniteDungeon/>
