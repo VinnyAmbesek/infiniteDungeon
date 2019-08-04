@@ -620,6 +620,8 @@ var gridController = cc.Class({
 			default:
 				// code block
 		}
+		strength -= window.gameSession.skills[field + "Shield"];
+
 		this.showFeedback(feedback, new cc.Color(255,0,0), node, true);
 		this.lastDanger = effect;
 		window.gameSession.stats.traps[field]++;

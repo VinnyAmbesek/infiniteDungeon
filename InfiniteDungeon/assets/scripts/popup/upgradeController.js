@@ -1,13 +1,3 @@
-// Learn cc.Class:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/class.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/class.html
-// Learn Attribute:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/life-cycle-callbacks.html
-
 var upgradeController = cc.Class({
 	extends: cc.Component,
 
@@ -34,21 +24,6 @@ var upgradeController = cc.Class({
 		popups: [cc.Node],
 
 		icons: [cc.SpriteFrame],
-		// foo: {
-		//	 // ATTRIBUTES:
-		//	 default: null,		// The default value will be used only when the component attaching
-		//						   // to a node for the first time
-		//	 type: cc.SpriteFrame, // optional, default is typeof default
-		//	 serializable: true,   // optional, default is true
-		// },
-		// bar: {
-		//	 get () {
-		//		 return this._bar;
-		//	 },
-		//	 set (value) {
-		//		 this._bar = value;
-		//	 }
-		// },
 	},
 
 	// LIFE-CYCLE CALLBACKS:
@@ -64,6 +39,13 @@ var upgradeController = cc.Class({
 		this.checkSpecialButton(window.gameSession.stats.traps.total, window.gameSession.trapFinder, this.trapFinder);
 		this.checkSpecialButton(window.gameSession.stats.items.chests, window.gameSession.treasureHunter, this.treasureHunter);
 		this.checkSpecialButton(window.gameSession.stats.kills.total, window.gameSession.tracker, this.tracker);
+
+		this.checkPermanentShield("fire");
+		this.checkPermanentShield("ice");
+		this.checkPermanentShield("acid");
+		this.checkPermanentShield("electricity");
+		this.checkPermanentShield("spikes");
+		this.checkPermanentShield("poison");
 	},
 
 	setButtons: function(){
@@ -103,7 +85,75 @@ var upgradeController = cc.Class({
 
 		this.createSpecialButton("tracker","Tracker","Find how many enemies are in a floor.","upgradeTracker");
 		this.checkSpecialButton(window.gameSession.stats.kills.total, window.gameSession.tracker, this.tracker);
-		
+
+		this.createPermanentShield("Fireproof", "Permanent fire shield", "fire", 8);
+		this.checkPermanentShield("fire");
+		this.createPermanentShield("Freezeproof", "Permanent ice shield", "ice", 8);
+		this.checkPermanentShield("ice");
+		this.createPermanentShield("Non-corrosive", "Permanent acid shield", "acid", 8);
+		this.checkPermanentShield("acid");
+		this.createPermanentShield("Ground Wire", "Permanent electricity shield", "electricity", 8);
+		this.checkPermanentShield("electricity");
+		this.createPermanentShield("Impenetrable", "Permanent spikes shield", "spikes", 8);
+		this.checkPermanentShield("spikes");
+		this.createPermanentShield("Mithridatism", "Permanent poison shield", "poison", 8);
+		this.checkPermanentShield("poison");
+		//this.checkPermanentShield();
+	},
+
+	createPermanentShield: function(name, desc, field, id){
+		let button = cc.instantiate(this.button);
+		button.parent = this.grid;
+
+		// fill data
+		button.getChildByName("Name").getComponent(cc.Label).string = name;
+		button.getChildByName("Description").getComponent(cc.Label).string = desc;
+		button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.skills[field + "Shield"];
+		button.getChildByName("Price").getComponent(cc.Label).string = (window.gameSession.skills[field + "Shield"] + 1)*5000 + "XP";
+		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[id];
+
+		button.field = field;
+
+		//add click event
+		let eventHandler = new cc.Component.EventHandler();
+        eventHandler.target = this.node;
+        eventHandler.component = "upgradeController";
+        eventHandler.handler = "permanentShield";
+		button.getComponent(cc.Button).clickEvents.push(eventHandler);
+
+		this["perm" + field] = button;
+	},
+
+	checkPermanentShield: function(field){
+		if (window.gameSession.skills[field + "Shield"] < window.gameSession.achievements.items[field] && this["perm" + field]) {
+			this["perm" + field].active = true;
+		} else if (this["perm" + field]) {
+			this["perm" + field].active = false;
+		}
+	},
+
+	permanentShield: function(event){
+		let button = event.target;
+		let field = button.field;
+		let price = (window.gameSession.skills[field + "Shield"] + 1)*5000;
+
+		if (window.gameSession.xp >= price){
+			// take xp
+			window.gameSession.xp -= price;
+			window.gameSession.stats.xp += price;
+			if (window.gameSession.stats.xp % 10000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
+			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+
+			//do upgrade
+			window.gameSession.skills[field + "Shield"]++;
+
+			button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.skills[field + "Shield"];
+			button.getChildByName("Price").getComponent(cc.Label).string = (price+5000) + "XP";
+
+			this.saveGame();
+		}
+
+		this.checkPermanentShield(field);
 	},
 
 	createSpecialButton: function(me, name, desc, callback){
