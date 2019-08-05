@@ -13,7 +13,7 @@ cc.Class({
     start () {
         this.animate();
         this.index = 0;
-        let saveVersion = {major: 0, minor: 4, fix: 0};
+        let saveVersion = {major: 0, minor: 4, fix: 1};
         this.initSession(saveVersion);
         this.next();
     },
@@ -382,7 +382,7 @@ cc.Class({
         window.gameSession.achievements.xp = 0;
         window.gameSession.achievements.tiles = 0;
         
-        window.gameSession.saveVersion = {major: 0, minor: 3, fix: 0};
+        window.gameSession.saveVersion = {major: 0, minor: 4, fix: 1};
     },
 
     updateV4: function(){
