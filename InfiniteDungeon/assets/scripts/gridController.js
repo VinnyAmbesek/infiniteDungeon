@@ -313,6 +313,7 @@ var gridController = cc.Class({
 
 		// gain exploration xp
 		xp += window.gameSession.level;
+		if (window.gameSession.job == this.enumClass["wizard"]) xp += window.gameSession.level;
 
 		// verify room content
 		if(tile.content == this.enumContent["treasure"]) {
@@ -951,7 +952,7 @@ var gridController = cc.Class({
 						this.treasures++;
 						this.treasureHunter.string = "Treasures: " + this.treasures;
 					}
-				} else if (chance <=8 && tile.content == this.enumContent["empty"]) {
+				} else if (chance <=10 && tile.content == this.enumContent["empty"]) {
 					tile.content = this.enumContent["monster"];
 					this.monsters++;
 					this.tracker.string = "Enemies: " + this.monsters;
