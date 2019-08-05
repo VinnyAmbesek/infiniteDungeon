@@ -332,8 +332,8 @@ var upgradeController = cc.Class({
 				button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession[field];
 			}
 			// increase next xp cost
-			window.gameSession.upgrades[field] += (1000 * button.mult);
-			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades[field] + "XP";
+			window.gameSession.upgrades[field] += 1000;
+			button.getChildByName("Price").getComponent(cc.Label).string = (window.gameSession.upgrades[field]*button.mult) + "XP";
 
 			this.saveGame();
 		}
