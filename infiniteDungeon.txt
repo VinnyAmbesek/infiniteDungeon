@@ -1,0 +1,26 @@
+infiniteDungeon
+cash: fill inventory, phoenix feather [full restore on death], ad click to recover hp
+
+roadmap: 
+* upgrade: fire/ice/etc finder: show qtd of traps in level by type [attached to traps achievement lvl]
+* technical debt: make individual controllers, gridController is too big
+* make dungeon exit more random [?]
+* scoreboard
+* better effects
+* better ui
+* change tile colors each 10-50 levels
+* escape death upgrade [attached to death achievement]
+* reveal x traps/treasure/monster upgrade
+
+* retention: daily bonus xp [minQt for 1 upgrade]
+* retention: add push notifications [right time, remeber free upgrade, dont be annoying]
+* retention: add analytics
+* retention: add share into social networks
+* retention: add personalisations
+
+ICON: 
+* dungeon [square]: burned floor, froozen floor, electricity burn floor, acid floor, darts floor, spikes floor, stair up, stair down, open chest
+* UI [image + number space]: HP, XP, Floor, fire shield, ice shield, acid shield, electricity shield, iron boots, chain cape, potion
+* Other: button, font, popup background, maze background, background
+* Effects: burned screen, froozen screen, thunder, acid stream, poisoned darts, spikes
+* Splash screen, game icon. 
