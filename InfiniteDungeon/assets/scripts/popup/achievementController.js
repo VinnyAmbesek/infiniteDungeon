@@ -19,54 +19,54 @@ var achievementController = cc.Class({
         this.updateSpecialButton("darkness");
         this.updateSpecialButton("lucky");
 
-        this.updateButton(this["levelMax"], null, "levelMax", 100);
-        this.updateButton(this["xp"], null, "xp", 0.01);
-        this.updateButton(this["tiles"], null, "tiles", 0.1);
+        this.updateButton(this["levelMax"]);
+        this.updateButton(this["xp"]);
+        this.updateButton(this["tiles"]);
 
-        this.updateButton(this["killstotal"], "kills", "total", 1);
-        this.updateButton(this["killsmelee"], "kills", "melee", 1);
-        this.updateButton(this["killsranged"], "kills", "ranged", 1);
-        this.updateButton(this["killsmagic"], "kills", "magic", 1);
+        this.updateButton(this["killstotal"]);
+        this.updateButton(this["killsmelee"]);
+        this.updateButton(this["killsranged"]);
+        this.updateButton(this["killsmagic"]);
 
-        this.updateButton(this["trapstotal"], "traps", "total", 1);
-        this.updateButton(this["trapsfire"], "traps", "fire", 1);
-        this.updateButton(this["trapsice"], "traps", "ice", 1);
-        this.updateButton(this["trapsacid"], "traps", "acid", 1);
-        this.updateButton(this["trapselectricity"], "traps", "electricity", 1);
-        this.updateButton(this["trapsspikes"], "traps", "spikes", 1);
-        this.updateButton(this["trapspoison"], "traps", "poison", 1);
+        this.updateButton(this["trapstotal"]);
+        this.updateButton(this["trapsfire"]);
+        this.updateButton(this["trapsice"]);
+        this.updateButton(this["trapsacid"]);
+        this.updateButton(this["trapselectricity"]);
+        this.updateButton(this["trapsspikes"]);
+        this.updateButton(this["trapspoison"]);
 
-        this.updateButton(this["itemschests"], "items", "chests", 1);
-        this.updateButton(this["itemstotal"], "items", "total", 1);
-        this.updateButton(this["itemsfire"], "items", "fire", 1);
-        this.updateButton(this["itemsice"], "items", "ice", 1);
-        this.updateButton(this["itemsacid"], "items", "acid", 1);
-        this.updateButton(this["itemselectricity"], "items", "electricity", 1);
-        this.updateButton(this["itemsspikes"], "items", "spikes", 1);
-        this.updateButton(this["itemspoison"], "items", "poison", 1);
-        this.updateButton(this["itemspotion"], "items", "potion", 1);
+        this.updateButton(this["itemschests"]);
+        this.updateButton(this["itemstotal"]);
+        this.updateButton(this["itemsfire"]);
+        this.updateButton(this["itemsice"]);
+        this.updateButton(this["itemsacid"]);
+        this.updateButton(this["itemselectricity"]);
+        this.updateButton(this["itemsspikes"]);
+        this.updateButton(this["itemspoison"]);
+        this.updateButton(this["itemspotion"]);
 
-        this.updateButton(this["damagetotal"], "damage", "total", 1);
-        this.updateButton(this["damagefire"], "damage", "fire", 1);
-        this.updateButton(this["damageice"], "damage", "ice", 1);
-        this.updateButton(this["damageacid"], "damage", "acid", 1);
-        this.updateButton(this["damageelectricity"], "damage", "electricity", 1);
-        this.updateButton(this["damagespikes"], "damage", "spikes", 1);
-        this.updateButton(this["damagepoison"], "damage", "poison", 1);
-        this.updateButton(this["damagemelee"], "damage", "melee", 1);
-        this.updateButton(this["damageranged"], "damage", "ranged", 1);
-        this.updateButton(this["damagemagic"], "damage", "magic", 1);
+        this.updateButton(this["damagetotal"]);
+        this.updateButton(this["damagefire"]);
+        this.updateButton(this["damageice"]);
+        this.updateButton(this["damageacid"]);
+        this.updateButton(this["damageelectricity"]);
+        this.updateButton(this["damagespikes"]);
+        this.updateButton(this["damagepoison"]);
+        this.updateButton(this["damagemelee"]);
+        this.updateButton(this["damageranged"]);
+        this.updateButton(this["damagemagic"]);
 
-        this.updateButton(this["deathtotal"], "death", "total", 10);
-        this.updateButton(this["deathfire"], "death", "fire", 10);
-        this.updateButton(this["deathice"], "death", "ice", 10);
-        this.updateButton(this["deathacid"], "death", "acid", 10);
-        this.updateButton(this["deathelectricity"], "death", "electricity", 10);
-        this.updateButton(this["deathspikes"], "death", "spikes", 10);
-        this.updateButton(this["deathpoison"], "death", "poison", 10);
-        this.updateButton(this["deathmelee"], "death", "melee", 10);
-        this.updateButton(this["deathranged"], "death", "ranged", 10);
-        this.updateButton(this["deathmagic"], "death", "magic", 10);
+        this.updateButton(this["deathtotal"]);
+        this.updateButton(this["deathfire"]);
+        this.updateButton(this["deathice"]);
+        this.updateButton(this["deathacid"]);
+        this.updateButton(this["deathelectricity"]);
+        this.updateButton(this["deathspikes"]);
+        this.updateButton(this["deathpoison"]);
+        this.updateButton(this["deathmelee"]);
+        this.updateButton(this["deathranged"]);
+        this.updateButton(this["deathmagic"]);
     },
 
     start () {
@@ -78,7 +78,7 @@ var achievementController = cc.Class({
         this.createSpecialButton("Lucky", "Cross a floor without hitting any trap", "lucky", 1);
 
         this.createButton("Explorer", "Deepest floor you went", null, "levelMax", 2, 100);
-        this.createButton("High level", "Total XP spent", null, "xp", 2, 0.01);
+        this.createButton("High level", "Total XP spent", null, "xp", 2, 0.001);
         this.createButton("Runner", "Tiles walked", null, "tiles", 2, 0.1);
 
         this.createButton("God of War", "Enemies you defeated", "kills", "total", 3, 1);
@@ -95,7 +95,7 @@ var achievementController = cc.Class({
         this.createButton("Holed wall", "Total poisoned dart traps found the hard way", "traps", "poison", 6, 10);
 
         this.createButton("Treasure Hunter", "Total chests found", "items", "chests", 7, 1);
-        this.createButton("Spender", "Total items used", "items", "total", 8, 1);
+        this.createButton("Spender", "Total items used", "items", "total", 8, 0.5);
         this.createButton("Like sunscreen", "Total fire shields used", "items", "fire", 9, 5);
         this.createButton("A warm blanket", "Total ice shields used", "items", "ice", 9, 5);
         this.createButton("Still intact", "Total acid shields used", "items", "acid", 9, 5);
@@ -304,13 +304,16 @@ var achievementController = cc.Class({
         }
 
         // update button
-        this.updateButton(button, sub, field, button.mult);
+        this.updateButton(button, sub, field);
 
         this.saveGame();
     },
 
-    updateButton(button, sub, field, mult){
+    updateButton(button){
         if (!button) return;
+        let mult = button.mult;
+        let sub = button.sub;
+        let field = button.field;
 
         let achievement;
         let stat;
