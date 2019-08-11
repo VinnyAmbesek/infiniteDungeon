@@ -1,0 +1,30 @@
+{
+  "ver": "1.0.0",
+  "uuid": "4b70c160-d524-4bcf-9d8a-a18a88760a45",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "subMetas": {
+    "Treasure_hud": {
+      "ver": "1.0.3",
+      "uuid": "5a38f737-89b8-4ba6-b1f9-c8cec70c2a8d",
+      "rawTextureUuid": "4b70c160-d524-4bcf-9d8a-a18a88760a45",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 250,
+      "height": 50,
+      "rawWidth": 250,
+      "rawHeight": 50,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}

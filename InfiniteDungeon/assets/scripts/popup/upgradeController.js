@@ -144,8 +144,8 @@ var upgradeController = cc.Class({
 			// take xp
 			window.gameSession.xp -= price;
 			window.gameSession.stats.xp += price;
-			if (window.gameSession.stats.xp % 10000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+			if (window.gameSession.stats.xp % 100000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
+			this.dungeonXP.string = window.gameSession.xp;
 
 			//do upgrade
 			window.gameSession.skills[field + "Shield"]++;
@@ -196,8 +196,8 @@ var upgradeController = cc.Class({
 			// take xp
 			window.gameSession.xp -= 5000;
 			window.gameSession.stats.xp += 5000;
-			if (window.gameSession.stats.xp % 10000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+			if (window.gameSession.stats.xp % 100000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
+			this.dungeonXP.string = window.gameSession.xp;
 
 			// do upgrade
 			window.gameSession[upgrade] = true;
@@ -263,8 +263,8 @@ var upgradeController = cc.Class({
 			// take xp
 			window.gameSession.xp -= window.gameSession.upgrades.levelMin;
 			window.gameSession.stats.xp += window.gameSession.upgrades.levelMin;
-			if (window.gameSession.stats.xp % 10000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+			if (window.gameSession.stats.xp % 100000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
+			this.dungeonXP.string = window.gameSession.xp;
 
 			// do upgrade
 			if (window.gameSession.levelMin == 1){
@@ -320,8 +320,8 @@ var upgradeController = cc.Class({
 			// take xp
 			window.gameSession.xp -= window.gameSession.upgrades[field];
 			window.gameSession.stats.xp += window.gameSession.upgrades[field];
-			if (window.gameSession.stats.xp % 10000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			this.dungeonXP.string = "XP: " + window.gameSession.xp;
+			if (window.gameSession.stats.xp % 100000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
+			this.dungeonXP.string = window.gameSession.xp;
 			// do upgrade
 			if (window.gameSession.inventory[field] != null) {
 				window.gameSession.inventory[field] += 1;

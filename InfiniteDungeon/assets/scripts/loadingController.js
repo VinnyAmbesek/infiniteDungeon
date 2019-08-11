@@ -13,7 +13,7 @@ cc.Class({
     start () {
         this.animate();
         this.index = 0;
-        let saveVersion = {major: 0, minor: 4, fix: 2};
+        let saveVersion = {major: 0, minor: 4, fix: 3};
         this.initSession(saveVersion);
         this.next();
     },
@@ -22,6 +22,7 @@ cc.Class({
         if (saved.major == 0 && saved.minor == 1) this.updateV2();
         if (saved.major == 0 && saved.minor == 2) this.updateV3();
         if (saved.major == 0 && saved.minor == 3) this.updateV4();
+        if (saved.major == 0 && saved.minor == 4 && saved.fix <= 2) this.updateV4b();
     },
 
     initSession: function(saveVersion){
@@ -232,6 +233,34 @@ cc.Class({
         window.gameSession.achievements.xp = 0;
         window.gameSession.achievements.tiles = 0;
 
+        //tutorial
+        window.gameSession.tutorial = {};
+
+        window.gameSession.skills = {};
+        window.gameSession.skills.treasureHunter = window.gameSession.treasureHunter;
+        window.gameSession.skills.fireShield = 0;
+        window.gameSession.skills.iceShield = 0;
+        window.gameSession.skills.acidShield = 0;
+        window.gameSession.skills.electricityShield = 0;
+        window.gameSession.skills.spikesShield = 0;
+        window.gameSession.skills.poisonShield = 0;
+        window.gameSession.skills.totalShield = 0;
+
+        window.gameSession.skills.trapFinder = window.gameSession.trapFinder;
+        window.gameSession.skills.fireFinder = false;
+        window.gameSession.skills.iceFinder = false;
+        window.gameSession.skills.acidFinder = false;
+        window.gameSession.skills.electricityFinder = false;
+        window.gameSession.skills.spikesFinder = false;
+        window.gameSession.skills.poisonFinder = false;
+
+        window.gameSession.skills.tracker = window.gameSession.tracker;
+        window.gameSession.skills.meleeTracker = false;
+        window.gameSession.skills.rangedTracker = false;
+        window.gameSession.skills.magicTracker = false;
+
+        window.gameSession.job = 0;
+
         //save version
         window.gameSession.saveVersion = saveVersion;
     },
@@ -382,7 +411,7 @@ cc.Class({
         window.gameSession.achievements.xp = 0;
         window.gameSession.achievements.tiles = 0;
         
-        window.gameSession.saveVersion = {major: 0, minor: 4, fix: 2};
+        window.gameSession.saveVersion = {major: 0, minor: 3, fix: 0};
     },
 
     updateV4: function(){
@@ -414,6 +443,40 @@ cc.Class({
         window.gameSession.job = 0;
 
         window.gameSession.saveVersion = {major: 0, minor: 4, fix: 0};
+    },
+
+    updateV4b: function(){
+        if (!window.gameSession.tutorial) window.gameSession.tutorial = {};
+
+        if (!window.gameSession.skills){
+            window.gameSession.skills = {};
+            window.gameSession.skills.treasureHunter = window.gameSession.treasureHunter;
+            window.gameSession.skills.fireShield = 0;
+            window.gameSession.skills.iceShield = 0;
+            window.gameSession.skills.acidShield = 0;
+            window.gameSession.skills.electricityShield = 0;
+            window.gameSession.skills.spikesShield = 0;
+            window.gameSession.skills.poisonShield = 0;
+            window.gameSession.skills.totalShield = 0;
+
+            window.gameSession.skills.trapFinder = window.gameSession.trapFinder;
+            window.gameSession.skills.fireFinder = false;
+            window.gameSession.skills.iceFinder = false;
+            window.gameSession.skills.acidFinder = false;
+            window.gameSession.skills.electricityFinder = false;
+            window.gameSession.skills.spikesFinder = false;
+            window.gameSession.skills.poisonFinder = false;
+
+            window.gameSession.skills.tracker = window.gameSession.tracker;
+            window.gameSession.skills.meleeTracker = false;
+            window.gameSession.skills.rangedTracker = false;
+            window.gameSession.skills.magicTracker = false;
+
+        }
+
+        if (!window.gameSession.job) window.gameSession.job = 0;
+
+        window.gameSession.saveVersion = {major: 0, minor: 4, fix: 3};
     },
 
     animate: function(){

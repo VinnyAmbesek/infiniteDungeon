@@ -30,6 +30,7 @@ var gridController = cc.Class({
 		treasureHunter: cc.Label,
 		tracker: cc.Label,
 		deathMessage: cc.Label,
+		shields: [cc.Label],
 
 		door_corner: cc.SpriteFrame,
 		door_side: cc.SpriteFrame,
@@ -135,9 +136,16 @@ var gridController = cc.Class({
 	},
 
 	initUI: function(){
-		this.dungeonLevel.string = "Floor: " + window.gameSession.level;
-		this.dungeonXP.string = "XP: " + window.gameSession.xp;
-		this.dungeonHP.string = "HP: " + window.gameSession.hp;
+		this.dungeonLevel.string = window.gameSession.level;
+		this.dungeonXP.string = window.gameSession.xp;
+		this.dungeonHP.string = window.gameSession.hp;
+
+		this.shields[0].string = window.gameSession.inventory.fire;
+		this.shields[1].string = window.gameSession.inventory.ice;
+		this.shields[2].string = window.gameSession.inventory.acid;
+		this.shields[3].string = window.gameSession.inventory.electricity;
+		this.shields[4].string = window.gameSession.inventory.spikes;
+		this.shields[5].string = window.gameSession.inventory.poison;
 	},
 
 	cleanGrid: function (size){
@@ -299,7 +307,7 @@ var gridController = cc.Class({
 				window.gameSession.hp++;
 				this.showFeedback("+1HP", new cc.Color(0,255,0), this.dungeonHP.node, false);
 			}
-			this.dungeonHP.string = "HP: " + window.gameSession.hp;
+			this.dungeonHP.string = window.gameSession.hp;
 			
 		}
 		
@@ -437,7 +445,7 @@ var gridController = cc.Class({
 
 		// show xp gain
 		window.gameSession.xp += xp;
-		this.dungeonXP.string = "XP: " + window.gameSession.xp;
+		this.dungeonXP.string = window.gameSession.xp;
 		this.showFeedback("+" + xp + "XP", new cc.Color(0,255,0), this.dungeonXP.node, false);
 	},
 
@@ -451,7 +459,7 @@ var gridController = cc.Class({
 
 	fightMonster: function(monster, node, boss){
 		this.monsters--;
-		this.tracker.string = "Enemies: " + this.monsters;
+		this.tracker.string = this.monsters;
 		let strength = Math.floor(window.gameSession.level/5) + 1 + boss;
 		if (window.gameSession.job == this.enumClass["fighter"]) strength--;
 		let feedback;
@@ -514,7 +522,7 @@ var gridController = cc.Class({
 			if (window.gameSession.stats.damage[field] % 100 == 0) this.showFeedback("Achievement: " + achivDamage, new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.damage.total += strength;
 			if (window.gameSession.stats.damage.total % 100 == 0) this.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			this.dungeonHP.string = "HP: " + window.gameSession.hp;
+			this.dungeonHP.string = window.gameSession.hp;
 		}
 
 		if (window.gameSession.hp > 0) {
@@ -541,7 +549,7 @@ var gridController = cc.Class({
 	fightDanger: function(danger, node){
 		this.dangers--;
 		this.hitTrap = true;
-		this.trapFinder.string = "Traps: " + this.dangers;
+		this.trapFinder.string = this.dangers;
 		let strength = Math.floor(window.gameSession.level/10 + 1);
 		if (window.gameSession.job == this.enumClass["rogue"]) strength--;
 		let feedback;
@@ -635,6 +643,7 @@ var gridController = cc.Class({
 			// lose shields up to strength of danger
 			window.gameSession.inventory[field] -= protection;
 			window.gameSession.stats.items[field] += protection; 
+			this.shields[danger-1].string = window.gameSession.inventory[field];
 			if (window.gameSession.stats.items[field] % 100 == 0) this.showFeedback("Achievement: " + achivItem, new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.items.total += protection;
 			if (window.gameSession.stats.items.total % 100 == 0) this.showFeedback("Achievement: Spender", new cc.Color(0,255,0), this.dungeonAchievement, true);
@@ -653,7 +662,7 @@ var gridController = cc.Class({
 			if (window.gameSession.stats.items[field] % 100 == 0) this.showFeedback("Achievement: " + achivItem, new cc.Color(0,255,0), this.dungeonAchievement, true);
 			window.gameSession.stats.damage.total += strength;
 			if (window.gameSession.stats.damage.total % 100 == 0) this.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			this.dungeonHP.string = "HP: " + window.gameSession.hp;
+			this.dungeonHP.string = window.gameSession.hp;
 		}
 		if (window.gameSession.hp <= 0) {
 			if (window.gameSession.hp < -9) {
@@ -673,7 +682,7 @@ var gridController = cc.Class({
 
 	giveTreasure: function(prize, node){
 		this.treasures--;
-		this.treasureHunter.string = "Treasures: " + this.treasures;
+		this.treasureHunter.string = this.treasures;
 		let reward = 1 + window.gameSession.skills.totalShield;
 		window.gameSession.stats.items.chests += reward;
 		if (window.gameSession.stats.items.chests % 100 == 0) this.showFeedback("Achievement: Treasure Hunter", new cc.Color(0,255,0), this.dungeonAchievement, true);
@@ -683,21 +692,27 @@ var gridController = cc.Class({
 		} else if (prize <= 25 ) {
 			window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fire+reward, window.gameSession.inventory.fireMax);
 			this.showFeedback("Got " + reward + " Fire Shield", new cc.Color(0,255,0), node, true);
+			this.shields[0].string = window.gameSession.inventory.fire;
 		} else if (prize <= 40 ) {
 			window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.ice+reward, window.gameSession.inventory.iceMax);
 			this.showFeedback("Got " + reward + " Ice Shield", new cc.Color(0,255,0), node, true);
+			this.shields[1].string = window.gameSession.inventory.ice;
 		} else if (prize <= 55 ) {
 			window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acid+reward, window.gameSession.inventory.acidMax);
 			this.showFeedback("Got " + reward + " Acid Shield", new cc.Color(0,255,0), node, true);
+			this.shields[2].string = window.gameSession.inventory.acid;
 		} else if (prize <= 70 ) {
 			window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricity+reward, window.gameSession.inventory.electricityMax);
 			this.showFeedback("Got " + reward + " Electricity Shield", new cc.Color(0,255,0), node, true);
+			this.shields[3].string = window.gameSession.inventory.electricity;
 		} else if (prize <= 85 ) {
 			window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikes+reward, window.gameSession.inventory.spikesMax);
 			this.showFeedback("Got " + reward + " Spikes Shield", new cc.Color(0,255,0), node, true);
+			this.shields[4].string = window.gameSession.inventory.spikes;
 		} else if (prize <= 100 ) {
 			window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poison+reward, window.gameSession.inventory.poisonMax);
 			this.showFeedback("Got " + reward + " Poison Shield", new cc.Color(0,255,0), node, true);
+			this.shields[5].string = window.gameSession.inventory.poison;
 		}
 	},
 
@@ -850,11 +865,11 @@ var gridController = cc.Class({
 			// 25% de chance de perigo +1% por level, max 50%
 			tile.content = this.enumContent["danger"];
 			this.dangers++;
-			this.trapFinder.string = "Traps: " + this.dangers;
+			this.trapFinder.string = this.dangers;
 		} else if (tile.content == this.enumContent["empty"] && tile.tile != this.enumTile["entrance"] && tile.tile != this.enumTile["exit"]) {
 			tile.content = this.enumContent["treasure"];
 			this.treasures++;
-			this.treasureHunter.string = "Treasures: " + this.treasures;
+			this.treasureHunter.string = this.treasures;
 		}	
 	},
 	showLine: function(tile){
@@ -946,16 +961,16 @@ var gridController = cc.Class({
 						// 25% de chance de perigo +1% por level, max 50%
 						tile.content = this.enumContent["danger"];
 						this.dangers++;
-						this.trapFinder.string = "Traps: " + this.dangers;
+						this.trapFinder.string = this.dangers;
 					} else{
 						tile.content = this.enumContent["treasure"];
 						this.treasures++;
-						this.treasureHunter.string = "Treasures: " + this.treasures;
+						this.treasureHunter.string = this.treasures;
 					}
 				} else if (chance <=10 && tile.content == this.enumContent["empty"]) {
 					tile.content = this.enumContent["monster"];
 					this.monsters++;
-					this.tracker.string = "Enemies: " + this.monsters;
+					this.tracker.string = this.monsters;
 				}
 			}
 			// make a path in random direction
