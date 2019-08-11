@@ -31,6 +31,7 @@ var gridController = cc.Class({
 		tracker: cc.Label,
 		deathMessage: cc.Label,
 		shields: [cc.Label],
+		trapsQtd: [cc.Label],
 
 		door_corner: cc.SpriteFrame,
 		door_side: cc.SpriteFrame,
@@ -73,6 +74,7 @@ var gridController = cc.Class({
 		// init variables
 		this.clicks = 0;
 		this.dangers = 0;
+		this.dangersType = [0,0,0,0,0,0];
 		this.treasures = 0;
 		this.monsters = 0;
 		this.clickable = 0;
@@ -112,6 +114,12 @@ var gridController = cc.Class({
 		// show upgrades
 		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
 		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
+		if(window.gameSession.fireFinder) this.trapsQtd[0].node.active = true;
+		if(window.gameSession.iceFinder) this.trapsQtd[1].node.active = true;
+		if(window.gameSession.acidFinder) this.trapsQtd[2].node.active = true;
+		if(window.gameSession.electricityFinder) this.trapsQtd[3].node.active = true;
+		if(window.gameSession.spikesFinder) this.trapsQtd[4].node.active = true;
+		if(window.gameSession.poisonFinder) this.trapsQtd[5].node.active = true;
 		if(window.gameSession.tracker) this.tracker.node.active = true;
 	},
 
@@ -153,6 +161,7 @@ var gridController = cc.Class({
 
 		this.clicks = 0;
 		this.dangers = 0;
+		this.dangersType = [0,0,0,0,0,0];
 		this.treasures = 0;
 		this.monsters = 0;
 
@@ -276,6 +285,12 @@ var gridController = cc.Class({
 
 		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
 		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
+		if(window.gameSession.fireFinder) this.trapsQtd[0].node.active = true;
+		if(window.gameSession.iceFinder) this.trapsQtd[1].node.active = true;
+		if(window.gameSession.acidFinder) this.trapsQtd[2].node.active = true;
+		if(window.gameSession.electricityFinder) this.trapsQtd[3].node.active = true;
+		if(window.gameSession.spikesFinder) this.trapsQtd[4].node.active = true;
+		if(window.gameSession.poisonFinder) this.trapsQtd[5].node.active = true;
 		if(window.gameSession.tracker) this.tracker.node.active = true;
 
 		this.startRunning();
@@ -330,9 +345,8 @@ var gridController = cc.Class({
 		}
 		if(tile.content == this.enumContent["danger"]) {
 			this.running = false;
-			let index = Math.floor((Math.random() * 6) + 1);
-			this.fightDanger(index, event.target);
-			this.findSubSprite(tile, index);
+			this.fightDanger(tile.contentType, event.target);
+			this.findSubSprite(tile, tile.contentType);
 			// victory xp
 			if (window.gameSession.hp > 0) {
 				xp += window.gameSession.level*25;
@@ -565,6 +579,8 @@ var gridController = cc.Class({
 			if (!window.gameSession.achievements.unique.daredevil) this.showFeedback("Achievement: Daredevil", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		}
 
+		this.dangersType[danger-1]--;
+		this.trapsQtd[danger-1].string = this.dangersType[danger-1];
 		switch(danger) {
 			case 1:
 				// code block
@@ -864,6 +880,9 @@ var gridController = cc.Class({
 		if (chance <= 25+level && tile.content == this.enumContent["empty"] && tile.tile != this.enumTile["entrance"] && tile.tile != this.enumTile["exit"]) {
 			// 25% de chance de perigo +1% por level, max 50%
 			tile.content = this.enumContent["danger"];
+			tile.contentType = Math.floor((Math.random() * 6) + 1);
+			this.dangersType[tile.contentType-1]++;
+			this.trapsQtd[tile.contentType-1].string = this.dangersType[tile.contentType-1];
 			this.dangers++;
 			this.trapFinder.string = this.dangers;
 		} else if (tile.content == this.enumContent["empty"] && tile.tile != this.enumTile["entrance"] && tile.tile != this.enumTile["exit"]) {
@@ -960,6 +979,9 @@ var gridController = cc.Class({
 					} else if (chance <= 25+level) {
 						// 25% de chance de perigo +1% por level, max 50%
 						tile.content = this.enumContent["danger"];
+						tile.contentType = Math.floor((Math.random() * 6) + 1);
+						this.dangersType[tile.contentType-1]++;
+						this.trapsQtd[tile.contentType-1].string = this.dangersType[tile.contentType-1];
 						this.dangers++;
 						this.trapFinder.string = this.dangers;
 					} else{

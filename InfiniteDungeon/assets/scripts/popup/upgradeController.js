@@ -37,6 +37,12 @@ var upgradeController = cc.Class({
 	onEnable (){
 		this.checkSecretPassage();
 		this.checkSpecialButton(window.gameSession.stats.traps.total, window.gameSession.trapFinder, this.trapFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.fire, window.gameSession.fireFinder, this.fireFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.ice, window.gameSession.iceFinder, this.iceFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.acid, window.gameSession.acidFinder, this.acidFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.electricity, window.gameSession.electricityFinder, this.electricityFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.spikes, window.gameSession.spikesFinder, this.spikesFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.poison, window.gameSession.poisonFinder, this.poisonFinder);
 		this.checkSpecialButton(window.gameSession.stats.items.chests, window.gameSession.treasureHunter, this.treasureHunter);
 		this.checkSpecialButton(window.gameSession.stats.kills.total, window.gameSession.tracker, this.tracker);
 
@@ -80,6 +86,18 @@ var upgradeController = cc.Class({
 
 		this.createSpecialButton("trapFinder","Trap Finder","Find how many traps exist in a floor.","upgradeTrapFinder");
 		this.checkSpecialButton(window.gameSession.stats.traps.total, window.gameSession.trapFinder, this.trapFinder);
+		this.createSpecialButton("fireFinder","Fire Finder","Find how many fire traps exist in a floor.","upgradeFireFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.fire, window.gameSession.fireFinder, this.fireFinder);
+		this.createSpecialButton("iceFinder","Ice Finder","Find how many ice traps exist in a floor.","upgradeIceFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.ice, window.gameSession.iceFinder, this.iceFinder);
+		this.createSpecialButton("acidFinder","Acid Finder","Find how many acid traps exist in a floor.","upgradeAcidFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.acid, window.gameSession.acidFinder, this.acidFinder);
+		this.createSpecialButton("electricityFinder","Electricity Finder","Find how many electricity traps exist in a floor.","upgradeElectricityFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.electricity, window.gameSession.electricityFinder, this.electricityFinder);
+		this.createSpecialButton("spikesFinder","Spikes Finder","Find how many spikes traps exist in a floor.","upgradeSpikesFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.spikes, window.gameSession.spikesFinder, this.spikesFinder);
+		this.createSpecialButton("poisonFinder","Poison Finder","Find how many poison traps exist in a floor.","upgradePoisonFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.poison, window.gameSession.poisonFinder, this.poisonFinder);
 
 		this.createSpecialButton("treasureHunter","Treasure Hunter","Find how many chests exist in a floor.","upgradeTreasureHunter");		
 		this.checkSpecialButton(window.gameSession.stats.items.chests, window.gameSession.treasureHunter, this.treasureHunter);
@@ -181,7 +199,7 @@ var upgradeController = cc.Class({
 	},
 
 	checkSpecialButton: function(req, upgrade, me){
-		if (req > 49 && !(upgrade) && me) {
+		if (req > 99 && !(upgrade) && me) {
 			// show trap finder upgrade
 			me.active = true;
 		} else if (me) {
@@ -209,6 +227,36 @@ var upgradeController = cc.Class({
 
 			this.saveGame();
 		}
+	},
+
+	upgradeFireFinder(event){
+		this.upgradeSpecial(event, "fireFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.fire, window.gameSession.fireFinder, this.fireFinder);
+	},
+
+	upgradeIceFinder(event){
+		this.upgradeSpecial(event, "iceFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.ice, window.gameSession.iceFinder, this.iceFinder);
+	},
+
+	upgradeAcidFinder(event){
+		this.upgradeSpecial(event, "acidFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.acid, window.gameSession.acidFinder, this.acidFinder);
+	},
+
+	upgradeElectricityFinder(event){
+		this.upgradeSpecial(event, "electricityFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.electricity, window.gameSession.electricityFinder, this.electricityFinder);
+	},
+
+	upgradeSpikesFinder(event){
+		this.upgradeSpecial(event, "spikesFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.spikes, window.gameSession.spikesFinder, this.spikesFinder);
+	},
+
+	upgradePoisonFinder(event){
+		this.upgradeSpecial(event, "poisonFinder");
+		this.checkSpecialButton(window.gameSession.stats.traps.poison, window.gameSession.poisonFinder, this.poisonFinder);
 	},
 
 	upgradeTrapFinder(event){

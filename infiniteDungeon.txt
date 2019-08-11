@@ -2,10 +2,10 @@ infiniteDungeon
 cash: fill inventory, phoenix feather [full restore on death], ad click to recover hp
 
 roadmap: 
-
-* upgrade: fire/ice/etc finder: show qtd of traps in level by type [attached to traps achievement lvl]
-* technical debt: make individual controllers, gridController is too big
 * make dungeon exit more random [?]
+* hard currency
+
+* technical debt: make individual controllers, gridController is too big
 * scoreboard
 * better effects
 * better ui
