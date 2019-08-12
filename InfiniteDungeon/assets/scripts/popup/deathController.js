@@ -12,22 +12,8 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        deathPopup: cc.Node
-        // foo: {
-        //     // ATTRIBUTES:
-        //     default: null,        // The default value will be used only when the component attaching
-        //                           // to a node for the first time
-        //     type: cc.SpriteFrame, // optional, default is typeof default
-        //     serializable: true,   // optional, default is true
-        // },
-        // bar: {
-        //     get () {
-        //         return this._bar;
-        //     },
-        //     set (value) {
-        //         this._bar = value;
-        //     }
-        // },
+        deathPopup: cc.Node,
+        hp: cc.Label
     },
 
     iDied: function(){
@@ -55,6 +41,13 @@ cc.Class({
         cc.director.loadScene("gameScene");
     },
 
+    iAmBack: function(){
+        if (window.gameSession.currency < 100) return;
+        window.gameSession.currency -= 100;
+        window.gameSession.hp = window.gameSession.hpMax;
+        this.hp.string = window.gameSession.hp;
+        this.close();
+    },
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {},

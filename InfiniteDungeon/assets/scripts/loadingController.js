@@ -41,6 +41,7 @@ cc.Class({
         window.gameSession = {};
 
         window.gameSession.xp = 0;
+        window.gameSession.currency = 0;
 
         window.gameSession.hp = 3;
         window.gameSession.hpMax = 3;

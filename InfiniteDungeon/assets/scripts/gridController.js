@@ -30,6 +30,7 @@ var gridController = cc.Class({
 		treasureHunter: cc.Label,
 		tracker: cc.Label,
 		deathMessage: cc.Label,
+		currencyLabel: cc.Label,
 		shields: [cc.Label],
 		trapsQtd: [cc.Label],
 
@@ -67,8 +68,8 @@ var gridController = cc.Class({
 		} else {
 			this.showJobSelection();
 		}
-		
-
+		if (!window.gameSession.currency) window.gameSession.currency = 0;
+		this.currencyLabel.string = window.gameSession.currency;
 		this.saveGame();
 
 		// init variables
@@ -739,7 +740,8 @@ var gridController = cc.Class({
 			window.gameSession.stats.unique.lucky = true;
 			if (!window.gameSession.achievements.unique.lucky) this.showFeedback("Achievement: Lucky", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		}
-		
+		window.gameSession.currency++;
+
 		window.gameSession.level++;
 		if (window.gameSession.level > window.gameSession.stats.levelMax) window.gameSession.stats.levelMax = window.gameSession.level;
 		if (window.gameSession.stats.levelMax % 100 == 0) this.showFeedback("Achievement: Explorer", new cc.Color(0,255,0), this.dungeonAchievement, true);
