@@ -3,7 +3,6 @@ cash: fill inventory, phoenix feather [full restore on death], ad click to recov
 
 roadmap: 
 * make dungeon exit more random [?]
-* hard currency
 
 * technical debt: make individual controllers, gridController is too big
 * scoreboard
