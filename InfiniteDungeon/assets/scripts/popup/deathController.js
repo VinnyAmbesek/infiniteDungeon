@@ -46,6 +46,8 @@ cc.Class({
         window.gameSession.currency -= 100;
         window.gameSession.hp = window.gameSession.hpMax;
         this.hp.string = window.gameSession.hp;
+
+        this.saveGame();
         this.close();
     },
     // LIFE-CYCLE CALLBACKS:
@@ -54,6 +56,10 @@ cc.Class({
 
     start () {
 
+    },
+
+    saveGame(){
+        cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
     },
 
     close: function() {

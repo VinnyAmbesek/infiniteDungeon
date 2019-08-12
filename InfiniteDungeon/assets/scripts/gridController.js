@@ -1089,22 +1089,23 @@ var gridController = cc.Class({
 	setDoorDirection: function(size){
 		// sets entrance and exit in opposite sides
 		let dir = Math.floor((Math.random() * 4) + 1);
+		let endMod = Math.floor(Math.random() * Math.floor(this.size/2));
 		switch(dir) {
 			case 1:
 				// north - south
-				this.makeDoors(0, Math.floor((Math.random() * size)), size-1, Math.floor((Math.random() * size)));
+				this.makeDoors(0, Math.floor((Math.random() * size)), size-1-endMod, Math.floor((Math.random() * size)));
 				break;
 			case 2:
 				// south - north
-				this.makeDoors(size-1, Math.floor((Math.random() * size)), 0, Math.floor((Math.random() * size)));
+				this.makeDoors(size-1, Math.floor((Math.random() * size)), 0+endMod, Math.floor((Math.random() * size)));
 				break;
 			case 3:
 				// east - west
-				this.makeDoors(Math.floor((Math.random() * size)), 0, Math.floor((Math.random() * size)), size-1);
+				this.makeDoors(Math.floor((Math.random() * size)), 0, Math.floor((Math.random() * size)), size-1-endMod);
 				break;
 			case 4:
 				// west - east
-				this.makeDoors(Math.floor((Math.random() * size)), size-1, Math.floor((Math.random() * size)), 0);
+				this.makeDoors(Math.floor((Math.random() * size)), size-1, Math.floor((Math.random() * size)), 0+endMod);
 				break;
 			default:
 				// code block
@@ -1116,10 +1117,10 @@ var gridController = cc.Class({
 		let y = Math.floor((Math.random() * (size-2)) + 1);
 		let tile = this.grid[x][y];
 		tile.content = this.enumContent["lever"];
-		cc.log(tile);
 	},
 
 	makeDoors: function(x1, y1, x2, y2){
+		cc.log(x1, y1, x2, y2);
 		// entrance
 		let tile = this.grid[x1][y1];
 		tile.tile = this.enumTile["entrance"];

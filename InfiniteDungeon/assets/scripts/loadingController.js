@@ -13,7 +13,7 @@ cc.Class({
     start () {
         this.animate();
         this.index = 0;
-        let saveVersion = {major: 0, minor: 4, fix: 3};
+        let saveVersion = {major: 0, minor: 5, fix: 0};
         this.initSession(saveVersion);
         this.next();
     },
