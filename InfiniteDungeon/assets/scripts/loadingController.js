@@ -23,6 +23,7 @@ cc.Class({
         if (saved.major == 0 && saved.minor == 2) this.updateV3();
         if (saved.major == 0 && saved.minor == 3) this.updateV4();
         if (saved.major == 0 && saved.minor == 4 && saved.fix <= 2) this.updateV4b();
+        if (saved.major == 0 && saved.minor == 4 && saved.fix > 2) this.updateV5();
     },
 
     initSession: function(saveVersion){
@@ -262,6 +263,9 @@ cc.Class({
 
         window.gameSession.job = 0;
 
+        let d = new Date(); 
+        window.gameSession.date = {d: d.getDate(), m: d.getMonth(), y: d.getFullYear()};
+
         //save version
         window.gameSession.saveVersion = saveVersion;
     },
@@ -478,6 +482,13 @@ cc.Class({
         if (!window.gameSession.job) window.gameSession.job = 0;
 
         window.gameSession.saveVersion = {major: 0, minor: 4, fix: 3};
+    },
+
+    updateV5: function(){
+        let d = new Date(); 
+        window.gameSession.date = {d: d.getDate(), m: d.getMonth(), y: d.getFullYear()};
+
+        window.gameSession.saveVersion = {major: 0, minor: 5, fix: 0};
     },
 
     animate: function(){

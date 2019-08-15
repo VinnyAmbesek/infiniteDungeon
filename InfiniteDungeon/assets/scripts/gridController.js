@@ -18,6 +18,7 @@ var gridController = cc.Class({
 		upgradePopup: cc.Node,
 		deathPopup: cc.Node,
 		jobPopup: cc.Node,
+		rewardPopup: cc.Node,
 		canvas: cc.Node,
 		inventoryButton: cc.Node,
 		dungeonAchievement: cc.Node,
@@ -63,11 +64,12 @@ var gridController = cc.Class({
 		this.enumClass = {undefined: 0, rogue: 1, fighter: 2, wizard: 3};
 
 		this.initUI();
-		if (window.gameSession.job != 0) {
-			this.showUpgrades();
-		} else {
+		if (window.gameSession.job < 1) {
 			this.showJobSelection();
 		}
+		this.showUpgrades();
+		this.checkTime();
+		
 		if (!window.gameSession.currency) window.gameSession.currency = 0;
 		this.currencyLabel.string = window.gameSession.currency;
 		this.saveGame();
@@ -122,6 +124,48 @@ var gridController = cc.Class({
 		if(window.gameSession.spikesFinder) this.trapsQtd[4].node.active = true;
 		if(window.gameSession.poisonFinder) this.trapsQtd[5].node.active = true;
 		if(window.gameSession.tracker) this.tracker.node.active = true;
+	},
+
+	checkTime(){
+		let d = new Date(); 
+		let date = {d: d.getDate(), m: d.getMonth(), y: d.getFullYear()};
+		let lastPrize = window.gameSession.date;
+
+		let newDay = this.isNewDay(date, lastPrize);
+		if (newDay){
+			this.wbPrize();
+			this.rewardPopup.active = true;
+			window.gameSession.date = date;
+			this.saveGame();
+		}
+	},
+
+	isNewDay(today, lastDay){
+		if (lastDay.y < today.y) return true;
+		// went back in time?
+		if (lastDay.y > today.y) return false;
+
+		if (lastDay.m < today.m) return true;
+		// went back in time?
+		if (lastDay.m > today.m) return false;
+
+		if (lastDay.d < today.d) return true;
+		// went back in time?
+		if (lastDay.d > today.d) return false;
+
+		return false;
+	},
+
+	wbPrize(){
+		let minXP = Math.min(window.gameSession.upgrades.fireMin, window.gameSession.upgrades.fireMax, window.gameSession.upgrades.iceMin,
+		window.gameSession.upgrades.iceMax, window.gameSession.upgrades.acidMin, window.gameSession.upgrades.acidMax, window.gameSession.upgrades.electricityMin,
+		window.gameSession.upgrades.electricityMax, window.gameSession.upgrades.spikesMin, window.gameSession.upgrades.spikesMax, window.gameSession.upgrades.poisonMin,
+		window.gameSession.upgrades.poisonMax, window.gameSession.upgrades.potionMin, window.gameSession.upgrades.potionMax, window.gameSession.upgrades.hpMax);
+
+		window.gameSession.xp += minXP;
+		window.gameGlobals.xpReward = minXP;
+		this.dungeonXP.string = window.gameSession.xp;
+		this.showFeedback("+" + minXP + "XP", new cc.Color(0,255,0), this.dungeonXP.node, false);
 	},
 
 	saveGame(){

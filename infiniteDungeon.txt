@@ -2,17 +2,12 @@ infiniteDungeon
 cash: fill inventory, phoenix feather [full restore on death], ad click to recover hp
 
 roadmap: 
-* make dungeon exit more random [?]
-
 * technical debt: make individual controllers, gridController is too big
 * scoreboard
 * better effects
 * better ui
 * change tile colors each 10-50 levels
-* escape death upgrade [attached to death achievement]
-* reveal x traps/treasure/monster upgrade
 
-* retention: daily bonus xp [minQt for 1 upgrade]
 * retention: add push notifications [right time, remeber free upgrade, dont be annoying]
 * retention: add analytics
 * retention: add share into social networks
