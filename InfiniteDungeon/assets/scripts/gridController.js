@@ -136,6 +136,11 @@ var gridController = cc.Class({
 	},
 
 	isNewDay(today, lastDay){
+		if(!lastDay) {
+			window.gameSession.date = today;
+			return false;
+		}
+
 		if (lastDay.y < today.y) return true;
 		// went back in time?
 		if (lastDay.y > today.y) return false;
