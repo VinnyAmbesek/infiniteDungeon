@@ -27,6 +27,7 @@ cc.Class({
     },
 
     setClass: function(event, id){
+        window.analytics.Design_event("class:" + id);
         window.gameSession.job = this.enumClass[id];
         this.saveGame();
         this.close();

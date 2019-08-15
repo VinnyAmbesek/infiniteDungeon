@@ -95,7 +95,7 @@ var achievementController = cc.Class({
         this.createButton("Holed wall", "Total poisoned dart traps found the hard way", "traps", "poison", 6, 50);
 
         this.createButton("Treasure Hunter", "Total chests found", "items", "chests", 7, 1);
-        this.createButton("Spender", "Total items used", "items", "total", 8, 0.5);
+        this.createButton("Spender", "Total items used", "items", "total", 8, 0.25);
         this.createButton("Like sunscreen", "Total fire shields used", "items", "fire", 9, 5);
         this.createButton("A warm blanket", "Total ice shields used", "items", "ice", 9, 5);
         this.createButton("Still intact", "Total acid shields used", "items", "acid", 9, 5);
@@ -177,6 +177,7 @@ var achievementController = cc.Class({
 
         //give prize
         if (progress >= 1 && !(window.gameSession.achievements.unique[field])) {
+            window.analytics.Design_event("achievement:unique:"+field);
             window.gameSession.xp += button.prize;
             this.dungeonXP.string = window.gameSession.xp;
 
@@ -288,14 +289,20 @@ var achievementController = cc.Class({
             if (sub) {
                 window.gameSession.achievements[sub][field]++;
                 if (window.gameSession.achievements[sub][field] > 100) {
+                    // 100 is the limit, if go above it undo
                     window.gameSession.achievements[sub][field] = 100;
                     window.gameSession.xp -= button.prize;
+                } else {
+                    window.analytics.Design_event("achievement:multiple:"+sub+":"+field, window.gameSession.achievements[sub][field]);
                 }
             } else {
                 window.gameSession.achievements[field]++;
                 if (window.gameSession.achievements[field] > 100) {
+                    // 100 is the limit, if go above it undo
                     window.gameSession.achievements[field] = 100;
                     window.gameSession.xp -= button.prize;
+                } else {
+                    window.analytics.Design_event("achievement:multiple:"+field, window.gameSession.achievements[field]);
                 }
             }
 

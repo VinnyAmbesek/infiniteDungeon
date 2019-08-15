@@ -1,10 +1,3 @@
-// Learn cc.Class:
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/class.html
-// Learn Attribute:
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/life-cycle-callbacks.html
-
 var gridController = cc.Class({
 	extends: cc.Component,
 
@@ -56,6 +49,8 @@ var gridController = cc.Class({
 
 	// onLoad () {},
 	start () {
+		window.analytics.Level_Start("Floor " + window.gameSession.level, "Dungeon Scene");
+
 		this.enumSides = {undefined: 0, block: 1, wall: 2, open: 3};
 		this.enumTile = {undefined: 0, entrance: 1, exit: 2, deadend: 3,corridor: 4};
 		this.enumStatus = {hidden: 0, flashing: 1, visible: 2};
@@ -166,6 +161,7 @@ var gridController = cc.Class({
 		window.gameGlobals.xpReward = minXP;
 		this.dungeonXP.string = window.gameSession.xp;
 		this.showFeedback("+" + minXP + "XP", new cc.Color(0,255,0), this.dungeonXP.node, false);
+		window.analytics.Design_event("event:dailyXP", minXP);
 	},
 
 	saveGame(){
@@ -351,6 +347,7 @@ var gridController = cc.Class({
 
 		// use a potion
 		if (window.gameSession.hp < window.gameSession.hpMax && window.gameSession.inventory.potion > 0) {
+			window.analytics.Design_event("event:potion");
 			window.gameSession.inventory.potion--;
 			window.gameSession.stats.items.potion++;
 			if (window.gameSession.stats.items.potion % 100 == 0) this.showFeedback("Achievement: Not addicted", new cc.Color(0,255,0), this.dungeonAchievement, true);
@@ -375,6 +372,7 @@ var gridController = cc.Class({
 		// extra xp for clean map
 		this.clicks++;
 		if (this.clicks == this.gridSize) {
+			window.analytics.Design_event("event:cleanFloor", window.gameSession.level);
 			xp += window.gameSession.level*(this.gridSize+1);
 			if (window.gameSession.job == this.enumClass["wizard"]) xp += window.gameSession.level*this.gridSize;
 		}
@@ -407,6 +405,7 @@ var gridController = cc.Class({
 		if(tile.content == this.enumContent["darkness"]){
 			this.showFeedback("Dungeon Moves!", new cc.Color(255,0,0), this.dungeonLevel.node, true);
 			this.dungeonMoves++;
+			window.analytics.Design_event("event:darkness", this.dungeonMoves);
 			if (this.dungeonMoves> 1) {
 				window.gameSession.stats.unique.darkness = true
 				if (! window.gameSession.achievements.unique.darkness) this.showFeedback("Achievement: Stop Moving!", new cc.Color(0,255,0), this.dungeonAchievement, true);
@@ -455,6 +454,7 @@ var gridController = cc.Class({
 			}
 		}
 		if(tile.content == this.enumContent["lever"]){
+			window.analytics.Design_event("event:lever", window.gameSession.level);
 			this.showFeedback("Stairs Unlocked", new cc.Color(0,255,0), this.dungeonLevel.node, true);
 			this.closed = false;
 			let exitTile = this.grid[this.exit.x][this.exit.y];
@@ -474,6 +474,7 @@ var gridController = cc.Class({
 			this.running = false;
 			if (this.closed) {
 				this.showFeedback("Stairs Locked", new cc.Color(255,0,0), this.dungeonLevel.node, true);
+				window.analytics.Design_event("event:stairsLocked", window.gameSession.level);
 			}else {
 				this.nextButton.active = true;
 			}
@@ -571,8 +572,8 @@ var gridController = cc.Class({
 			window.gameSession.stats.unique.overkill = true;
 			if (!window.gameSession.achievements.unique.overkill) this.showFeedback("Achievement: Overkill", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		}
+		window.analytics.Design_event("Fight:" + field + ":" + strength, window.gameSession.inventory[field]);
 		strength -= Math.min(strength, window.gameSession.inventory[field]);
-
 		// receives strength in damage
 		if (strength>0) {
 			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node, false);
@@ -690,13 +691,14 @@ var gridController = cc.Class({
 			default:
 				// code block
 		}
+		window.analytics.Design_event("Trap:" + field + ":" + strength, window.gameSession.inventory[field]);
 		strength -= window.gameSession.skills[field + "Shield"];
 
 		this.showFeedback(feedback, new cc.Color(255,0,0), node, true);
 		this.lastDanger = effect;
 		window.gameSession.stats.traps[field]++;
 		if (window.gameSession.stats.traps[field] % 100 == 0) this.showFeedback("Achievement: " + achivTrap, new cc.Color(0,255,0), this.dungeonAchievement, true);
-
+		
 		if (window.gameSession.inventory[field] > 0){
 			let shield = window.gameSession.inventory[field];
 			let protection = Math.min(strength, shield);
@@ -748,29 +750,36 @@ var gridController = cc.Class({
 		window.gameSession.stats.items.chests += reward;
 		if (window.gameSession.stats.items.chests % 100 == 0) this.showFeedback("Achievement: Treasure Hunter", new cc.Color(0,255,0), this.dungeonAchievement, true);
 		if (prize <= 10) {
+			window.analytics.Design_event("Treasure:potion", reward);
 			window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potion+reward, window.gameSession.inventory.potionMax);
 			this.showFeedback("Got " + reward + " Potion", new cc.Color(0,255,0), node, true);
 		} else if (prize <= 25 ) {
+			window.analytics.Design_event("Treasure:fire", reward);
 			window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fire+reward, window.gameSession.inventory.fireMax);
 			this.showFeedback("Got " + reward + " Fire Shield", new cc.Color(0,255,0), node, true);
 			this.shields[0].string = window.gameSession.inventory.fire;
 		} else if (prize <= 40 ) {
+			window.analytics.Design_event("Treasure:ice", reward);
 			window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.ice+reward, window.gameSession.inventory.iceMax);
 			this.showFeedback("Got " + reward + " Ice Shield", new cc.Color(0,255,0), node, true);
 			this.shields[1].string = window.gameSession.inventory.ice;
 		} else if (prize <= 55 ) {
+			window.analytics.Design_event("Treasure:acid", reward);
 			window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acid+reward, window.gameSession.inventory.acidMax);
 			this.showFeedback("Got " + reward + " Acid Shield", new cc.Color(0,255,0), node, true);
 			this.shields[2].string = window.gameSession.inventory.acid;
 		} else if (prize <= 70 ) {
+			window.analytics.Design_event("Treasure:electricity", reward);
 			window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricity+reward, window.gameSession.inventory.electricityMax);
 			this.showFeedback("Got " + reward + " Electricity Shield", new cc.Color(0,255,0), node, true);
 			this.shields[3].string = window.gameSession.inventory.electricity;
 		} else if (prize <= 85 ) {
+			window.analytics.Design_event("Treasure:spikes", reward);
 			window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikes+reward, window.gameSession.inventory.spikesMax);
 			this.showFeedback("Got " + reward + " Spikes Shield", new cc.Color(0,255,0), node, true);
 			this.shields[4].string = window.gameSession.inventory.spikes;
 		} else if (prize <= 100 ) {
+			window.analytics.Design_event("Treasure:poison", reward);
 			window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poison+reward, window.gameSession.inventory.poisonMax);
 			this.showFeedback("Got " + reward + " Poison Shield", new cc.Color(0,255,0), node, true);
 			this.shields[5].string = window.gameSession.inventory.poison;
@@ -786,6 +795,7 @@ var gridController = cc.Class({
 		}
 		window.gameSession.currency++;
 
+		window.analytics.Level_Complete("Floor " + window.gameSession.level, "Dungeon Scene");
 		window.gameSession.level++;
 		if (window.gameSession.level > window.gameSession.stats.levelMax) window.gameSession.stats.levelMax = window.gameSession.level;
 		if (window.gameSession.stats.levelMax % 100 == 0) this.showFeedback("Achievement: Explorer", new cc.Color(0,255,0), this.dungeonAchievement, true);
@@ -1164,7 +1174,6 @@ var gridController = cc.Class({
 	},
 
 	makeDoors: function(x1, y1, x2, y2){
-		cc.log(x1, y1, x2, y2);
 		// entrance
 		let tile = this.grid[x1][y1];
 		tile.tile = this.enumTile["entrance"];

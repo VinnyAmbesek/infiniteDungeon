@@ -167,6 +167,7 @@ var upgradeController = cc.Class({
 
 			//do upgrade
 			window.gameSession.skills[field + "Shield"]++;
+			window.analytics.Design_event("upgrade:permanentShield:"+field, window.gameSession.skills[field + "Shield"]);
 
 			button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.skills[field + "Shield"];
 			button.getChildByName("Price").getComponent(cc.Label).string = (price+5000) + "XP";
@@ -211,6 +212,7 @@ var upgradeController = cc.Class({
 		let button = event.target;
 
 		if (window.gameSession.xp >= 5000) {
+			window.analytics.Design_event("upgrade:special:"+upgrade);
 			// take xp
 			window.gameSession.xp -= 5000;
 			window.gameSession.stats.xp += 5000;
@@ -320,6 +322,7 @@ var upgradeController = cc.Class({
 			} else {
 				window.gameSession.levelMin += 5;
 			}
+			window.analytics.Design_event("upgrade:special:secretPassage", window.gameSession.levelMin);
 			
 			button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.levelMin;
 			
@@ -380,11 +383,13 @@ var upgradeController = cc.Class({
 			let price;
 			if (window.gameSession.inventory[field] != null) {
 				window.gameSession.inventory[field] += 1;
+				window.analytics.Design_event("upgrade:common:inventory:"+field, window.gameSession.inventory[field]);
 				price = window.gameSession.inventory[field] + 1;
 				button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.inventory[field];
 				if (button.item) this.giveItem(button.item);
 			} else {
 				window.gameSession[field] += 1;
+				window.analytics.Design_event("upgrade:common:"+field, window.gameSession[field]);
 				price = window.gameSession[field] + 1;
 				button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession[field];
 			}

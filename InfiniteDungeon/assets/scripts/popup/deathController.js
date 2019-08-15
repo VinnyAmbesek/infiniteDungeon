@@ -18,6 +18,7 @@ cc.Class({
 
     iDied: function(){
         this.close();
+        window.analytics.Level_Fail("Floor " + window.gameSession.level, "Dungeon Scene");
         // back to level
         window.gameSession.level = window.gameSession.levelMin;
 
@@ -44,6 +45,7 @@ cc.Class({
     iAmBack: function(){
         if (window.gameSession.currency < 100) return;
         window.gameSession.currency -= 100;
+        window.analytics.Design_event("event:ressurrection", window.gameSession.currency);
         window.gameSession.hp = window.gameSession.hpMax;
         this.hp.string = window.gameSession.hp;
 

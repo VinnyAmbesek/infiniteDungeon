@@ -1,7 +1,10 @@
+const Analytics = require("analytics");
+
 cc.Class({
     extends: cc.Component,
 
     properties: {
+        analytics: Analytics,
         sprite: cc.Sprite,
         tutorial: [cc.SpriteFrame],
         animated: cc.Node,
@@ -11,11 +14,15 @@ cc.Class({
 
     // onLoad () {},
     start () {
+        this.saveLoaded = false;
+        this.timer = 0;
+
         this.animate();
         this.index = 0;
         let saveVersion = {major: 0, minor: 5, fix: 0};
         this.initSession(saveVersion);
-        this.next();
+        this.saveLoaded = true;
+        //this.next();
     },
 
     verifyUpdate: function(saved){
@@ -501,5 +508,18 @@ cc.Class({
         this.animated.runAction(cc.repeatForever(animation));
     },
 
-    // update (dt) {},
+    update (dt) {
+        this.timer += dt;
+
+        if (this.saveLoaded && this.analytics.Analytics_Ready()){
+            this.saveLoaded = false;
+            this.next();
+        }
+
+        if (this.timer > 30 && this.saveLoaded){
+            this.saveLoaded = false;
+            cc.log("Analytics is taking too long");
+            this.next();
+        }
+    },
 });
