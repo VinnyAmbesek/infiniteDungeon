@@ -1,12 +1,16 @@
 {
-  "ver": "1.0.0",
+  "ver": "2.3.3",
   "uuid": "8e0549f6-ab72-41be-8a73-21fd5b73c441",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "platformSettings": {},
   "subMetas": {
     "door_corner": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "78db1a8b-ba9b-43f6-b716-e8f9dc0a9fa3",
       "rawTextureUuid": "8e0549f6-ab72-41be-8a73-21fd5b73c441",
       "trimType": "auto",

@@ -1,12 +1,16 @@
 {
-  "ver": "1.0.0",
+  "ver": "2.3.3",
   "uuid": "bb74c347-aec9-40bd-a9b2-b7f6b7c99d23",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "platformSettings": {},
   "subMetas": {
     "ectoplasm": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "b018f74f-4734-4a8f-9b08-c3243e8ac4b1",
       "rawTextureUuid": "bb74c347-aec9-40bd-a9b2-b7f6b7c99d23",
       "trimType": "auto",

@@ -1,12 +1,16 @@
 {
-  "ver": "1.0.0",
+  "ver": "2.3.3",
   "uuid": "4b70c160-d524-4bcf-9d8a-a18a88760a45",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "platformSettings": {},
   "subMetas": {
     "Treasure_hud": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "5a38f737-89b8-4ba6-b1f9-c8cec70c2a8d",
       "rawTextureUuid": "4b70c160-d524-4bcf-9d8a-a18a88760a45",
       "trimType": "auto",

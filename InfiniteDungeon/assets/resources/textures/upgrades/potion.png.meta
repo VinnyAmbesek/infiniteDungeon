@@ -1,12 +1,16 @@
 {
-  "ver": "1.0.0",
+  "ver": "2.3.3",
   "uuid": "eac9da80-86e3-4732-951b-841184acb11d",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "platformSettings": {},
   "subMetas": {
     "potion": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "54a05a8a-9321-4a88-836c-13d6c2548f1b",
       "rawTextureUuid": "eac9da80-86e3-4732-951b-841184acb11d",
       "trimType": "custom",

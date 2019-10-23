@@ -1,12 +1,16 @@
 {
-  "ver": "1.0.0",
+  "ver": "2.3.3",
   "uuid": "c6ba329f-e5b4-4790-9dc3-8081cb1836a3",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "platformSettings": {},
   "subMetas": {
     "Enemies_hud": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "1a9cf81c-32da-4ffa-97d0-7eee7f739f43",
       "rawTextureUuid": "c6ba329f-e5b4-4790-9dc3-8081cb1836a3",
       "trimType": "auto",

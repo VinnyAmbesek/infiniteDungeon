@@ -1,12 +1,16 @@
 {
-  "ver": "1.0.0",
+  "ver": "2.3.3",
   "uuid": "ce08b4d8-eacf-4f72-952c-91e913d94fbb",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "platformSettings": {},
   "subMetas": {
     "tuto3": {
-      "ver": "1.0.3",
+      "ver": "1.0.4",
       "uuid": "5640a49c-2e3e-46a7-9699-0eb2b20461b6",
       "rawTextureUuid": "ce08b4d8-eacf-4f72-952c-91e913d94fbb",
       "trimType": "auto",
