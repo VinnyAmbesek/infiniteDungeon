@@ -519,7 +519,7 @@ var gridController = cc.Class({
 		let tile = this.grid[x][y];
 		let cell = this.gridUI[x][y];
 		let content = cell.getChildByName("content");
-		content.rotation = 360 - cell.rotation;
+		content.angle = -(360-cell.angle);
 		if (tile.subsprite) content.getComponent(cc.Sprite).spriteFrame = tile.subsprite;
 	},
 
@@ -827,7 +827,7 @@ var gridController = cc.Class({
 				child.height = this.subtileWidth;
 
 				cell.parent = this.gridNode;
-				cell.rotation = tile.rotation;
+				cell.angle = tile.angle;
 				let sprite = cell.getComponent(cc.Sprite);
 				if (tile.status == this.enumStatus["visible"]) {
 					sprite.spriteFrame = tile.sprite;	
@@ -896,15 +896,15 @@ var gridController = cc.Class({
 			// find rotation
 			if (tile.north == 1){
 				if (tile.west == 1) {
-					tile.rotation = 0;
+					tile.angle = -0;
 				} else if (tile.east == 1) {
-					tile.rotation = 90;
+					tile.angle = -90;
 				}  
 			} else if (tile.south == 1){
 				if (tile.west == 1) {
-					tile.rotation = 270;
+					tile.angle = -270;
 				} else if (tile.east == 1) {
-					tile.rotation = 180;
+					tile.angle = -180;
 				}
 			}
 		} else if (blocks == 1) {
@@ -912,13 +912,13 @@ var gridController = cc.Class({
 			tile.sprite = this.door_side;
 			// find rotation
 			if (tile.north == 1){
-				tile.rotation = 0;
+				tile.angle = -0;
 			} else if (tile.east == 1) {
-				tile.rotation = 90;
+				tile.angle = -90;
 			} else if (tile.south == 1){
-				tile.rotation = 180;
+				tile.angle = -180;
 			} else if (tile.west == 1) {
-				tile.rotation = 270;
+				tile.angle = -270;
 			}
 		} else {
 			console.error("ERROR: should not have that amount of blocks", tile, blocks);
@@ -928,13 +928,13 @@ var gridController = cc.Class({
 		// 1 sprite, 4 directions
 		tile.sprite = this.deadend;
 		if (tile.north == this.enumSides["open"]){
-			tile.rotation = 270;
+			tile.angle = -270;
 		} else if (tile.east == this.enumSides["open"]) {
-			tile.rotation = 0;
+			tile.angle = -0;
 		} else if (tile.south == this.enumSides["open"]){
-			tile.rotation = 90;
+			tile.angle = -90;
 		} else if (tile.west == this.enumSides["open"]) {
-			tile.rotation = 180;
+			tile.angle = -180;
 		}
 
 		// mark if has treasure or danger
@@ -958,9 +958,9 @@ var gridController = cc.Class({
 		// 1 sprite, 2 directions
 		tile.sprite = this.line;
 		if (tile.north == this.enumSides["open"]){
-			tile.rotation = 0;
+			tile.angle = -0;
 		} else if (tile.east == this.enumSides["open"]) {
-			tile.rotation = 90;
+			tile.angle = -90;
 		}
 	},
 	showCurve: function(tile){
@@ -968,15 +968,15 @@ var gridController = cc.Class({
 		tile.sprite = this.curve;
 		if (tile.north == this.enumSides["open"]){
 			if (tile.west == this.enumSides["open"]) {
-				tile.rotation = 180;
+				tile.angle = -180;
 			} else if (tile.east == this.enumSides["open"]) {
-				tile.rotation = 270;
+				tile.angle = -270;
 			}  
 		} else if (tile.south == this.enumSides["open"]){
 			if (tile.west == this.enumSides["open"]) {
-				tile.rotation = 90;
+				tile.angle = -90;
 			} else if (tile.east == this.enumSides["open"]) {
-				tile.rotation = 0;
+				tile.angle = -0;
 			}
 		}
 	},
@@ -984,13 +984,13 @@ var gridController = cc.Class({
 		// 1 sprite, 4 directions
 		tile.sprite = this.threeway;
 		if (tile.north == this.enumSides["wall"] || tile.north == this.enumSides["block"]){
-			tile.rotation = 0;
+			tile.angle = -0;
 		} else if (tile.east == this.enumSides["wall"] || tile.east == this.enumSides["block"]) {
-			tile.rotation = 90;
+			tile.angle = -90;
 		} else if (tile.south == this.enumSides["wall"] || tile.south == this.enumSides["block"]){
-			tile.rotation = 180;
+			tile.angle = -180;
 		} else if (tile.west == this.enumSides["wall"] || tile.west == this.enumSides["block"]) {
-			tile.rotation = 270;
+			tile.angle = -270;
 		} else {
 			console.error("ERROR: no wall", tile);
 		}
@@ -998,7 +998,7 @@ var gridController = cc.Class({
 	showFourWay: function(tile){
 		// 1 sprite, 1 direction
 		tile.sprite = this.fourway;
-		tile.rotation = 0;
+		tile.angle = -0;
 	},
 
 	makeWall: function(tile){
