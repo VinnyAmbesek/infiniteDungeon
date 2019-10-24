@@ -16,6 +16,7 @@ var gridController = cc.Class({
 		inventoryButton: cc.Node,
 		dungeonAchievement: cc.Node,
 		feedbackLog: cc.Node,
+		loadingAnimation: cc.Node,
 
 		dungeonHP: cc.Label,
 		dungeonLevel: cc.Label,
@@ -792,6 +793,7 @@ var gridController = cc.Class({
 	},
 
 	nextLevel: function(){
+		this.loadingAnimation.active = true;
 		if (window.gameSession.hp < 1) return; 
 		window.gameSession.death = false;
 		if (!this.hitTrap) {

@@ -7,7 +7,6 @@ cc.Class({
         analytics: Analytics,
         sprite: cc.Sprite,
         tutorial: [cc.SpriteFrame],
-        animated: cc.Node,
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -16,8 +15,6 @@ cc.Class({
     start () {
         this.saveLoaded = false;
         this.timer = 0;
-
-        this.animate();
         this.index = 0;
         let saveVersion = {major: 0, minor: 5, fix: 0};
         this.initSession(saveVersion);
@@ -278,16 +275,6 @@ cc.Class({
 
     next: function(){
         cc.director.loadScene("gameScene");
-    },
-
-    animate: function(){
-        let duration = 0.1;
-        let animation = cc.sequence(cc.moveBy(duration, cc.v2(-100,0)), cc.moveBy(duration*2, cc.v2(0,200)), cc.moveBy(duration*2, cc.v2(-200,0)), 
-            cc.moveBy(duration*4, cc.v2(0,-400)), cc.moveBy(duration*2, cc.v2(200,0)), cc.moveBy(duration*2, cc.v2(0,200)), cc.moveBy(duration*2, cc.v2(200,0)), 
-            cc.moveBy(duration*2, cc.v2(0,200)), cc.moveBy(duration*2, cc.v2(200,0)), cc.moveBy(duration*4, cc.v2(0,-400)), cc.moveBy(duration*2, cc.v2(-200,0)), 
-            cc.moveBy(duration*2, cc.v2(0,200)), cc.moveBy(duration, cc.v2(-100,0)) );
-
-        this.animated.runAction(cc.repeatForever(animation));
     },
 
     update (dt) {
