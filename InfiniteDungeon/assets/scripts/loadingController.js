@@ -15,7 +15,6 @@ cc.Class({
     start () {
         this.saveLoaded = false;
         this.timer = 0;
-        this.index = 0;
         let saveVersion = {major: 0, minor: 5, fix: 0};
         this.initSession(saveVersion);
         this.saveLoaded = true;
@@ -271,6 +270,8 @@ cc.Class({
 
     loadGame: function(){
         window.gameSession = JSON.parse(cc.sys.localStorage.getItem('gameSession'));
+        if (window.gameSession==null) window.gameSession = {};
+        if (! window.hasOwnProperty("gameSession")) window.gameSession = {};
     },
 
     next: function(){

@@ -29,7 +29,7 @@
     "portrait": true,
     "upsideDown": true
   },
-  "packageName": "org.Ambesek.InfiniteDungeon",
+  "packageName": "com.Ambesek.InfiniteDungeon",
   "qqplay": {
     "REMOTE_SERVER_ROOT": "",
     "orientation": "portrait"
