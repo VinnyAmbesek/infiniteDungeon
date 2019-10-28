@@ -162,7 +162,7 @@
       "__type__": "cc.Vec3",
       "x": 0,
       "y": 0,
-      "z": 378.4531014537997
+      "z": 286.6544086526492
     },
     "_scale": {
       "__type__": "cc.Vec3",
@@ -5025,7 +5025,7 @@
       "__id__": 108
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_level": 4,
     "_components": [
       {
@@ -5303,7 +5303,7 @@
       "__id__": 114
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_level": 4,
     "_components": [
       {
@@ -23425,7 +23425,7 @@
     "_useOriginalSize": false,
     "_string": "Try again!",
     "_N$string": "Try again!",
-    "_fontSize": 60,
+    "_fontSize": 42,
     "_lineHeight": 100,
     "_enableWrapText": false,
     "_N$file": {
