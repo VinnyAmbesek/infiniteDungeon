@@ -2,16 +2,20 @@ infiniteDungeon
 cash: fill inventory, phoenix feather [full restore on death], ad click to recover hp
 
 roadmap: 
-* dont let feedbacks go outside screen
 * add suicide option
 * add lvl selection option
-* add supoer boss chance
+* add super boss/trap chance
+* add soul store
+* add souls to treasure
+* improve icons
+* trade xp for souls
 
 * random powerfull effects
 * technical debt: make individual controllers, gridController is too big
 * scoreboard
 * better effects
 * change tile colors each 10-50 levels
+* add artifacts to treasures
 
 * retention: add push notifications [right time, remeber free upgrade, dont be annoying]
 * retention: add share into social networks

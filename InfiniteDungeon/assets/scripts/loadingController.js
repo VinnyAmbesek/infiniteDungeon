@@ -15,7 +15,7 @@ cc.Class({
     start () {
         this.saveLoaded = false;
         this.timer = 0;
-        let saveVersion = {major: 0, minor: 5, fix: 0};
+        let saveVersion = {major: 0, minor: 6, fix: 0};
         this.initSession(saveVersion);
         this.saveLoaded = true;
     },
@@ -248,7 +248,7 @@ cc.Class({
         this.setDefault(window.gameSession, "job", 0);
 
         let d = new Date(); 
-        window.gameSession.date = {d: d.getDate(), m: d.getMonth(), y: d.getFullYear()};
+        this.setDefault(window.gameSession, "date", {d: d.getDate(), m: d.getMonth(), y: d.getFullYear()});
 
         //save version
         window.gameSession.saveVersion =  saveVersion;

@@ -61,6 +61,9 @@ cc.Class({
     updateLabel: function(item, extra){
         let uc = this.jsUcfirst(item);
         this["inventory"+uc].string = uc + extra + ": " + window.gameSession.inventory[item] + "/" + window.gameSession.inventory[item+"Max"];
+        if (window.gameSession.skills.hasOwnProperty(item+"Shield")){
+            this["inventory"+uc].string = this["inventory"+uc].string + " (+" + window.gameSession.skills[item + "Shield"] + ")";
+        }
     },
 
     jsUcfirst: function(string){

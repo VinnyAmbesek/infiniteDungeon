@@ -87,15 +87,15 @@ var achievementController = cc.Class({
         this.createButton("Archmage", "Enemies you defeated with your wand", "kills", "magic", 5, 100, 500);
 
         this.createButton("Trap Finder", "Total traps found the hard way", "traps", "total", 6);
-        this.createButton("Getting warmer", "Total fire traps found the hard way", "traps", "fire", 6, 100, 5000);
-        this.createButton("Getting colder", "Total ice traps found the hard way", "traps", "ice", 6, 100, 5000);
-        this.createButton("Dirty floor", "Total acid traps found the hard way", "traps", "acid", 6, 100, 5000);
-        this.createButton("Tesla attack", "Total electricity traps found the hard way", "traps", "electricity", 6, 100, 5000);
-        this.createButton("Holed floor", "Total spikes traps found the hard way", "traps", "spikes", 6, 100, 5000);
-        this.createButton("Holed wall", "Total poisoned dart traps found the hard way", "traps", "poison", 6, 100, 5000);
+        this.createButton("Getting warmer", "Total fire traps found the hard way", "traps", "fire", 6, 50, 2500);
+        this.createButton("Getting colder", "Total ice traps found the hard way", "traps", "ice", 6, 50, 2500);
+        this.createButton("Dirty floor", "Total acid traps found the hard way", "traps", "acid", 6, 50, 2500);
+        this.createButton("Tesla attack", "Total electricity traps found the hard way", "traps", "electricity", 6, 50, 2500);
+        this.createButton("Holed floor", "Total spikes traps found the hard way", "traps", "spikes", 6, 50, 2500);
+        this.createButton("Holed wall", "Total poisoned dart traps found the hard way", "traps", "poison", 6, 50, 2500);
 
         this.createButton("Treasure Hunter", "Total chests found", "items", "chests", 7);
-        this.createButton("Spender", "Total items used", "items", "total", 8, 400);
+        this.createButton("Spender", "Total items used", "items", "total", 8, 500);
         this.createButton("Like sunscreen", "Total fire shields used", "items", "fire", 9, 100, 500);
         this.createButton("A warm blanket", "Total ice shields used", "items", "ice", 9, 100, 500);
         this.createButton("Still intact", "Total acid shields used", "items", "acid", 9, 100, 500);

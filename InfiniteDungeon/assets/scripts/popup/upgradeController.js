@@ -200,7 +200,7 @@ var upgradeController = cc.Class({
 	},
 
 	checkSpecialButton: function(req, upgrade, me){
-		if (req > 99 && !(upgrade) && me) {
+		if (req > 49 && !(upgrade) && me) {
 			// show trap finder upgrade
 			me.active = true;
 		} else if (me) {

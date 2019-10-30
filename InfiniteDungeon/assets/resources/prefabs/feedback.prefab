@@ -22,10 +22,13 @@
     "_components": [
       {
         "__id__": 2
+      },
+      {
+        "__id__": 3
       }
     ],
     "_prefab": {
-      "__id__": 3
+      "__id__": 4
     },
     "_opacity": 255,
     "_color": {
@@ -37,8 +40,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 0,
-      "height": 50.4
+      "width": 2,
+      "height": 52.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -99,6 +102,24 @@
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 0,
+    "_id": ""
+  },
+  {
+    "__type__": "cc.LabelOutline",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "_color": {
+      "__type__": "cc.Color",
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 255
+    },
+    "_width": 1,
     "_id": ""
   },
   {

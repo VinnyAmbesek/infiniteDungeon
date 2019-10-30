@@ -452,7 +452,7 @@ var gridController = cc.Class({
 			// victory xp
 			if (window.gameSession.hp > 0) {
 				xp += window.gameSession.level*25;
-				if (window.gameSession.job == this.enumClass["fighter"]) xp += window.gameSession.level*25;
+				if (window.gameSession.job == this.enumClass["fighter"]) xp += window.gameSession.level*50;
 			} else {
 				this.deathPopup.active = true;
 				window.gameGlobals.popup = true;
@@ -500,7 +500,7 @@ var gridController = cc.Class({
 				// victory xp
 				if (window.gameSession.hp > 0) {
 					xp += window.gameSession.level*25;
-					if (window.gameSession.job == this.enumClass["fighter"]) xp += window.gameSession.level*25;
+					if (window.gameSession.job == this.enumClass["fighter"]) xp += window.gameSession.level*50;
 				} else {
 					this.deathPopup.active = true;
 					window.gameGlobals.popup = true;
@@ -944,7 +944,7 @@ var gridController = cc.Class({
 
 		// mark if has treasure or danger
 		let chance = Math.floor((Math.random() * 100) + 1);
-		let level = Math.min(25, window.gameSession.level);
+		let level = Math.min(35, window.gameSession.level);
 		if (chance <= 25+level && tile.content == this.enumContent["empty"] && tile.tile != this.enumTile["entrance"] && tile.tile != this.enumTile["exit"]) {
 			// 25% de chance de perigo +1% por level, max 50%
 			tile.content = this.enumContent["danger"];
@@ -1206,6 +1206,8 @@ var gridController = cc.Class({
 		let position = parent.parent.convertToWorldSpaceAR(parent.position);
 		position = this.canvas.convertToNodeSpaceAR(position);
 		feedback.x = position.x;
+		if (feedback.x < -231) feedback.x = -200;
+		if (feedback.x > 231) feedback.x = 200;
 		feedback.y = position.y;
 
 		feedback.getComponent(cc.Label).string = text;
