@@ -21,8 +21,6 @@ var upgradeController = cc.Class({
 		inventoryPoison: cc.Label,
 		inventoryPotion: cc.Label,
 
-		popups: [cc.Node],
-
 		icons: [cc.SpriteFrame],
 	},
 
@@ -411,20 +409,6 @@ var upgradeController = cc.Class({
 	saveGame(){
 		cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
 	},
-
-    close: function() {
-        this.node.active = false;
-        window.gameGlobals.popup = false;
-    },
-
-    open: function() {
-    	if (window.gameSession.hp < 1) return;
-    	for (var i = 0; i < this.popups.length; i++) {
-    		this.popups[i].active = false;
-    	}
-        this.node.active = true;
-        window.gameGlobals.popup = true;
-    },
 
 	showFeedback: function(text, color, parent, stay){
 		let duration = 2.0;

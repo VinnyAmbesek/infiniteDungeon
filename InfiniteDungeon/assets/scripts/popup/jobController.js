@@ -13,7 +13,6 @@ cc.Class({
 
     properties: {
         jobPrefab: cc.Prefab,
-        popups: [cc.Node],
         icons: [cc.SpriteFrame],
     },
 
@@ -30,25 +29,10 @@ cc.Class({
         window.analytics.Design_event("class:" + id);
         window.gameSession.job = this.enumClass[id];
         this.saveGame();
-        this.close();
     },
 
     saveGame(){
         cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
-    },
-
-    close: function() {
-        this.node.active = false;
-        window.gameGlobals.popup = false;
-    },
-
-    open: function() {
-        if (window.gameSession.hp < 1) return;
-        for (var i = 0; i < this.popups.length; i++) {
-            this.popups[i].active = false;
-        }
-        this.node.active = true;
-        window.gameGlobals.popup = true;
     },
 
     // update (dt) {},

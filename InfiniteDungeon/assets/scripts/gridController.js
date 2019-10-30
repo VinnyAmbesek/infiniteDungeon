@@ -1,17 +1,16 @@
+const PopupController = require("popupController");
+
 var gridController = cc.Class({
 	extends: cc.Component,
 
 	properties: {
+		popupController: PopupController,
 		tilePrefab: cc.Prefab,
 		feedbackPrefab: cc.Prefab,
 		logPrefab: cc.Prefab,
 
 		gridNode: cc.Node,
 		nextButton: cc.Node,
-		upgradePopup: cc.Node,
-		deathPopup: cc.Node,
-		jobPopup: cc.Node,
-		rewardPopup: cc.Node,
 		canvas: cc.Node,
 		inventoryButton: cc.Node,
 		dungeonAchievement: cc.Node,
@@ -130,7 +129,7 @@ var gridController = cc.Class({
 		let newDay = this.isNewDay(date, lastPrize);
 		if (newDay){
 			this.wbPrize();
-			this.rewardPopup.active = true;
+			this.popupController.openPermanentPopup("dailyReward");
 			window.gameSession.date = date;
 			this.saveGame();
 		}
@@ -180,14 +179,11 @@ var gridController = cc.Class({
 		window.gameSession.upgrades.electricityMax, window.gameSession.upgrades.spikesMin, window.gameSession.upgrades.spikesMax, window.gameSession.upgrades.poisonMin,
 		window.gameSession.upgrades.poisonMax, window.gameSession.upgrades.potionMin, window.gameSession.upgrades.potionMax, window.gameSession.upgrades.hpMax);
 
-		if (window.gameSession.xp > minXP) {
-			this.upgradePopup.active = true;
-			window.gameGlobals.popup = true;
-		}
+		if (window.gameSession.xp > minXP) this.popupController.openPopup("upgrade");
 	},
 
 	showJobSelection: function(){
-		this.jobPopup.active = true;
+		this.popupController.openPermanentPopup("job");
 	},
 
 	initUI: function(){
@@ -314,7 +310,7 @@ var gridController = cc.Class({
 
 	gridClick: function(event){
 		if (window.gameSession.hp < 1) return;
-		if (window.gameGlobals.popup) return;
+		if (this.popupController.isAnyOpen()) return;
 
 		// click on exit tile a second time to go to next floor
 		if (event.target.tile.tile == this.enumTile["exit"] && event.target.used && !this.closed){
@@ -403,8 +399,7 @@ var gridController = cc.Class({
 				window.gameSession.stats.traps.total++;
 				if (window.gameSession.stats.traps.total % 100 == 0) this.showFeedback("Achievement: Trap Finder", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
 			} else {
-				this.deathPopup.active = true;
-				window.gameGlobals.popup = true;
+				this.popupController.openPermanentPopup("death");
 				this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
 			}
 		}
@@ -454,8 +449,7 @@ var gridController = cc.Class({
 				xp += window.gameSession.level*25;
 				if (window.gameSession.job == this.enumClass["fighter"]) xp += window.gameSession.level*50;
 			} else {
-				this.deathPopup.active = true;
-				window.gameGlobals.popup = true;
+				this.popupController.openPermanentPopup("death");
 				this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
 			}
 		}
@@ -502,8 +496,7 @@ var gridController = cc.Class({
 					xp += window.gameSession.level*25;
 					if (window.gameSession.job == this.enumClass["fighter"]) xp += window.gameSession.level*50;
 				} else {
-					this.deathPopup.active = true;
-					window.gameGlobals.popup = true;
+					this.popupController.openPermanentPopup("death");
 					this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
 				}
 			}

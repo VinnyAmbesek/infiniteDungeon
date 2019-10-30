@@ -1,23 +1,15 @@
-// Learn cc.Class:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/class.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/class.html
-// Learn Attribute:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/life-cycle-callbacks.html
+const PopupController = require("popupController");
 
 cc.Class({
     extends: cc.Component,
 
     properties: {
+        popupController: PopupController,
         deathPopup: cc.Node,
         hp: cc.Label
     },
 
     iDied: function(){
-        this.close();
         window.analytics.Level_Fail("Floor " + window.gameSession.level, "Dungeon Scene");
         // back to level
         window.gameSession.level = window.gameSession.levelMin;
@@ -50,7 +42,7 @@ cc.Class({
         this.hp.string = window.gameSession.hp;
 
         this.saveGame();
-        this.close();
+        this.popupController.closePopupByName("death");
     },
     // LIFE-CYCLE CALLBACKS:
 
@@ -62,16 +54,6 @@ cc.Class({
 
     saveGame(){
         cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
-    },
-
-    close: function() {
-        this.node.active = false;
-        window.gameGlobals.popup = false;
-    },
-
-    open: function() {
-        this.node.active = true;
-        window.gameGlobals.popup = true;
     },
 
     // update (dt) {},

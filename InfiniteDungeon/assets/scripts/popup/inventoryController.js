@@ -19,23 +19,6 @@ cc.Class({
         inventorySpikes: cc.Label,
         inventoryPoison: cc.Label,
         inventoryPotion: cc.Label,
-
-        popups: [cc.Node],
-        // foo: {
-        //     // ATTRIBUTES:
-        //     default: null,        // The default value will be used only when the component attaching
-        //                           // to a node for the first time
-        //     type: cc.SpriteFrame, // optional, default is typeof default
-        //     serializable: true,   // optional, default is true
-        // },
-        // bar: {
-        //     get () {
-        //         return this._bar;
-        //     },
-        //     set (value) {
-        //         this._bar = value;
-        //     }
-        // },
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -68,19 +51,5 @@ cc.Class({
 
     jsUcfirst: function(string){
         return string.charAt(0).toUpperCase() + string.slice(1);
-    },
-
-    close: function() {
-        this.node.active = false;
-        window.gameGlobals.popup = false;
-    },
-
-    open: function() {
-        if (window.gameSession.hp < 1) return;
-        for (var i = 0; i < this.popups.length; i++) {
-            this.popups[i].active = false;
-        }
-        this.node.active = true;
-        window.gameGlobals.popup = true;
     },
 });

@@ -30,15 +30,5 @@ cc.Class({
         cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
     },
 
-    close: function() {
-        this.node.active = false;
-        window.gameGlobals.popup = false;
-    },
-
-    open: function() {
-        this.node.active = true;
-        window.gameGlobals.popup = true;
-    },
-
     // update (dt) {},
 });
