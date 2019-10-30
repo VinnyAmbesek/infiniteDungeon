@@ -2,14 +2,15 @@ var popupController = cc.Class({
     extends: cc.Component,
 
     properties: {
-        job: cc.Node,
+        job: cc.Node, // usually only activated permanently
         upgrade: cc.Node,
         inventory: cc.Node,
         achievement: cc.Node,
+        options: cc.Node,
         tutorial: cc.Node,
         log: cc.Node,
-        death: cc.Node,
-        dailyReward: cc.Node,
+        death: cc.Node, // usually only activated permanently
+        dailyReward: cc.Node, // usually only activated permanently
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -20,7 +21,7 @@ var popupController = cc.Class({
 
     },
 
-    // Open popup, if another is opened this one is automatically closed
+    // Open popup, if another is opened this one will be automatically closed
     openPopup(property){
         this.closePopup();
         this[property].active = true;
@@ -31,7 +32,7 @@ var popupController = cc.Class({
         this.openPopup(property);
     },
 
-    // this popup won't be closed if other is open
+    // this popup won't be closed if another is open
     openPermanentPopup(property){
         this.closePopup();
         this[property].active = true;
@@ -52,9 +53,10 @@ var popupController = cc.Class({
         this.closePopupByName(property);
     },
 
+    // verifies if any popup is open
     isAnyOpen(){
         if (! this.hasOwnProperty("current")) return false;
-        return this.current.active;
+        return (this.current.active || this.job.active || this.death.active || this.dailyReward.active );
     },
 
 

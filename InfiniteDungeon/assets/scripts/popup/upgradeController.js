@@ -282,9 +282,9 @@ var upgradeController = cc.Class({
 		// fill data
 		button.getChildByName("Name").getComponent(cc.Label).string = "Secret Passage";
 		button.getChildByName("Description").getComponent(cc.Label).string = "The floor you start back when you die.";
-		button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.levelMin;
-		if (! window.gameSession.upgrades.levelMin) window.gameSession.upgrades.levelMin = 1000;
-		button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelMin + "XP";
+		button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.levelPassage;
+		if (! window.gameSession.upgrades.levelPassage) window.gameSession.upgrades.levelPassage = 1000;
+		button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelPassage + "XP";
 		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[4];
 		//add click event
 
@@ -296,7 +296,7 @@ var upgradeController = cc.Class({
 	},
 
 	checkSecretPassage: function(){
-		if (window.gameSession.levelMin+5 < window.gameSession.stats.levelMax && this.secretPassage) {
+		if (window.gameSession.levelPassage+5 < window.gameSession.stats.levelPassage && this.secretPassage) {
 			// show secret passage upgrade
 			this.secretPassage.active = true;
 		} else if (this.secretPassage) {
@@ -307,26 +307,27 @@ var upgradeController = cc.Class({
 	upgradeSecretPassage(event){
 		let button = event.target;
 
-		if (window.gameSession.xp >= window.gameSession.upgrades.levelMin) {
+		if (window.gameSession.xp >= window.gameSession.upgrades.levelPassage) {
 			// take xp
-			window.gameSession.xp -= window.gameSession.upgrades.levelMin;
-			window.gameSession.stats.xp += window.gameSession.upgrades.levelMin;
+			window.gameSession.xp -= window.gameSession.upgrades.levelPassage;
+			window.gameSession.stats.xp += window.gameSession.upgrades.levelPassage;
 			if (window.gameSession.stats.xp % 100000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
 			this.dungeonXP.string = window.gameSession.xp;
 
 			// do upgrade
-			if (window.gameSession.levelMin == 1){
-				window.gameSession.levelMin = 5;
+			if (window.gameSession.levelPassage == 1){
+				window.gameSession.levelPassage = 5;
 			} else {
-				window.gameSession.levelMin += 5;
+				window.gameSession.levelPassage += 5;
 			}
-			window.analytics.Design_event("upgrade:special:secretPassage", window.gameSession.levelMin);
+			window.gameSession.levelMin = window.gameSession.levelPassage;
+			window.analytics.Design_event("upgrade:special:secretPassage", window.gameSession.levelPassage);
 			
-			button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.levelMin;
+			button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.levelPassage;
 			
 			// increase next xp cost
-			window.gameSession.upgrades.levelMin += 1000;
-			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelMin + "XP";
+			window.gameSession.upgrades.levelPassage += 1000;
+			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelPassage + "XP";
 
 			this.saveGame();
 		}

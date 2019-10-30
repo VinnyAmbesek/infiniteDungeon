@@ -37,6 +37,7 @@ cc.Class({
         // progress data
         this.setDefault(window.gameSession, "level", 1);
         this.setDefault(window.gameSession, "levelMin", 1);
+        this.setDefault(window.gameSession, "levelPassage", window.gameSession.levelMin);
 
         // inventory
         this.setDefault(window.gameSession, "inventory", {});
