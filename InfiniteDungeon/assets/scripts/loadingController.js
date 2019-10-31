@@ -15,7 +15,7 @@ cc.Class({
     start () {
         this.saveLoaded = false;
         this.timer = 0;
-        let saveVersion = {major: 0, minor: 6, fix: 0};
+        let saveVersion = {major: 0, minor: 7, fix: 0};
         this.initSession(saveVersion);
         this.saveLoaded = true;
     },
