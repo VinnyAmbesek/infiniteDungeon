@@ -296,7 +296,7 @@ var upgradeController = cc.Class({
 	},
 
 	checkSecretPassage: function(){
-		if (window.gameSession.levelPassage+5 < window.gameSession.stats.levelPassage && this.secretPassage) {
+		if (window.gameSession.levelPassage+5 < window.gameSession.stats.levelMax && this.secretPassage) {
 			// show secret passage upgrade
 			this.secretPassage.active = true;
 		} else if (this.secretPassage) {
@@ -448,3 +448,5 @@ var upgradeController = cc.Class({
 
 	// update (dt) {},
 });
+
+module.exports = upgradeController;

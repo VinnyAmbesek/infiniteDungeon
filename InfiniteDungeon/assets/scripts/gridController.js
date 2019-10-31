@@ -1,32 +1,24 @@
 const PopupController = require("popupController");
+const InventoryController = require("inventoryController");
+const HudController = require("hudController");
+const FeedbackController = require("feedbackController");
+const DeathController = require("deathController");
 
 var gridController = cc.Class({
 	extends: cc.Component,
 
 	properties: {
 		popupController: PopupController,
+		inventoryController: InventoryController,
+        hudController: HudController,
+        feedbackController: FeedbackController,
+        deathController: DeathController,
+
 		tilePrefab: cc.Prefab,
-		feedbackPrefab: cc.Prefab,
-		logPrefab: cc.Prefab,
 
 		gridNode: cc.Node,
 		nextButton: cc.Node,
-		canvas: cc.Node,
-		inventoryButton: cc.Node,
-		dungeonAchievement: cc.Node,
-		feedbackLog: cc.Node,
 		loadingAnimation: cc.Node,
-
-		dungeonHP: cc.Label,
-		dungeonLevel: cc.Label,
-		dungeonXP: cc.Label,
-		trapFinder: cc.Label,
-		treasureHunter: cc.Label,
-		tracker: cc.Label,
-		deathMessage: cc.Label,
-		currencyLabel: cc.Label,
-		shields: [cc.Label],
-		trapsQtd: [cc.Label],
 
 		door_corner: cc.SpriteFrame,
 		door_side: cc.SpriteFrame,
@@ -49,6 +41,9 @@ var gridController = cc.Class({
 
 	// onLoad () {},
 	start () {
+		if (this.deathController.isDead()) {
+			this.popupController.openPermanentPopup("death");
+		}
 		window.analytics.Level_Start("Floor " + window.gameSession.level, "Dungeon Scene");
 
 		this.enumSides = {undefined: 0, block: 1, wall: 2, open: 3};
@@ -58,15 +53,13 @@ var gridController = cc.Class({
 		this.enumSprite = {entrance: 0, exit: 1, deadend: 2, curve: 3, line: 4, threeway: 5, fourway: 6};
 		this.enumClass = {undefined: 0, rogue: 1, fighter: 2, wizard: 3};
 
-		this.initUI();
+		this.hudController.updateAllLabels();
 		if (window.gameSession.job < 1) {
 			this.showJobSelection();
 		}
 		this.showUpgrades();
 		this.checkTime();
 		
-		if (!window.gameSession.currency) window.gameSession.currency = 0;
-		this.currencyLabel.string = window.gameSession.currency;
 		this.saveGame();
 
 		// init variables
@@ -110,15 +103,15 @@ var gridController = cc.Class({
 		this.revealSubSprite(this.entrance.x, this.entrance.y);
 
 		// show upgrades
-		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
-		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
-		if(window.gameSession.fireFinder) this.trapsQtd[0].node.active = true;
-		if(window.gameSession.iceFinder) this.trapsQtd[1].node.active = true;
-		if(window.gameSession.acidFinder) this.trapsQtd[2].node.active = true;
-		if(window.gameSession.electricityFinder) this.trapsQtd[3].node.active = true;
-		if(window.gameSession.spikesFinder) this.trapsQtd[4].node.active = true;
-		if(window.gameSession.poisonFinder) this.trapsQtd[5].node.active = true;
-		if(window.gameSession.tracker) this.tracker.node.active = true;
+		if(window.gameSession.treasureHunter) this.hudController.activateLabel("chests");
+		if(window.gameSession.trapFinder) this.hudController.activateLabel("traps");
+		if(window.gameSession.fireFinder) this.hudController.activateTrapLabel("fire");
+		if(window.gameSession.iceFinder) this.hudController.activateTrapLabel("ice");
+		if(window.gameSession.acidFinder) this.hudController.activateTrapLabel("acid");
+		if(window.gameSession.electricityFinder) this.hudController.activateTrapLabel("electricity");
+		if(window.gameSession.spikesFinder) this.hudController.activateTrapLabel("spikes");
+		if(window.gameSession.poisonFinder) this.hudController.activateTrapLabel("poison");
+		if(window.gameSession.tracker) this.hudController.activateLabel("enemies");
 	},
 
 	checkTime(){
@@ -164,9 +157,12 @@ var gridController = cc.Class({
 
 		window.gameSession.xp += minXP;
 		window.gameGlobals.xpReward = minXP;
-		this.dungeonXP.string = window.gameSession.xp;
-		this.showFeedback("+" + minXP + "XP", new cc.Color(0,255,0), this.dungeonXP.node, false);
+		this.hudController.updateLabel("xp", ""+window.gameSession.xp);
+		this.feedbackController.showFeedback("+" + minXP + "XP", new cc.Color(0,255,0), "xp", false);
 		window.analytics.Design_event("event:dailyXP", minXP);
+
+		window.gameSession.currency+=10;
+		this.hudController.updateLabel("soul", ""+window.gameSession.currency);
 	},
 
 	saveGame(){
@@ -184,19 +180,6 @@ var gridController = cc.Class({
 
 	showJobSelection: function(){
 		this.popupController.openPermanentPopup("job");
-	},
-
-	initUI: function(){
-		this.dungeonLevel.string = window.gameSession.level;
-		this.dungeonXP.string = window.gameSession.xp;
-		this.dungeonHP.string = window.gameSession.hp;
-
-		this.shields[0].string = window.gameSession.inventory.fire;
-		this.shields[1].string = window.gameSession.inventory.ice;
-		this.shields[2].string = window.gameSession.inventory.acid;
-		this.shields[3].string = window.gameSession.inventory.electricity;
-		this.shields[4].string = window.gameSession.inventory.spikes;
-		this.shields[5].string = window.gameSession.inventory.poison;
 	},
 
 	cleanGrid: function (size){
@@ -309,14 +292,19 @@ var gridController = cc.Class({
 	},
 
 	gridClick: function(event){
-		if (window.gameSession.hp < 1) return;
+		//if dead ignore click
+		if (this.deathController.isDead()){
+			this.popupController.openPermanentPopup("death");
+			return;
+		}
+		//if popup open ignore click
 		if (this.popupController.isAnyOpen()) return;
 
 		// click on exit tile a second time to go to next floor
 		if (event.target.tile.tile == this.enumTile["exit"] && event.target.used && !this.closed){
 			this.nextLevel();
 			return;
-		} else if (event.target.used) {
+		} else if (event.target.used) { // ignore clicks in open tiles
 			return;
 		}
 
@@ -324,17 +312,17 @@ var gridController = cc.Class({
 		event.target.used = true;
 		this.clickable--;
 		window.gameSession.stats.tiles++;
-		if (window.gameSession.stats.tiles % 1000 == 0) this.showFeedback("Achievement: Runner", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+		if (window.gameSession.stats.tiles % 1000 == 0) this.feedbackController.showFeedback("Achievement: Runner", new cc.Color(0,255,0), "achievement", true, 5.0);
 
-		if(window.gameSession.treasureHunter) this.treasureHunter.node.active = true;
-		if(window.gameSession.trapFinder) this.trapFinder.node.active = true;
-		if(window.gameSession.fireFinder) this.trapsQtd[0].node.active = true;
-		if(window.gameSession.iceFinder) this.trapsQtd[1].node.active = true;
-		if(window.gameSession.acidFinder) this.trapsQtd[2].node.active = true;
-		if(window.gameSession.electricityFinder) this.trapsQtd[3].node.active = true;
-		if(window.gameSession.spikesFinder) this.trapsQtd[4].node.active = true;
-		if(window.gameSession.poisonFinder) this.trapsQtd[5].node.active = true;
-		if(window.gameSession.tracker) this.tracker.node.active = true;
+		if(window.gameSession.treasureHunter) this.hudController.activateLabel("chests");
+		if(window.gameSession.trapFinder) this.hudController.activateLabel("traps");
+		if(window.gameSession.fireFinder) this.hudController.activateTrapLabel("fire");
+		if(window.gameSession.iceFinder) this.hudController.activateTrapLabel("ice");
+		if(window.gameSession.acidFinder) this.hudController.activateTrapLabel("acid");
+		if(window.gameSession.electricityFinder) this.hudController.activateTrapLabel("electricity");
+		if(window.gameSession.spikesFinder) this.hudController.activateTrapLabel("spikes");
+		if(window.gameSession.poisonFinder) this.hudController.activateTrapLabel("poison");
+		if(window.gameSession.tracker) this.hudController.activateLabel("enemies");
 
 		this.startRunning();
 
@@ -348,26 +336,16 @@ var gridController = cc.Class({
 		this.showClickZones(tile.x, tile.y);
 
 		// use a potion
-		if (window.gameSession.hp < window.gameSession.hpMax && window.gameSession.inventory.potion > 0) {
-			window.analytics.Design_event("event:potion");
-			window.gameSession.inventory.potion--;
-			window.gameSession.stats.items.potion++;
-			if (window.gameSession.stats.items.potion % 100 == 0) this.showFeedback("Achievement: Not addicted", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
-			window.gameSession.stats.items.total++;
-			if (window.gameSession.stats.items.total % 100 == 0) this.showFeedback("Achievement: Spender", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
-			
+		if (this.deathController.hasDamage() && window.gameSession.inventory.potion > 0) {
+			this.inventoryController.useItem("potion", 1, event.target);
+			if (window.gameSession.stats.items.potion % 100 == 0) this.feedbackController.showFeedback("Achievement: Not addicted", new cc.Color(0,255,0), "achievement", true, 5.0);
+			if (window.gameSession.stats.items.total % 100 == 0) this.feedbackController.showFeedback("Achievement: Spender", new cc.Color(0,255,0), "achievement", true, 5.0);
 
-			this.showFeedback("Used potion", new cc.Color(0,255,0), event.target, true);
-			
 			if (window.gameSession.job == this.enumClass["wizard"]) {
-				window.gameSession.hp+=2;
-				this.showFeedback("+2HP", new cc.Color(0,255,0), this.dungeonHP.node, false);
+				this.deathController.heal(2);
 			} else {
-				window.gameSession.hp++;
-				this.showFeedback("+1HP", new cc.Color(0,255,0), this.dungeonHP.node, false);
+				this.deathController.heal(1);
 			}
-			this.dungeonHP.string = window.gameSession.hp;
-			
 		}
 		
 		let xp = 0;
@@ -393,23 +371,23 @@ var gridController = cc.Class({
 			this.fightDanger(tile.contentType, event.target);
 			this.findSubSprite(tile, tile.contentType);
 			// victory xp
-			if (window.gameSession.hp > 0) {
+			if (! this.deathController.isDead()) {
 				xp += window.gameSession.level*25;
 				if (window.gameSession.job == this.enumClass["rogue"]) xp += window.gameSession.level*25;
 				window.gameSession.stats.traps.total++;
-				if (window.gameSession.stats.traps.total % 100 == 0) this.showFeedback("Achievement: Trap Finder", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+				if (window.gameSession.stats.traps.total % 100 == 0) this.feedbackController.showFeedback("Achievement: Trap Finder", new cc.Color(0,255,0), "achievement", true, 5.0);
 			} else {
 				this.popupController.openPermanentPopup("death");
-				this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
+				this.deathController.setMessage("You were " + this.lastDanger + "!");
 			}
 		}
 		if(tile.content == this.enumContent["darkness"]){
-			this.showFeedback("Dungeon Moves!", new cc.Color(255,0,0), this.dungeonLevel.node, true);
+			this.feedbackController.showFeedback("Dungeon Moves!", new cc.Color(255,0,0), "floor", true);
 			this.dungeonMoves++;
 			window.analytics.Design_event("event:darkness", this.dungeonMoves);
 			if (this.dungeonMoves> 1) {
 				window.gameSession.stats.unique.darkness = true
-				if (! window.gameSession.achievements.unique.darkness) this.showFeedback("Achievement: Stop Moving!", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+				if (! window.gameSession.achievements.unique.darkness) this.feedbackController.showFeedback("Achievement: Stop Moving!", new cc.Color(0,255,0), "achievement", true, 5.0);
 			}
 			this.running = false;
 			let x = event.target.tile.x;
@@ -445,17 +423,17 @@ var gridController = cc.Class({
 			this.fightMonster(index, event.target, 0);
 			this.findSubSprite(tile, index)
 			// victory xp
-			if (window.gameSession.hp > 0) {
+			if (! this.deathController.isDead()) {
 				xp += window.gameSession.level*25;
 				if (window.gameSession.job == this.enumClass["fighter"]) xp += window.gameSession.level*50;
 			} else {
 				this.popupController.openPermanentPopup("death");
-				this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
+				this.deathController.setMessage("You were " + this.lastDanger + "!");
 			}
 		}
 		if(tile.content == this.enumContent["lever"]){
 			window.analytics.Design_event("event:lever", window.gameSession.level);
-			this.showFeedback("Stairs Unlocked", new cc.Color(0,255,0), this.dungeonLevel.node, true);
+			this.feedbackController.showFeedback("Stairs Unlocked", new cc.Color(0,255,0), "floor", true);
 			this.closed = false;
 			let exitTile = this.grid[this.exit.x][this.exit.y];
 			this.findSubSprite(exitTile, -1);
@@ -473,7 +451,7 @@ var gridController = cc.Class({
 			// show next level button
 			this.running = false;
 			if (this.closed) {
-				this.showFeedback("Stairs Locked", new cc.Color(255,0,0), this.dungeonLevel.node, true);
+				this.feedbackController.showFeedback("Stairs Locked", new cc.Color(255,0,0), "floor", true);
 				window.analytics.Design_event("event:stairsLocked", window.gameSession.level);
 			}else {
 				this.nextButton.active = true;
@@ -492,20 +470,20 @@ var gridController = cc.Class({
 				this.fightMonster(index, event.target, boss);
 				this.findSubSprite(tile, index);
 				// victory xp
-				if (window.gameSession.hp > 0) {
+				if (! this.deathController.isDead()) {
 					xp += window.gameSession.level*25;
 					if (window.gameSession.job == this.enumClass["fighter"]) xp += window.gameSession.level*50;
 				} else {
 					this.popupController.openPermanentPopup("death");
-					this.deathMessage.string = "You died! \n You were " + this.lastDanger + "!";
+					this.deathController.setMessage("You were " + this.lastDanger + "!");
 				}
 			}
 		}
 
 		// show xp gain
 		window.gameSession.xp += xp;
-		this.dungeonXP.string = window.gameSession.xp;
-		this.showFeedback("+" + xp + "XP", new cc.Color(0,255,0), this.dungeonXP.node, false);
+		this.hudController.updateLabel("xp", ""+window.gameSession.xp);
+		this.feedbackController.showFeedback("+" + xp + "XP", new cc.Color(0,255,0), "xp", false);
 	},
 
 	revealSubSprite: function(x,y){
@@ -518,8 +496,8 @@ var gridController = cc.Class({
 
 	fightMonster: function(monster, node, boss){
 		this.monsters--;
-		this.tracker.string = this.monsters;
-		let strength = Math.floor(window.gameSession.level/5) + 1 + boss;
+		this.hudController.updateLabel("enemies", ""+this.monsters);
+		let strength = Math.floor(window.gameSession.level/5) + 1 + boss * Math.floor((Math.random() * Math.floor(window.gameSession.level/10)) + 1);
 		if (window.gameSession.job == this.enumClass["fighter"]) strength--;
 		let feedback;
 		let effect;
@@ -564,54 +542,60 @@ var gridController = cc.Class({
 			feedback = feedback + " Sub-boss";
 		}
 
-		this.showFeedback(feedback, new cc.Color(255,0,0), node, true, 3.0);
+		this.feedbackController.showFeedbackAtNode(feedback, new cc.Color(255,0,0), node, true, 3.0, 75);
 		this.lastDanger = effect;
 
 		if ((strength - window.gameSession.inventory[field]) < -9) {
+			if (!window.gameSession.achievements.unique.overkill) this.feedbackController.showFeedback("Achievement: Overkill", new cc.Color(0,255,0), "achievement", true, 5.0);
 			window.gameSession.stats.unique.overkill = true;
-			if (!window.gameSession.achievements.unique.overkill) this.showFeedback("Achievement: Overkill", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
 		}
 		window.analytics.Design_event("Fight:" + field + ":" + strength, window.gameSession.inventory[field]);
 		strength -= Math.min(strength, window.gameSession.inventory[field]);
 		// receives strength in damage
 		if (strength>0) {
-			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node, false);
-			window.gameSession.hp -= strength;
+			this.deathController.hurt(strength);
 			window.gameSession.stats.damage[field] += strength;
-			if (window.gameSession.stats.damage[field] % 100 == 0) this.showFeedback("Achievement: " + achivDamage, new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+			if (window.gameSession.stats.damage[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivDamage, new cc.Color(0,255,0), "achievement", true, 5.0);
 			window.gameSession.stats.damage.total += strength;
-			if (window.gameSession.stats.damage.total % 100 == 0) this.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
-			this.dungeonHP.string = window.gameSession.hp;
+			if (window.gameSession.stats.damage.total % 100 == 0) this.feedbackController.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), "achievement", true, 5.0);
 		}
 
-		if (window.gameSession.hp > 0) {
+		if (! this.deathController.isDead()) {
 			window.gameSession.stats.kills[field]++;
-			if (window.gameSession.stats.kills[field] % 100 == 0) this.showFeedback("Achievement: " + achivKills, new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+			if (window.gameSession.stats.kills[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivKills, new cc.Color(0,255,0), "achievement", true, 5.0);
 			window.gameSession.stats.kills.total++;
-			if (window.gameSession.stats.kills.total % 100 == 0) this.showFeedback("Achievement: God of War", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+			if (window.gameSession.stats.kills.total % 100 == 0) this.feedbackController.showFeedback("Achievement: God of War", new cc.Color(0,255,0), "achievement", true, 5.0);
 
 			//LOOT
 			this.giveTreasure(Math.floor((Math.random() * 100) + 1), node, true);
 		} else {
-			if (window.gameSession.hp < -9) {
+			if (this.deathController.isTrulyDead()) {
+				if (!window.gameSession.achievements.unique.truedeath) this.feedbackController.showFeedback("Achievement: True Death", new cc.Color(0,255,0), "achievement", true, 5.0);
 				window.gameSession.stats.unique.truedeath = true;
-				if (!window.gameSession.achievements.unique.truedeath) this.showFeedback("Achievement: True Death", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+			}
+			if (boss == 1) {
+				if (!window.gameSession.achievements.unique.subboss) this.feedbackController.showFeedback("Achievement: Did not expected that", new cc.Color(0,255,0), "achievement", true, 5.0);
+				window.gameSession.stats.unique.subboss = true;
+			}
+			if (boss == 2) {
+				if (!window.gameSession.achievements.unique.boss) this.feedbackController.showFeedback("Achievement: Expected that", new cc.Color(0,255,0), "achievement", true, 5.0);
+				window.gameSession.stats.unique.boss = true;
 			}
 			if (window.gameSession.death) {
+				if (!window.gameSession.achievements.unique.already) this.feedbackController.showFeedback("Achievement: Already Back?", new cc.Color(0,255,0), "achievement", true, 5.0);
 				window.gameSession.stats.unique.already = true;
-				if (!window.gameSession.achievements.unique.already) this.showFeedback("Achievement: Already Back?", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
 			}
 			window.gameSession.stats.death[field]++;
-			if (window.gameSession.stats.death[field] % 100 == 0) this.showFeedback("Achievement: " + achivDeath, new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+			if (window.gameSession.stats.death[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivDeath, new cc.Color(0,255,0), "achievement", true, 5.0);
 			window.gameSession.stats.death.total++;
-			if (window.gameSession.stats.death.total % 100 == 0) this.showFeedback("Achievement: Kenny", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+			if (window.gameSession.stats.death.total % 100 == 0) this.feedbackController.showFeedback("Achievement: Kenny", new cc.Color(0,255,0), "achievement", true, 5.0);
 		}
 	},
 
 	fightDanger: function(danger, node){
 		this.dangers--;
 		this.hitTrap = true;
-		this.trapFinder.string = this.dangers;
+		this.hudController.updateLabel("traps", ""+this.dangers);
 		let strength = Math.floor(window.gameSession.level/10 + 1);
 		if (window.gameSession.job == this.enumClass["rogue"]) strength--;
 		let feedback;
@@ -622,13 +606,11 @@ var gridController = cc.Class({
 		let achivItem;
 		let achivDeath;
 
-		if (window.gameSession.hp <2 && (window.gameSession.inventory.fire + window.gameSession.inventory.ice + window.gameSession.inventory.acid + window.gameSession.inventory.electricity + window.gameSession.inventory.spikes + window.gameSession.inventory.poison) <1){
+		if (this.deathController.isAlmostDead() && ! this.inventoryController.hasDefenses()){
+			if (!window.gameSession.achievements.unique.daredevil) this.feedbackController.showFeedback("Achievement: Daredevil", new cc.Color(0,255,0), "achievement", true, 5.0);
 			window.gameSession.stats.unique.daredevil = true;
-			if (!window.gameSession.achievements.unique.daredevil) this.showFeedback("Achievement: Daredevil", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
 		}
 
-		this.dangersType[danger-1]--;
-		this.trapsQtd[danger-1].string = this.dangersType[danger-1];
 		switch(danger) {
 			case 1:
 				// code block
@@ -693,117 +675,98 @@ var gridController = cc.Class({
 			default:
 				// code block
 		}
+
+		this.dangersType[danger-1]--;
+		this.hudController.updateTraps(field, this.dangersType[danger-1]);
+
 		window.analytics.Design_event("Trap:" + field + ":" + strength, window.gameSession.inventory[field]);
 		strength -= window.gameSession.skills[field + "Shield"];
 
-		this.showFeedback(feedback, new cc.Color(255,0,0), node, true);
+		this.feedbackController.showFeedbackAtNode(feedback, new cc.Color(255,0,0), node, true, 3.0, 75);
 		this.lastDanger = effect;
 		window.gameSession.stats.traps[field]++;
-		if (window.gameSession.stats.traps[field] % 100 == 0) this.showFeedback("Achievement: " + achivTrap, new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+		if (window.gameSession.stats.traps[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivTrap, new cc.Color(0,255,0), "achievement", true, 5.0);
 		
 		if (window.gameSession.inventory[field] > 0){
 			let shield = window.gameSession.inventory[field];
 			let protection = Math.min(strength, shield);
 
-			// lose shields up to strength of danger
-			window.gameSession.inventory[field] -= protection;
-			window.gameSession.stats.items[field] += protection; 
-			this.shields[danger-1].string = window.gameSession.inventory[field];
-			if (window.gameSession.stats.items[field] % 100 == 0) this.showFeedback("Achievement: " + achivItem, new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
-			window.gameSession.stats.items.total += protection;
-			if (window.gameSession.stats.items.total % 100 == 0) this.showFeedback("Achievement: Spender", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+			// use shields up to strength of danger
+			this.inventoryController.useItem(field, protection, node);
+			if (window.gameSession.stats.items[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivItem, new cc.Color(0,255,0), "achievement", true, 5.0);
+			if (window.gameSession.stats.items.total % 100 == 0) this.feedbackController.showFeedback("Achievement: Spender", new cc.Color(0,255,0), "achievement", true, 5.0);
 
 			// danger strength is reduced by spent shields
 			strength -= protection;
-
-			this.showFeedback("-" + protection + " " + item + " Shield", new cc.Color(255,0,0), this.dungeonLevel.node, true);
 		}
 
 		// receives strength in damage
 		if (strength>0) {
-			this.showFeedback("-" + strength + "HP", new cc.Color(255,0,0), this.dungeonHP.node, false);
-			window.gameSession.hp -= strength;
+			this.deathController.hurt(strength);
 			window.gameSession.stats.damage[field] += strength;
-			if (window.gameSession.stats.items[field] % 100 == 0) this.showFeedback("Achievement: " + achivItem, new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+			if (window.gameSession.stats.items[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivItem, new cc.Color(0,255,0), "achievement", true, 5.0);
 			window.gameSession.stats.damage.total += strength;
-			if (window.gameSession.stats.damage.total % 100 == 0) this.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
-			this.dungeonHP.string = window.gameSession.hp;
+			if (window.gameSession.stats.damage.total % 100 == 0) this.feedbackController.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), "achievement", true, 5.0);
 		}
-		if (window.gameSession.hp <= 0) {
-			if (window.gameSession.hp < -9) {
+		if (this.deathController.isDead()) {
+			if (this.deathController.isTrulyDead()) {
+				if (!window.gameSession.achievements.unique.truedeath) this.feedbackController.showFeedback("Achievement: True Death", new cc.Color(0,255,0), "achievement", true, 5.0);
 				window.gameSession.stats.unique.truedeath = true;
-				if (!window.gameSession.achievements.unique.truedeath) this.showFeedback("Achievement: True Death", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
 			}
 			if (window.gameSession.death) {
+				if (!window.gameSession.achievements.unique.already) this.feedbackController.showFeedback("Achievement: Already Back?", new cc.Color(0,255,0), "achievement", true, 5.0);
 				window.gameSession.stats.unique.already = true;
-				if (!window.gameSession.achievements.unique.already) this.showFeedback("Achievement: Already Back?", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
 			}
 			window.gameSession.stats.death[field]++;
-			if (window.gameSession.stats.death[field] % 100 == 0) this.showFeedback("Achievement: " + achivDeath, new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+			if (window.gameSession.stats.death[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivDeath, new cc.Color(0,255,0), "achievement", true, 5.0);
 			window.gameSession.stats.death.total++;
-			if (window.gameSession.stats.death.total % 100 == 0) this.showFeedback("Achievement: Kenny", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+			if (window.gameSession.stats.death.total % 100 == 0) this.feedbackController.showFeedback("Achievement: Kenny", new cc.Color(0,255,0), "achievement", true, 5.0);
 		}
 	},
 
 	giveTreasure: function(prize, node, loot=false){
 		if (!loot){
 			this.treasures--;
-			this.treasureHunter.string = this.treasures;
+			this.hudController.updateLabel("chests", ""+this.treasures);
 		}
 		let reward = 1 + window.gameSession.skills.totalShield;
 		window.gameSession.stats.items.chests += reward;
-		if (window.gameSession.stats.items.chests % 100 == 0) this.showFeedback("Achievement: Treasure Hunter", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+		if (window.gameSession.stats.items.chests % 100 == 0) this.feedbackController.showFeedback("Achievement: Treasure Hunter", new cc.Color(0,255,0), "achievement", true, 5.0);
 		if (prize <= 10) {
-			window.analytics.Design_event("Treasure:potion", reward);
-			window.gameSession.inventory.potion = Math.min(window.gameSession.inventory.potion+reward, window.gameSession.inventory.potionMax);
-			this.showFeedback("Got " + reward + " Potion", new cc.Color(0,255,0), node, true);
+			this.inventoryController.giveItem("potion", reward, node, "Potion");
 		} else if (prize <= 25 ) {
-			window.analytics.Design_event("Treasure:fire", reward);
-			window.gameSession.inventory.fire = Math.min(window.gameSession.inventory.fire+reward, window.gameSession.inventory.fireMax);
-			this.showFeedback("Got " + reward + " Fire Shield", new cc.Color(0,255,0), node, true);
-			this.shields[0].string = window.gameSession.inventory.fire;
+			this.inventoryController.giveItem("fire", reward, node, "Fire Shield");
 		} else if (prize <= 40 ) {
-			window.analytics.Design_event("Treasure:ice", reward);
-			window.gameSession.inventory.ice = Math.min(window.gameSession.inventory.ice+reward, window.gameSession.inventory.iceMax);
-			this.showFeedback("Got " + reward + " Ice Shield", new cc.Color(0,255,0), node, true);
-			this.shields[1].string = window.gameSession.inventory.ice;
+			this.inventoryController.giveItem("ice", reward, node, "Ice Shield");
 		} else if (prize <= 55 ) {
-			window.analytics.Design_event("Treasure:acid", reward);
-			window.gameSession.inventory.acid = Math.min(window.gameSession.inventory.acid+reward, window.gameSession.inventory.acidMax);
-			this.showFeedback("Got " + reward + " Acid Shield", new cc.Color(0,255,0), node, true);
-			this.shields[2].string = window.gameSession.inventory.acid;
+			this.inventoryController.giveItem("acid", reward, node, "Acid Shield");
 		} else if (prize <= 70 ) {
-			window.analytics.Design_event("Treasure:electricity", reward);
-			window.gameSession.inventory.electricity = Math.min(window.gameSession.inventory.electricity+reward, window.gameSession.inventory.electricityMax);
-			this.showFeedback("Got " + reward + " Electricity Shield", new cc.Color(0,255,0), node, true);
-			this.shields[3].string = window.gameSession.inventory.electricity;
+			this.inventoryController.giveItem("electricity", reward, node, "Electricity Shield");
 		} else if (prize <= 85 ) {
-			window.analytics.Design_event("Treasure:spikes", reward);
-			window.gameSession.inventory.spikes = Math.min(window.gameSession.inventory.spikes+reward, window.gameSession.inventory.spikesMax);
-			this.showFeedback("Got " + reward + " Spikes Shield", new cc.Color(0,255,0), node, true);
-			this.shields[4].string = window.gameSession.inventory.spikes;
+			this.inventoryController.giveItem("spikes", reward, node, "Spikes Shield");
 		} else if (prize <= 100 ) {
-			window.analytics.Design_event("Treasure:poison", reward);
-			window.gameSession.inventory.poison = Math.min(window.gameSession.inventory.poison+reward, window.gameSession.inventory.poisonMax);
-			this.showFeedback("Got " + reward + " Poison Shield", new cc.Color(0,255,0), node, true);
-			this.shields[5].string = window.gameSession.inventory.poison;
+			this.inventoryController.giveItem("poison", reward, node, "Poison Shield");
 		}
 	},
 
 	nextLevel: function(){
-		if (window.gameSession.hp < 1) return; 
+		if (this.deathController.isDead()) {
+			this.popupController.openPermanentPopup("death");
+			return; 
+		}
 		this.loadingAnimation.active = true;
 		window.gameSession.death = false;
 		if (!this.hitTrap) {
+			if (!window.gameSession.achievements.unique.lucky) this.feedbackController.showFeedback("Achievement: Lucky", new cc.Color(0,255,0), "achievement", true, 5.0);
 			window.gameSession.stats.unique.lucky = true;
-			if (!window.gameSession.achievements.unique.lucky) this.showFeedback("Achievement: Lucky", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
 		}
 		window.gameSession.currency++;
+		window.gameSession.stats.row++;
 
 		window.analytics.Level_Complete("Floor " + window.gameSession.level, "Dungeon Scene");
 		window.gameSession.level++;
 		if (window.gameSession.level > window.gameSession.stats.levelMax) window.gameSession.stats.levelMax = window.gameSession.level;
-		if (window.gameSession.stats.levelMax % 100 == 0) this.showFeedback("Achievement: Explorer", new cc.Color(0,255,0), this.dungeonAchievement, true, 5.0);
+		if (window.gameSession.stats.levelMax % 100 == 0) this.feedbackController.showFeedback("Achievement: Explorer", new cc.Color(0,255,0), "achievement", true, 5.0);
 		cc.director.loadScene("gameScene");
 	},
 
@@ -943,13 +906,13 @@ var gridController = cc.Class({
 			tile.content = this.enumContent["danger"];
 			tile.contentType = Math.floor((Math.random() * 6) + 1);
 			this.dangersType[tile.contentType-1]++;
-			this.trapsQtd[tile.contentType-1].string = this.dangersType[tile.contentType-1];
+			this.hudController.updateTrapsByNumber(tile.contentType-1, this.dangersType[tile.contentType-1]);
 			this.dangers++;
-			this.trapFinder.string = this.dangers;
+			this.hudController.updateLabel("traps", ""+this.dangers);
 		} else if (tile.content == this.enumContent["empty"] && tile.tile != this.enumTile["entrance"] && tile.tile != this.enumTile["exit"]) {
 			tile.content = this.enumContent["treasure"];
 			this.treasures++;
-			this.treasureHunter.string = this.treasures;
+			this.hudController.updateLabel("chests", ""+this.treasures);
 		}	
 	},
 	showLine: function(tile){
@@ -1042,18 +1005,18 @@ var gridController = cc.Class({
 						tile.content = this.enumContent["danger"];
 						tile.contentType = Math.floor((Math.random() * 6) + 1);
 						this.dangersType[tile.contentType-1]++;
-						this.trapsQtd[tile.contentType-1].string = this.dangersType[tile.contentType-1];
+						this.hudController.updateTrapsByNumber(tile.contentType-1, this.dangersType[tile.contentType-1]);
 						this.dangers++;
-						this.trapFinder.string = this.dangers;
+						this.hudController.updateLabel("traps", ""+this.dangers);
 					} else{
 						tile.content = this.enumContent["treasure"];
 						this.treasures++;
-						this.treasureHunter.string = this.treasures;
+						this.hudController.updateLabel("chests", ""+this.treasures);
 					}
 				} else if (chance <=10 && tile.content == this.enumContent["empty"]) {
 					tile.content = this.enumContent["monster"];
 					this.monsters++;
-					this.tracker.string = this.monsters;
+					this.hudController.updateLabel("enemies", ""+this.monsters);
 				}
 			}
 			// make a path in random direction
@@ -1189,41 +1152,6 @@ var gridController = cc.Class({
 		tile = this.grid[x2][y2];
 		tile.tile = this.enumTile["exit"];
 		this.exit = {x: x2, y: y2};
-	},
-
-	showFeedback: function(text, color, parent, stay, duration = 2.0){
-		let feedback = cc.instantiate(this.feedbackPrefab);
-		feedback.parent = this.canvas;
-		feedback.color = color;
-		
-		let position = parent.parent.convertToWorldSpaceAR(parent.position);
-		position = this.canvas.convertToNodeSpaceAR(position);
-		feedback.x = position.x;
-		if (feedback.x < -231) feedback.x = -200;
-		if (feedback.x > 231) feedback.x = 200;
-		feedback.y = position.y;
-
-		feedback.getComponent(cc.Label).string = text;
-
-		// move up and change opacity
-		let action;
-		if (stay){
-			action = cc.sequence(cc.moveBy(duration, cc.v2(0,100)), cc.fadeOut(duration), cc.callFunc(this.removeFeedback, this, feedback))
-		} else {
-			action = cc.sequence(cc.spawn(cc.moveBy(duration, cc.v2(0,100)), cc.fadeOut(duration)), cc.callFunc(this.removeFeedback, this, feedback))
-		}
-		
-		feedback.runAction( action );
-
-		//add to log
-		let log = cc.instantiate(this.logPrefab);
-		log.parent = this.feedbackLog;
-		log.getComponent(cc.Label).string = text;
-		log.color = color;
-	},
-
-	removeFeedback: function(feedback){
-		feedback.destroy();
 	},
 
 	update (dt) {

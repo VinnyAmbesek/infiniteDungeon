@@ -2,24 +2,22 @@ infiniteDungeon
 cash: fill inventory, phoenix feather [full restore on death], ad click to recover hp
 
 roadmap: 
-* add suicide option
-* add lvl selection option
-* add super boss/trap chance
-* add soul store
-* add souls to treasure
 * improve icons
-* trade xp for souls
-
-* random powerfull effects
+* random powerfull effects [death-trap, death-boss]
 * technical debt: make individual controllers, gridController is too big
 * scoreboard
 * better effects
-* change tile colors each 10-50 levels
-* add artifacts to treasures
+* skin: use souls to unlock dungeon skins
+* add artifacts/special treasures to boss loot
+* make upgrade controller control shown upgrades: trap finder, treasure hunter and tracker in hud and not grid controller
+* make achievement controller decide when to show achievement unlocked
 
 * retention: add push notifications [right time, remeber free upgrade, dont be annoying]
 * retention: add share into social networks
 * retention: add personalisations
+
+* Money: add ads to ressurect, double daily rewards, get 10 souls
+* Money: IAP to buy souls for 1brl at +5% per box [100, 210, 330, 460, 600, 750, 910, 1080, 1260, 1450]
 
 ICON: 
 * dungeon [square]: burned floor, froozen floor, electricity burn floor, acid floor, darts floor, spikes floor, stair up, stair down, open chest

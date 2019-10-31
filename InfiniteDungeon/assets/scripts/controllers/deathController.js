@@ -1,15 +1,20 @@
 const PopupController = require("popupController");
+const HudController = require("hudController");
+const FeedbackController = require("feedbackController");
 
-cc.Class({
+var deathController = cc.Class({
     extends: cc.Component,
 
     properties: {
         popupController: PopupController,
+        feedbackController: FeedbackController,
+        hudController: HudController,
         deathPopup: cc.Node,
-        hp: cc.Label
+        deathMessage: cc.Label,
     },
 
     iDied: function(){
+        window.gameSession.stats.row = 0;
         window.analytics.Level_Fail("Floor " + window.gameSession.level, "Dungeon Scene");
         // back to level
         window.gameSession.level = window.gameSession.levelMin;
@@ -36,20 +41,63 @@ cc.Class({
 
     iAmBack: function(){
         if (window.gameSession.currency < 100) return;
+        window.gameSession.stats.row = 0;
         window.gameSession.currency -= 100;
         window.analytics.Design_event("event:ressurrection", window.gameSession.currency);
         window.gameSession.hp = window.gameSession.hpMax;
-        this.hp.string = window.gameSession.hp;
+        this.hudController.updateLabel("hp", window.gameSession.hp);
 
         this.saveGame();
         this.popupController.closePopupByName("death");
+    },
+
+    kill: function(){
+        window.gameSession.hp = -1;
+        this.hudController.updateLabel("hp", window.gameSession.hp);
+        this.popupController.openPermanentPopup("death");
+    },
+
+    isDead(){
+        return window.gameSession.hp <1;
+    },
+
+    isTrulyDead(){
+        return window.gameSession.hp <9;
+    },
+
+    isAlmostDead(){
+        return window.gameSession.hp == 1;
+    },
+
+    hasDamage(){
+        return (window.gameSession.hp < window.gameSession.hpMax);
+    },
+
+    heal(qtd){
+        window.gameSession.hp +=qtd;
+        if (window.gameSession.hp > window.gameSession.hpMax) window.gameSession.hp = window.gameSession.hpMax;
+        this.hudController.updateLabel("hp", window.gameSession.hp);
+        this.feedbackController.showFeedback("+" + qtd + "HP", new cc.Color(0,255,0), "hp", false);
+    },
+
+    hurt(qtd){
+        window.gameSession.hp -=qtd;
+        this.hudController.updateLabel("hp", window.gameSession.hp);
+        if (this.isDead()) this.popupController.openPermanentPopup("death");
+        this.feedbackController.showFeedback("-" + qtd + "HP", new cc.Color(255,0,0), "hp", false);
+
+        this.saveGame();
+    },
+
+    setMessage(msg){
+        this.deathMessage.string = "You died!\n" + msg;
     },
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {},
 
     start () {
-
+        
     },
 
     saveGame(){
@@ -58,3 +106,5 @@ cc.Class({
 
     // update (dt) {},
 });
+
+module.exports = deathController;

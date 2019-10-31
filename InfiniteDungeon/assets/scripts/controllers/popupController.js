@@ -5,6 +5,7 @@ var popupController = cc.Class({
         job: cc.Node, // usually only activated permanently
         upgrade: cc.Node,
         inventory: cc.Node,
+        store: cc.Node,
         achievement: cc.Node,
         options: cc.Node,
         tutorial: cc.Node,

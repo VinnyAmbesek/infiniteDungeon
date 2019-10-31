@@ -1,10 +1,12 @@
 const PopupController = require("popupController");
+const HudController = require("hudController");
 
 cc.Class({
     extends: cc.Component,
 
     properties: {
         popupController: PopupController,
+        hudController: HudController,
         startLevel: cc.Label,
     },
 
@@ -26,11 +28,6 @@ cc.Class({
         window.gameSession.levelMin+= parseInt(qtd);
         if (window.gameSession.levelMin>window.gameSession.levelPassage) window.gameSession.levelMin = window.gameSession.levelPassage;
         this.startLevel.string = "Starting Level: " + window.gameSession.levelMin;
-    },
-
-    suicide (){
-        window.gameSession.hp = -1;
-        this.popupController.openPopup("death");
     },
 
     // update (dt) {},

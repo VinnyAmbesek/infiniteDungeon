@@ -106,6 +106,14 @@ cc.Class({
         this.setDefault(window.gameSession, "stats", {});
 
         this.setDefault(window.gameSession.stats, "unique", {});
+        this.setDefault(window.gameSession.stats.unique, "truedeath", false);
+        this.setDefault(window.gameSession.stats.unique, "daredevil", false);
+        this.setDefault(window.gameSession.stats.unique, "already", false);
+        this.setDefault(window.gameSession.stats.unique, "overkill", false);
+        this.setDefault(window.gameSession.stats.unique, "darkness", false);
+        this.setDefault(window.gameSession.stats.unique, "lucky", false);
+        this.setDefault(window.gameSession.stats.unique, "subboss", false);
+        this.setDefault(window.gameSession.stats.unique, "boss", false);
 
         this.setDefault(window.gameSession.stats, "death", {});
         this.setDefault(window.gameSession.stats.death, "total", 0);
@@ -160,6 +168,7 @@ cc.Class({
         this.setDefault(window.gameSession.stats, "levelMax", 0);
         this.setDefault(window.gameSession.stats, "xp", 0);
         this.setDefault(window.gameSession.stats, "tiles", 0);
+        this.setDefault(window.gameSession.stats, "row", 0);
 
         //achievements
         this.setDefault(window.gameSession, "achievements", {});
@@ -219,6 +228,7 @@ cc.Class({
         this.setDefault(window.gameSession.achievements, "levelMax", 0);
         this.setDefault(window.gameSession.achievements, "xp", 0);
         this.setDefault(window.gameSession.achievements, "tiles", 0);
+        this.setDefault(window.gameSession.achievements, "row", 0);
 
         //tutorial
         this.setDefault(window.gameSession, "tutorial", {});

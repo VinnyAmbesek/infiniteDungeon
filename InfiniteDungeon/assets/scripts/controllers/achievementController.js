@@ -75,10 +75,13 @@ var achievementController = cc.Class({
         this.createSpecialButton("Overkill", "Get an enemy to -10HP", "overkill", 1);
         this.createSpecialButton("Stop Moving!", "Get 'Dungeon Moves' twice in a floor", "darkness", 1);
         this.createSpecialButton("Lucky", "Cross a floor without hitting any trap", "lucky", 1);
+        this.createSpecialButton("Did not expected that", "Die to a sub boss", "subboss", 1);
+        this.createSpecialButton("Expected that", "Die to a boss", "boss", 1);
 
         this.createButton("Explorer", "Deepest floor you went", null, "levelMax", 2, 10, 10000);
         this.createButton("High level", "Total XP spent", null, "xp", 2, 100000);
         this.createButton("Runner", "Tiles walked", null, "tiles", 2, 1000);
+        this.createButton("In a Row", "Floors explored without dying", null, "row", 2, 5, 5000);
 
         this.createButton("God of War", "Enemies you defeated", "kills", "total", 3);
         this.createButton("Warrior", "Enemies you defeated with your sword", "kills", "melee", 3, 100, 500);
@@ -234,7 +237,7 @@ var achievementController = cc.Class({
 
         let required = (achievement + 1) * step;
         let reward = (achievement + 1) * prize;
-        let progress = stat/required;
+        let progress = (stat-required+step)/step;
         let completion = stat + " / " + required;
 
         let button = cc.instantiate(this.button);
@@ -315,6 +318,7 @@ var achievementController = cc.Class({
         let mult = button.mult;
         let sub = button.sub;
         let field = button.field;
+        let step = button.step;
 
         let achievement;
         let stat;
@@ -326,9 +330,9 @@ var achievementController = cc.Class({
             stat = window.gameSession.stats[field];
         }
 
-        let required = (achievement + 1) * button.step;
+        let required = (achievement + 1) * step;
         let reward = (achievement + 1) * button.prize;
-        let progress = stat/required;
+        let progress = (stat-required+step)/step;
         let completion = stat + " / " + required;
 
         button.progress = progress;
@@ -351,3 +355,5 @@ var achievementController = cc.Class({
 
     // update (dt) {},
 });
+
+module.exports = achievementController;
