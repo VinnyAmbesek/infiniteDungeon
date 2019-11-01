@@ -1,7 +1,15 @@
+const InventoryController = require("inventoryController");
+const FeedbackController = require("feedbackController");
+const HudController = require("hudController");
+
 var upgradeController = cc.Class({
 	extends: cc.Component,
 
 	properties: {
+		inventoryController: InventoryController,
+		feedbackController: FeedbackController,
+        hudController: HudController,
+
 		grid: cc.Node,
 		canvas: cc.Node,
 		dungeonAchievement: cc.Node,
@@ -34,15 +42,15 @@ var upgradeController = cc.Class({
 
 	onEnable (){
 		this.checkSecretPassage();
-		this.checkSpecialButton(window.gameSession.stats.traps.total, window.gameSession.trapFinder, this.trapFinder);
-		this.checkSpecialButton(window.gameSession.stats.traps.fire, window.gameSession.fireFinder, this.fireFinder);
-		this.checkSpecialButton(window.gameSession.stats.traps.ice, window.gameSession.iceFinder, this.iceFinder);
-		this.checkSpecialButton(window.gameSession.stats.traps.acid, window.gameSession.acidFinder, this.acidFinder);
-		this.checkSpecialButton(window.gameSession.stats.traps.electricity, window.gameSession.electricityFinder, this.electricityFinder);
-		this.checkSpecialButton(window.gameSession.stats.traps.spikes, window.gameSession.spikesFinder, this.spikesFinder);
-		this.checkSpecialButton(window.gameSession.stats.traps.poison, window.gameSession.poisonFinder, this.poisonFinder);
-		this.checkSpecialButton(window.gameSession.stats.items.chests, window.gameSession.treasureHunter, this.treasureHunter);
-		this.checkSpecialButton(window.gameSession.stats.kills.total, window.gameSession.tracker, this.tracker);
+		this.checkSpecialButton(window.gameSession.stats.traps.total, this.trapFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.fire, this.fireFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.ice, this.iceFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.acid, this.acidFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.electricity, this.electricityFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.spikes, this.spikesFinder);
+		this.checkSpecialButton(window.gameSession.stats.traps.poison, this.poisonFinder);
+		this.checkSpecialButton(window.gameSession.stats.items.chests, this.treasureHunter);
+		this.checkSpecialButton(window.gameSession.stats.kills.total, this.tracker);
 
 		this.checkPermanentShield("fire");
 		this.checkPermanentShield("ice");
@@ -54,55 +62,62 @@ var upgradeController = cc.Class({
 	},
 
 	setButtons: function(){
-		if (! window.gameSession) return;
+		if (!window.gameSession) return;
+		if (!this.hasOwnProperty("buttonsList")) this.buttonsList = [];
+		if (!this.hasOwnProperty("initiated")) this.initiated = false;
+		if (this.initiated) return;
 
-		this.createButton("Fire Protection", "fireMin", "fire", "Starting amount of Fire Shields", 0, 1, 0);
-		this.createButton("Ice Protection", "iceMin", "ice", "Starting amount of Ice Shields", 0, 1, 0);
-		this.createButton("Acid Protection", "acidMin", "acid", "Starting amount of Acid Shields", 0, 1, 0);
-		this.createButton("Electricity Protection", "electricityMin", "electricity", "Starting amount of Electricity Shields", 0, 1, 0);
-		this.createButton("Spikes Protection", "spikesMin", "spikes", "Starting amount of Spikes Shields", 0, 1, 0);
-		this.createButton("Poison Protection", "poisonMin", "poison", "Starting amount of Poison Shields", 0, 1, 0);
+		// Create upgrades that do not depend on stats
+		this.createButton("Fire Protection", "fireMin", "fire", "Starting amount of Fire Shields", 0, 0, 1000);
+		this.createButton("Ice Protection", "iceMin", "ice", "Starting amount of Ice Shields", 0, 0, 1000);
+		this.createButton("Acid Protection", "acidMin", "acid", "Starting amount of Acid Shields", 0, 0, 1000);
+		this.createButton("Electricity Protection", "electricityMin", "electricity", "Starting amount of Electricity Shields", 0, 0, 1000);
+		this.createButton("Spikes Protection", "spikesMin", "spikes", "Starting amount of Spikes Shields", 0, 0, 1000);
+		this.createButton("Poison Protection", "poisonMin", "poison", "Starting amount of Poison Shields", 0, 0, 1000);
 
-		this.createButton("Fire Pocket", "fireMax", null, "Maximum amount of Fire Shields", 1, 1, 3);
-		this.createButton("Ice Pocket", "iceMax", null, "Maximum amount of Ice Shields", 1, 1, 3);
-		this.createButton("Acid Pocket", "acidMax", null, "Maximum amount of Acid Shields", 1, 1, 3);
-		this.createButton("Electricity Pocket", "electricityMax", null, "Maximum amount of Electricity Shields", 1, 1, 3);
-		this.createButton("Spikes Pocket", "spikesMax", null, "Maximum amount of Spikes Shields", 1, 1, 3);
-		this.createButton("Poison Pocket", "poisonMax", null, "Maximum amount of Poison Shields", 1, 1, 3);
+		this.createButton("Fire Pocket", "fireMax", null, "Maximum amount of Fire Shields", 1, 3, 1000);
+		this.createButton("Ice Pocket", "iceMax", null, "Maximum amount of Ice Shields", 1, 3, 1000);
+		this.createButton("Acid Pocket", "acidMax", null, "Maximum amount of Acid Shields", 1, 3, 1000);
+		this.createButton("Electricity Pocket", "electricityMax", null, "Maximum amount of Electricity Shields", 1, 3, 1000);
+		this.createButton("Spikes Pocket", "spikesMax", null, "Maximum amount of Spikes Shields", 1, 3, 1000);
+		this.createButton("Poison Pocket", "poisonMax", null, "Maximum amount of Poison Shields", 1, 3, 1000);
 
-		this.createButton("Starting Potion", "potionMin", "potion", "Starting amount of Potions", 3, 1, 0);
-		this.createButton("Potion Pocket", "potionMax", null, "Maximum amount of Potions", 1, 1, 3);
+		this.createButton("Starting Potion", "potionMin", "potion", "Starting amount of Potions", 3, 0, 1000);
+		this.createButton("Potion Pocket", "potionMax", null, "Maximum amount of Potions", 1, 3, 1000);
 
-		this.createButton("Health Points", "hpMax", null, "Increases maximum HP", 2, 1, 3);
+		this.createButton("Health Points", "hpMax", null, "Increases maximum HP", 2, 3, 1000);
 
-		this.createButton("Sword Skill", "melee", null, "Increases skill with swords", 5, 2, 1);
-		this.createButton("Bow Skill", "ranged", null, "Increases skill with bows", 6, 2, 1);
-		this.createButton("Wand Skill", "magic", null, "Increases skill with wands", 7, 2, 1);
+		this.createButton("Sword Skill", "melee", null, "Increases skill with swords", 5, 1, 2000);
+		this.createButton("Bow Skill", "ranged", null, "Increases skill with bows", 6, 1, 2000);
+		this.createButton("Wand Skill", "magic", null, "Increases skill with wands", 7, 1, 2000);
 
+		// Create secret passage conditional upgrade
 		this.createSecretPassageButton();
 		this.checkSecretPassage();
 
-		this.createSpecialButton("trapFinder","Trap Finder","Find how many traps exist in a floor.","upgradeTrapFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.total, window.gameSession.trapFinder, this.trapFinder);
-		this.createSpecialButton("fireFinder","Fire Finder","Find how many fire traps exist in a floor.","upgradeFireFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.fire, window.gameSession.fireFinder, this.fireFinder);
-		this.createSpecialButton("iceFinder","Ice Finder","Find how many ice traps exist in a floor.","upgradeIceFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.ice, window.gameSession.iceFinder, this.iceFinder);
-		this.createSpecialButton("acidFinder","Acid Finder","Find how many acid traps exist in a floor.","upgradeAcidFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.acid, window.gameSession.acidFinder, this.acidFinder);
-		this.createSpecialButton("electricityFinder","Electricity Finder","Find how many electricity traps exist in a floor.","upgradeElectricityFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.electricity, window.gameSession.electricityFinder, this.electricityFinder);
-		this.createSpecialButton("spikesFinder","Spikes Finder","Find how many spikes traps exist in a floor.","upgradeSpikesFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.spikes, window.gameSession.spikesFinder, this.spikesFinder);
-		this.createSpecialButton("poisonFinder","Poison Finder","Find how many poison traps exist in a floor.","upgradePoisonFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.poison, window.gameSession.poisonFinder, this.poisonFinder);
+		// Create upgrades that depende on stats and are unique
+		this.createSpecialButton("trapFinder","Trap Finder","Find how many traps exist in a floor.","upgradeSpecial","traps","total");
+		this.checkSpecialButton(window.gameSession.stats.traps.total, this.trapFinder);
+		this.createSpecialButton("fireFinder","Fire Finder","Find how many fire traps exist in a floor.","upgradeSpecial","traps","fire");
+		this.checkSpecialButton(window.gameSession.stats.traps.fire, this.fireFinder);
+		this.createSpecialButton("iceFinder","Ice Finder","Find how many ice traps exist in a floor.","upgradeSpecial","traps","ice");
+		this.checkSpecialButton(window.gameSession.stats.traps.ice, this.iceFinder);
+		this.createSpecialButton("acidFinder","Acid Finder","Find how many acid traps exist in a floor.","upgradeSpecial","traps","acid");
+		this.checkSpecialButton(window.gameSession.stats.traps.acid, this.acidFinder);
+		this.createSpecialButton("electricityFinder","Electricity Finder","Find how many electricity traps exist in a floor.","upgradeSpecial","traps","electricity");
+		this.checkSpecialButton(window.gameSession.stats.traps.electricity, this.electricityFinder);
+		this.createSpecialButton("spikesFinder","Spikes Finder","Find how many spikes traps exist in a floor.","upgradeSpecial","traps","spikes");
+		this.checkSpecialButton(window.gameSession.stats.traps.spikes, this.spikesFinder);
+		this.createSpecialButton("poisonFinder","Poison Finder","Find how many poison traps exist in a floor.","upgradeSpecial","traps","poison");
+		this.checkSpecialButton(window.gameSession.stats.traps.poison, this.poisonFinder);
 
-		this.createSpecialButton("treasureHunter","Treasure Hunter","Find how many chests exist in a floor.","upgradeTreasureHunter");		
-		this.checkSpecialButton(window.gameSession.stats.items.chests, window.gameSession.treasureHunter, this.treasureHunter);
+		this.createSpecialButton("treasureHunter","Treasure Hunter","Find how many chests exist in a floor.","upgradeSpecial","items","chests");
+		this.checkSpecialButton(window.gameSession.stats.items.chests, this.treasureHunter);
 
-		this.createSpecialButton("tracker","Tracker","Find how many enemies are in a floor.","upgradeTracker");
-		this.checkSpecialButton(window.gameSession.stats.kills.total, window.gameSession.tracker, this.tracker);
+		this.createSpecialButton("tracker","Tracker","Find how many enemies are in a floor.","upgradeSpecial","kills","total");
+		this.checkSpecialButton(window.gameSession.stats.kills.total, this.tracker);
 
+		// Create permanent shield upgrade
 		this.createPermanentShield("Fireproof", "Permanent fire shield", "fire", 8);
 		this.checkPermanentShield("fire");
 		this.createPermanentShield("Freezeproof", "Permanent ice shield", "ice", 8);
@@ -117,18 +132,23 @@ var upgradeController = cc.Class({
 		this.checkPermanentShield("poison");
 		this.createPermanentShield("Scavenger", "Increase itens got by chest", "total", 9);
 		this.checkPermanentShield("total");
-		//this.checkPermanentShield();
+
+		this.initiated = true;
 	},
+
+	// Create permanent shield
 
 	createPermanentShield: function(name, desc, field, id){
 		let button = cc.instantiate(this.button);
+		this.buttonsList.push(button);
 		button.parent = this.grid;
 
 		// fill data
 		button.getChildByName("Name").getComponent(cc.Label).string = name;
 		button.getChildByName("Description").getComponent(cc.Label).string = desc;
 		button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.skills[field + "Shield"];
-		button.getChildByName("Price").getComponent(cc.Label).string = (window.gameSession.skills[field + "Shield"] + 1)*5000 + "XP";
+		button.xp = (window.gameSession.skills[field + "Shield"] + 1)*5000;
+		button.getChildByName("Price").getComponent(cc.Label).string = button.xp + "XP";
 		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[id];
 
 		button.field = field;
@@ -156,12 +176,9 @@ var upgradeController = cc.Class({
 		let field = button.field;
 		let price = (window.gameSession.skills[field + "Shield"] + 1)*5000;
 
-		if (window.gameSession.xp >= price){
+		if (this.hasXP(price)){
 			// take xp
-			window.gameSession.xp -= price;
-			window.gameSession.stats.xp += price;
-			if (window.gameSession.stats.xp % 100000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			this.dungeonXP.string = window.gameSession.xp;
+			this.useXP(price);
 
 			//do upgrade
 			window.gameSession.skills[field + "Shield"]++;
@@ -176,16 +193,23 @@ var upgradeController = cc.Class({
 		this.checkPermanentShield(field);
 	},
 
-	createSpecialButton: function(me, name, desc, callback){
+	// Unique upgrade
+
+	createSpecialButton: function(me, name, desc, callback, sub, field){
 		let button = cc.instantiate(this.button);
+		this.buttonsList.push(button);
 		button.parent = this.grid;
+		button.upgrade = me;
+		button.sub = sub;
+		button.field = field;
+		button.xp = 5000;
 		this[me] = button;
 
 		// fill data
 		button.getChildByName("Name").getComponent(cc.Label).string = name;
 		button.getChildByName("Description").getComponent(cc.Label).string = desc;
 		button.getChildByName("Value").getComponent(cc.Label).string = 0;
-		button.getChildByName("Price").getComponent(cc.Label).string = "5000XP";
+		button.getChildByName("Price").getComponent(cc.Label).string = button.xp + "XP";
 		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[4];
 
 		//add click event
@@ -197,8 +221,8 @@ var upgradeController = cc.Class({
 		button.getComponent(cc.Button).clickEvents.push(eventHandler);
 	},
 
-	checkSpecialButton: function(req, upgrade, me){
-		if (req > 49 && !(upgrade) && me) {
+	checkSpecialButton: function(req, me){
+		if (me && window.gameSession.achievements[me.sub][me.field] > 0 && !window.gameSession[me.upgrade]) {
 			// show trap finder upgrade
 			me.active = true;
 		} else if (me) {
@@ -206,16 +230,14 @@ var upgradeController = cc.Class({
 		}
 	},
 
-	upgradeSpecial: function(event, upgrade){
+	upgradeSpecial: function(event){
 		let button = event.target;
+		let upgrade = button.upgrade;
 
-		if (window.gameSession.xp >= 5000) {
+		if (this.hasXP(5000)) {
 			window.analytics.Design_event("upgrade:special:"+upgrade);
 			// take xp
-			window.gameSession.xp -= 5000;
-			window.gameSession.stats.xp += 5000;
-			if (window.gameSession.stats.xp % 100000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			this.dungeonXP.string = window.gameSession.xp;
+			this.useXP(5000);
 
 			// do upgrade
 			window.gameSession[upgrade] = true;
@@ -227,64 +249,26 @@ var upgradeController = cc.Class({
 
 			this.saveGame();
 		}
+
+		this.checkSpecialButton(window.gameSession.stats[button.sub][button.field], this[upgrade]);
 	},
 
-	upgradeFireFinder(event){
-		this.upgradeSpecial(event, "fireFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.fire, window.gameSession.fireFinder, this.fireFinder);
-	},
-
-	upgradeIceFinder(event){
-		this.upgradeSpecial(event, "iceFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.ice, window.gameSession.iceFinder, this.iceFinder);
-	},
-
-	upgradeAcidFinder(event){
-		this.upgradeSpecial(event, "acidFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.acid, window.gameSession.acidFinder, this.acidFinder);
-	},
-
-	upgradeElectricityFinder(event){
-		this.upgradeSpecial(event, "electricityFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.electricity, window.gameSession.electricityFinder, this.electricityFinder);
-	},
-
-	upgradeSpikesFinder(event){
-		this.upgradeSpecial(event, "spikesFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.spikes, window.gameSession.spikesFinder, this.spikesFinder);
-	},
-
-	upgradePoisonFinder(event){
-		this.upgradeSpecial(event, "poisonFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.poison, window.gameSession.poisonFinder, this.poisonFinder);
-	},
-
-	upgradeTrapFinder(event){
-		this.upgradeSpecial(event, "trapFinder");
-		this.checkSpecialButton(window.gameSession.stats.traps.total, window.gameSession.trapFinder, this.trapFinder);
-	},
-
-	upgradeTreasureHunter(event){
-		this.upgradeSpecial(event, "treasureHunter");
-		this.checkSpecialButton(window.gameSession.stats.items.chests, window.gameSession.treasureHunter, this.treasureHunter);
-	},
-
-	upgradeTracker(event){
-		this.upgradeSpecial(event, "tracker");
-		this.checkSpecialButton(window.gameSession.stats.kills.total, window.gameSession.tracker ,this.tracker);
-	},
+	// Secret Passage
 
 	createSecretPassageButton(){
 		let button = cc.instantiate(this.button);
+		this.buttonsList.push(button);
 		button.parent = this.grid;
 		this.secretPassage = button;
 
 		// fill data
 		button.getChildByName("Name").getComponent(cc.Label).string = "Secret Passage";
 		button.getChildByName("Description").getComponent(cc.Label).string = "The floor you start back when you die.";
-		button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.levelPassage;
-		if (! window.gameSession.upgrades.levelPassage) window.gameSession.upgrades.levelPassage = 1000;
-		button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelPassage + "XP";
+		let lvl = window.gameSession.levelPassage + 5;
+		if (lvl==6) lvl = 5;
+		button.getChildByName("Value").getComponent(cc.Label).string = lvl;
+		button.xp = 1000 * Math.floor(window.gameSession.levelPassage/5 + 1);
+		button.getChildByName("Price").getComponent(cc.Label).string = button.xp + "XP";
 		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[4];
 		//add click event
 
@@ -307,12 +291,9 @@ var upgradeController = cc.Class({
 	upgradeSecretPassage(event){
 		let button = event.target;
 
-		if (window.gameSession.xp >= window.gameSession.upgrades.levelPassage) {
+		if (this.hasXP(button.xp)) {
 			// take xp
-			window.gameSession.xp -= window.gameSession.upgrades.levelPassage;
-			window.gameSession.stats.xp += window.gameSession.upgrades.levelPassage;
-			if (window.gameSession.stats.xp % 100000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			this.dungeonXP.string = window.gameSession.xp;
+			this.useXP(button.xp);
 
 			// do upgrade
 			if (window.gameSession.levelPassage == 1){
@@ -326,8 +307,8 @@ var upgradeController = cc.Class({
 			button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.levelPassage;
 			
 			// increase next xp cost
-			window.gameSession.upgrades.levelPassage += 1000;
-			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades.levelPassage + "XP";
+			button.xp = 1000 * Math.floor(window.gameSession.levelPassage/5 + 1);
+			button.getChildByName("Price").getComponent(cc.Label).string = button.xp + "XP";
 
 			this.saveGame();
 		}
@@ -335,8 +316,11 @@ var upgradeController = cc.Class({
 		this.checkSecretPassage();
 	},
 
-	createButton(name, field, item, desc, id, mult, start){
+	// Generic upgrade button
+
+	createButton(name, field, item, desc, id, min, step){
 		let button = cc.instantiate(this.button);
+		this.buttonsList.push(button);
 		button.parent = this.grid;
 
 		// fill data
@@ -350,34 +334,32 @@ var upgradeController = cc.Class({
 			button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession[field];
 			price = window.gameSession[field] + 1;
 		}
-		price -= start;
-		window.gameSession.upgrades[field] = price * 1000 * mult;
-		button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades[field] + "XP";
+		let lvl = price - min;
+		let xp = lvl * step;
+		button.getChildByName("Price").getComponent(cc.Label).string = xp + "XP";
 		button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[id];
 
 		button.field = field;
 		button.item = item;
-		button.mult = mult;
-		button.start = start;
+		button.min = min;
+		button.step = step;
+		button.xp = xp;
 
 		//add click event
 		let eventHandler = new cc.Component.EventHandler();
         eventHandler.target = this.node;
         eventHandler.component = "upgradeController";
         eventHandler.handler = "upgrade";
-		button.getComponent(cc.Button).clickEvents.push(eventHandler);
+		button.getComponent(cc.Button).clickEvents.push(eventHandler); 
 	},
 
 	upgrade(event){
 		let button = event.target;
 		let field = button.field;
 
-		if (window.gameSession.xp >= window.gameSession.upgrades[field]) {
+		if (this.hasXP(button.xp)) {
 			// take xp
-			window.gameSession.xp -= window.gameSession.upgrades[field];
-			window.gameSession.stats.xp += window.gameSession.upgrades[field];
-			if (window.gameSession.stats.xp % 100000 == 0) this.showFeedback("Achievement: High Level", new cc.Color(0,255,0), this.dungeonAchievement, true);
-			this.dungeonXP.string = window.gameSession.xp;
+			this.useXP(button.xp);
 			// do upgrade
 			let price;
 			if (window.gameSession.inventory[field] != null) {
@@ -385,7 +367,7 @@ var upgradeController = cc.Class({
 				window.analytics.Design_event("upgrade:common:inventory:"+field, window.gameSession.inventory[field]);
 				price = window.gameSession.inventory[field] + 1;
 				button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession.inventory[field];
-				if (button.item) this.giveItem(button.item);
+				if (button.item) this.inventoryController.giveItem(button.item, 1, null, "", "Treasure");
 			} else {
 				window.gameSession[field] += 1;
 				window.analytics.Design_event("upgrade:common:"+field, window.gameSession[field]);
@@ -393,17 +375,11 @@ var upgradeController = cc.Class({
 				button.getChildByName("Value").getComponent(cc.Label).string = window.gameSession[field];
 			}
 			// increase next xp cost
-			price -= button.start;
-			window.gameSession.upgrades[field] = price * 1000 * button.mult;
-			button.getChildByName("Price").getComponent(cc.Label).string = window.gameSession.upgrades[field] + "XP";
+			let lvl = price - button.min;
+			button.getChildByName("Price").getComponent(cc.Label).string = lvl * button.step + "XP";
+			button.xp = lvl * button.step;
 
 			this.saveGame();
-		}
-	},
-
-	giveItem: function(item){
-		if (window.gameSession.inventory[item] +1 <= window.gameSession.inventory[item+"Max"]){
-			window.gameSession.inventory[item]++;
 		}
 	},
 
@@ -411,39 +387,39 @@ var upgradeController = cc.Class({
 		cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
 	},
 
-	showFeedback: function(text, color, parent, stay){
-		let duration = 2.0;
+	// XP control
 
-		let feedback = cc.instantiate(this.feedbackPrefab);
-		feedback.parent = this.canvas;
-		feedback.color = color;
-		
-		let position = parent.parent.convertToWorldSpaceAR(parent.position);
-		position = this.canvas.convertToNodeSpaceAR(position);
-		feedback.x = position.x;
-		feedback.y = position.y;
-
-		feedback.getComponent(cc.Label).string = text;
-
-		// move up and change opacity
-		let action;
-		if (stay){
-			action = cc.sequence(cc.moveBy(duration, cc.v2(0,100)), cc.fadeOut(duration), cc.callFunc(this.removeFeedback, this, feedback))
-		} else {
-			action = cc.sequence(cc.spawn(cc.moveBy(duration, cc.v2(0,100)), cc.fadeOut(duration)), cc.callFunc(this.removeFeedback, this, feedback))
-		}
-		
-		feedback.runAction( action );
-
-		//add to log
-		let log = cc.instantiate(this.logPrefab);
-		log.parent = this.feedbackLog;
-		log.getComponent(cc.Label).string = text;
-		log.color = color;
+	hasXP(cost){
+		return (window.gameSession.xp >= cost);
 	},
 
-	removeFeedback: function(feedback){
-		feedback.destroy();
+	useXP(qtd){
+		window.gameSession.xp -= qtd;
+		window.gameSession.stats.xp += qtd;
+		if (window.gameSession.stats.xp % 100000 == 0) this.feedbackController.showFeedback("Achievement: High Level", new cc.Color(0,255,0), "achievement", true, 5.0);
+		this.hudController.updateLabel("xp", ""+window.gameSession.xp);
+	},
+
+	getXP(qtd, giver){
+		window.gameSession.xp += qtd;
+		this.hudController.updateLabel("xp", ""+window.gameSession.xp);
+		this.feedbackController.showFeedback("+" + qtd + "XP", new cc.Color(0,255,0), "xp", false);
+		if (giver != null) window.analytics.Design_event("event:"+giver, qtd);
+	},
+
+	getMinXP(){
+		this.setButtons();
+		let minXP = Number.MAX_SAFE_INTEGER;
+		let maxXP = 1000;
+		for (var i = 0; i < this.buttonsList.length; i++) {
+			let button = this.buttonsList[i];
+			if (button.active) {
+				minXP = Math.min(minXP, button.xp);
+				maxXP = Math.max(maxXP, button.xp);
+			}
+		}
+		if (maxXP < minXP) minXP = maxXP;
+		return minXP;
 	},
 
 	// update (dt) {},

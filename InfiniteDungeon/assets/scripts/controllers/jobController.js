@@ -12,8 +12,6 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        jobPrefab: cc.Prefab,
-        icons: [cc.SpriteFrame],
     },
 
     // LIFE-CYCLE CALLBACKS:

@@ -3,6 +3,7 @@ const InventoryController = require("inventoryController");
 const HudController = require("hudController");
 const FeedbackController = require("feedbackController");
 const DeathController = require("deathController");
+const UpgradeController = require("upgradeController");
 
 var gridController = cc.Class({
 	extends: cc.Component,
@@ -13,6 +14,7 @@ var gridController = cc.Class({
         hudController: HudController,
         feedbackController: FeedbackController,
         deathController: DeathController,
+        upgradeController: UpgradeController,
 
 		tilePrefab: cc.Prefab,
 
@@ -150,16 +152,11 @@ var gridController = cc.Class({
 	},
 
 	wbPrize(){
-		let minXP = Math.min(window.gameSession.upgrades.fireMin, window.gameSession.upgrades.fireMax, window.gameSession.upgrades.iceMin,
-		window.gameSession.upgrades.iceMax, window.gameSession.upgrades.acidMin, window.gameSession.upgrades.acidMax, window.gameSession.upgrades.electricityMin,
-		window.gameSession.upgrades.electricityMax, window.gameSession.upgrades.spikesMin, window.gameSession.upgrades.spikesMax, window.gameSession.upgrades.poisonMin,
-		window.gameSession.upgrades.poisonMax, window.gameSession.upgrades.potionMin, window.gameSession.upgrades.potionMax, window.gameSession.upgrades.hpMax);
+		this.upgradeController.setButtons();
+		let minXP = this.upgradeController.getMinXP();
 
-		window.gameSession.xp += minXP;
+		this.upgradeController.getXP(minXP, "dailyXP");
 		window.gameGlobals.xpReward = minXP;
-		this.hudController.updateLabel("xp", ""+window.gameSession.xp);
-		this.feedbackController.showFeedback("+" + minXP + "XP", new cc.Color(0,255,0), "xp", false);
-		window.analytics.Design_event("event:dailyXP", minXP);
 
 		window.gameSession.currency+=10;
 		this.hudController.updateLabel("soul", ""+window.gameSession.currency);
@@ -170,10 +167,9 @@ var gridController = cc.Class({
 	},
 
 	showUpgrades: function(){
-		let minXP = Math.min(window.gameSession.upgrades.fireMin, window.gameSession.upgrades.fireMax, window.gameSession.upgrades.iceMin,
-		window.gameSession.upgrades.iceMax, window.gameSession.upgrades.acidMin, window.gameSession.upgrades.acidMax, window.gameSession.upgrades.electricityMin,
-		window.gameSession.upgrades.electricityMax, window.gameSession.upgrades.spikesMin, window.gameSession.upgrades.spikesMax, window.gameSession.upgrades.poisonMin,
-		window.gameSession.upgrades.poisonMax, window.gameSession.upgrades.potionMin, window.gameSession.upgrades.potionMax, window.gameSession.upgrades.hpMax);
+		if (!window.gameSession.options.autoupgrade) return;
+		this.upgradeController.setButtons();
+		let minXP = this.upgradeController.getMinXP();
 
 		if (window.gameSession.xp > minXP) this.popupController.openPopup("upgrade");
 	},
@@ -481,9 +477,7 @@ var gridController = cc.Class({
 		}
 
 		// show xp gain
-		window.gameSession.xp += xp;
-		this.hudController.updateLabel("xp", ""+window.gameSession.xp);
-		this.feedbackController.showFeedback("+" + xp + "XP", new cc.Color(0,255,0), "xp", false);
+		this.upgradeController.getXP(xp, null);
 	},
 
 	revealSubSprite: function(x,y){

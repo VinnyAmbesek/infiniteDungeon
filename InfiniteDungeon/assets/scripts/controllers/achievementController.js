@@ -1,7 +1,10 @@
+const UpgradeController = require("upgradeController");
+
 var achievementController = cc.Class({
     extends: cc.Component,
 
     properties: {
+        upgradeController: UpgradeController,
         list: cc.Node,
         button: cc.Prefab,
         icons: [cc.SpriteFrame],
@@ -180,8 +183,7 @@ var achievementController = cc.Class({
         //give prize
         if (progress >= 1 && !(window.gameSession.achievements.unique[field])) {
             window.analytics.Design_event("achievement:unique:"+field);
-            window.gameSession.xp += button.prize;
-            this.dungeonXP.string = window.gameSession.xp;
+            this.upgradeController.getXP(button.prize, null);
 
             // update achievement level
             window.gameSession.achievements.unique[field] = true;
@@ -281,30 +283,30 @@ var achievementController = cc.Class({
 
         //give prize
         if (progress >= 1) {
-
+            let underLimit = true;
             // update achievement level
             if (sub) {
                 window.gameSession.achievements[sub][field]++;
                 if (window.gameSession.achievements[sub][field] > 100) {
+                    underLimit = false;
                     // 100 is the limit, if go above it undo
                     window.gameSession.achievements[sub][field] = 100;
-                    window.gameSession.xp -= button.reward;
                 } else {
                     window.analytics.Design_event("achievement:multiple:"+sub+":"+field, window.gameSession.achievements[sub][field]);
                 }
             } else {
                 window.gameSession.achievements[field]++;
                 if (window.gameSession.achievements[field] > 100) {
+                    underLimit = false;
                     // 100 is the limit, if go above it undo
                     window.gameSession.achievements[field] = 100;
-                    window.gameSession.xp -= button.reward;
                 } else {
                     window.analytics.Design_event("achievement:multiple:"+field, window.gameSession.achievements[field]);
                 }
             }
 
-            window.gameSession.xp += button.reward;
-            this.dungeonXP.string = window.gameSession.xp;
+            // if achievement lvl under 100 give XP prize
+            if (underLimit)this.upgradeController.getXP(button.reward, null);
         }
 
         // update button
@@ -315,7 +317,6 @@ var achievementController = cc.Class({
 
     updateButton(button){
         if (!button) return;
-        let mult = button.mult;
         let sub = button.sub;
         let field = button.field;
         let step = button.step;

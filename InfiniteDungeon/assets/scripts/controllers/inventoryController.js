@@ -51,7 +51,7 @@ var inventoryController = cc.Class({
         window.gameSession.inventory[item] = Math.min(window.gameSession.inventory[item]+qtd, window.gameSession.inventory[item+"Max"]);
         this.hudController.updateShields(item);
 
-        this.feedbackController.showFeedbackAtNode("Got " + qtd + " " + txt, new cc.Color(0,255,0), node, true, 3.0, 150);
+        if (node!= null) this.feedbackController.showFeedbackAtNode("Got " + qtd + " " + txt, new cc.Color(0,255,0), node, true, 3.0, 150);
     },
 
     useItem: function(item, qtd, node){

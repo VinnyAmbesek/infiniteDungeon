@@ -74,34 +74,6 @@ cc.Class({
         this.setDefault(window.gameSession.inventory, "ranged", 1);
         this.setDefault(window.gameSession.inventory, "magic", 1);
 
-        // upgrades
-        this.setDefault(window.gameSession, "upgrades", {});
-
-        this.setDefault(window.gameSession.upgrades, "fireMin", 1000);
-        this.setDefault(window.gameSession.upgrades, "fireMax", 1000);
-        this.setDefault(window.gameSession.upgrades, "iceMin", 1000);
-        this.setDefault(window.gameSession.upgrades, "iceMax", 1000);
-        this.setDefault(window.gameSession.upgrades, "acidMin", 1000);
-        this.setDefault(window.gameSession.upgrades, "acidMax", 1000);
-        this.setDefault(window.gameSession.upgrades, "electricityMin", 1000);
-        this.setDefault(window.gameSession.upgrades, "electricityMax", 1000);
-        this.setDefault(window.gameSession.upgrades, "spikesMin", 1000);
-        this.setDefault(window.gameSession.upgrades, "spikesMax", 1000);
-        this.setDefault(window.gameSession.upgrades, "poisonMin", 1000);
-        this.setDefault(window.gameSession.upgrades, "poisonMax", 1000);
-
-        this.setDefault(window.gameSession.upgrades, "potionMin", 1000);
-        this.setDefault(window.gameSession.upgrades, "potionMax", 1000);
-
-        this.setDefault(window.gameSession.upgrades, "hpMax", 1000);
-
-        this.setDefault(window.gameSession.upgrades, "levelMin", 1000);
-        this.setDefault(window.gameSession.upgrades, "info", 1000);
-
-        this.setDefault(window.gameSession.upgrades, "melee", 1000);
-        this.setDefault(window.gameSession.upgrades, "ranged", 1000);
-        this.setDefault(window.gameSession.upgrades, "magic", 1000);
-
         //stats
         this.setDefault(window.gameSession, "stats", {});
 
@@ -255,6 +227,10 @@ cc.Class({
         this.setDefault(window.gameSession.skills, "meleeTracker", false);
         this.setDefault(window.gameSession.skills, "rangedTracker", false);
         this.setDefault(window.gameSession.skills, "magicTracker", false);
+
+        //options
+        this.setDefault(window.gameSession, "options", {});
+        this.setDefault(window.gameSession.options, "autoupgrade", true);
 
         this.setDefault(window.gameSession, "job", 0);
 

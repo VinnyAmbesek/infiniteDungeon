@@ -11,6 +11,8 @@ roadmap:
 * add artifacts/special treasures to boss loot
 * make upgrade controller control shown upgrades: trap finder, treasure hunter and tracker in hud and not grid controller
 * make achievement controller decide when to show achievement unlocked
+* make secret passage cost be based on secret passage level
+* achievement: find lever before door
 
 * retention: add push notifications [right time, remeber free upgrade, dont be annoying]
 * retention: add share into social networks
