@@ -1,12 +1,15 @@
 const UpgradeController = require("upgradeController");
+const FeedbackController = require("feedbackController");
 
 var achievementController = cc.Class({
     extends: cc.Component,
 
     properties: {
         upgradeController: UpgradeController,
+        feedbackController: FeedbackController,
         list: cc.Node,
         button: cc.Prefab,
+        notification: cc.Node,
         icons: [cc.SpriteFrame],
         dungeonXP: cc.Label,
     },
@@ -14,6 +17,8 @@ var achievementController = cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onEnable () {
+        this.notification.active = false;
+
         this.updateSpecialButton("truedeath");
         this.updateSpecialButton("daredevil");
         this.updateSpecialButton("already");
@@ -21,57 +26,69 @@ var achievementController = cc.Class({
         this.updateSpecialButton("darkness");
         this.updateSpecialButton("lucky");
 
-        this.updateButton(this["levelMax"]);
-        this.updateButton(this["xp"]);
-        this.updateButton(this["tiles"]);
+        this.updateButton("levelMax");
+        this.updateButton("xp");
+        this.updateButton("tiles");
 
-        this.updateButton(this["killstotal"]);
-        this.updateButton(this["killsmelee"]);
-        this.updateButton(this["killsranged"]);
-        this.updateButton(this["killsmagic"]);
+        this.updateButton("killstotal");
+        this.updateButton("killsmelee");
+        this.updateButton("killsranged");
+        this.updateButton("killsmagic");
 
-        this.updateButton(this["trapstotal"]);
-        this.updateButton(this["trapsfire"]);
-        this.updateButton(this["trapsice"]);
-        this.updateButton(this["trapsacid"]);
-        this.updateButton(this["trapselectricity"]);
-        this.updateButton(this["trapsspikes"]);
-        this.updateButton(this["trapspoison"]);
+        this.updateButton("trapstotal");
+        this.updateButton("trapsfire");
+        this.updateButton("trapsice");
+        this.updateButton("trapsacid");
+        this.updateButton("trapselectricity");
+        this.updateButton("trapsspikes");
+        this.updateButton("trapspoison");
 
-        this.updateButton(this["itemschests"]);
-        this.updateButton(this["itemstotal"]);
-        this.updateButton(this["itemsfire"]);
-        this.updateButton(this["itemsice"]);
-        this.updateButton(this["itemsacid"]);
-        this.updateButton(this["itemselectricity"]);
-        this.updateButton(this["itemsspikes"]);
-        this.updateButton(this["itemspoison"]);
-        this.updateButton(this["itemspotion"]);
+        this.updateButton("itemschests");
+        this.updateButton("itemstotal");
+        this.updateButton("itemsfire");
+        this.updateButton("itemsice");
+        this.updateButton("itemsacid");
+        this.updateButton("itemselectricity");
+        this.updateButton("itemsspikes");
+        this.updateButton("itemspoison");
+        this.updateButton("itemspotion");
 
-        this.updateButton(this["damagetotal"]);
-        this.updateButton(this["damagefire"]);
-        this.updateButton(this["damageice"]);
-        this.updateButton(this["damageacid"]);
-        this.updateButton(this["damageelectricity"]);
-        this.updateButton(this["damagespikes"]);
-        this.updateButton(this["damagepoison"]);
-        this.updateButton(this["damagemelee"]);
-        this.updateButton(this["damageranged"]);
-        this.updateButton(this["damagemagic"]);
+        this.updateButton("damagetotal");
+        this.updateButton("damagefire");
+        this.updateButton("damageice");
+        this.updateButton("damageacid");
+        this.updateButton("damageelectricity");
+        this.updateButton("damagespikes");
+        this.updateButton("damagepoison");
+        this.updateButton("damagemelee");
+        this.updateButton("damageranged");
+        this.updateButton("damagemagic");
 
-        this.updateButton(this["deathtotal"]);
-        this.updateButton(this["deathfire"]);
-        this.updateButton(this["deathice"]);
-        this.updateButton(this["deathacid"]);
-        this.updateButton(this["deathelectricity"]);
-        this.updateButton(this["deathspikes"]);
-        this.updateButton(this["deathpoison"]);
-        this.updateButton(this["deathmelee"]);
-        this.updateButton(this["deathranged"]);
-        this.updateButton(this["deathmagic"]);
+        this.updateButton("deathtotal");
+        this.updateButton("deathfire");
+        this.updateButton("deathice");
+        this.updateButton("deathacid");
+        this.updateButton("deathelectricity");
+        this.updateButton("deathspikes");
+        this.updateButton("deathpoison");
+        this.updateButton("deathmelee");
+        this.updateButton("deathranged");
+        this.updateButton("deathmagic");
     },
 
     start () {
+        this.setButtons();
+    },
+
+    setButtons () {
+        if (!window.gameSession) return;
+        if (!this.hasOwnProperty("initiated")) this.initiated = false;
+        if (this.initiated) return;
+
+        this.createSpecialButton("Stairs!", "Finish your first level.", "firstLevel", 1);
+        this.createSpecialButton("Subdued", "Kill your first sub-boss", "killSubboss", 1);
+        this.createSpecialButton("Going up the food chain", "Kill your first boss", "killBoss", 1);
+        this.createSpecialButton("What does this do?", "Find a lever before the closed door.", "lever", 1); 
         this.createSpecialButton("True Death", "Get to -10HP", "truedeath", 1);
         this.createSpecialButton("Daredevil", "Face a trap with 1HP and 0 shields", "daredevil", 1);
         this.createSpecialButton("Already back?", "Die, then die again in the next floor", "already", 1);
@@ -130,8 +147,11 @@ var achievementController = cc.Class({
         this.createButton("Shaky hand", "Total deaths in melee combat", "death", "melee", 12, 10, 5000);
         this.createButton("Bad Sight", "Total deaths in ranged combat", "death", "ranged", 12, 10, 5000);
         this.createButton("Curled Tongue", "Total deaths in magic combat", "death", "magic", 12, 10, 5000);
+
+        this.initiated = true;
     },
 
+    // Unique achievements
     createSpecialButton(name, desc, field, id){
         let sub = "unique";
         let stat = 0;
@@ -145,10 +165,10 @@ var achievementController = cc.Class({
         let button = cc.instantiate(this.button);
         button.parent = this.list;
         button.progress = progress;
+        button.title = name;
         button.prize = value;
         button.sub = sub;
         button.field = field;
-        button.mult = 1;
         button.id = id;
 
         // fill data
@@ -172,6 +192,8 @@ var achievementController = cc.Class({
 
         //save button
         this[buttonName] = button;
+
+        if (progress >= 1 && !(window.gameSession.achievements.unique[field])) this.notification.active = true;
     },
 
     getSpecialPrize(event){
@@ -196,8 +218,10 @@ var achievementController = cc.Class({
     },
 
     updateSpecialButton(field){
-        let button = this["unique" + field]
+        let button = this["unique" + field];
         if (!button) return;
+
+        let oldProgress = button.progress;
 
         let stat = 0;
         if (window.gameSession.stats.unique[field]) stat = 1;
@@ -219,7 +243,22 @@ var achievementController = cc.Class({
         } else {
             button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[button.id];
         }
+
+        if (oldProgress <1 && progress >=1){
+            // just unlocked the achievement
+            this.feedbackController.showFeedback("Achievement: " + button.title, new cc.Color(0,255,0), "achievement", true, 5.0);
+            this.showNotification();
+        }
     },
+
+    updateSpecialStat(field){
+        this.setButtons();
+        if (window.gameSession.achievements.unique[field]) return;
+        window.gameSession.stats.unique[field] = true;
+        this.updateSpecialButton(field);  
+    },
+
+    // Repeatable achievements
 
     createButton(name, desc, sub, field, spriteID, step=100, prize=100){
         let achievement;
@@ -244,6 +283,7 @@ var achievementController = cc.Class({
 
         let button = cc.instantiate(this.button);
         button.parent = this.list;
+        button.title = name;
         button.progress = progress;
         button.step = step;
         button.prize = prize;
@@ -273,6 +313,8 @@ var achievementController = cc.Class({
 
         //save button
         this[buttonName] = button;
+
+        if (progress >= 1 && achievement < 100) this.notification.active = true;
     },
 
     getPrize(event){
@@ -310,16 +352,20 @@ var achievementController = cc.Class({
         }
 
         // update button
-        this.updateButton(button, sub, field);
+        let buttonName = field;
+        if (sub != null) buttonName = sub + field;
+        this.updateButton(buttonName);
 
         this.saveGame();
     },
 
-    updateButton(button){
+    updateButton(buttonName){
+        let button = this[buttonName];
         if (!button) return;
         let sub = button.sub;
         let field = button.field;
         let step = button.step;
+        let oldProgress = button.progress;
 
         let achievement;
         let stat;
@@ -348,10 +394,36 @@ var achievementController = cc.Class({
         } else {
             button.getChildByName("Icon").getComponent(cc.Sprite).spriteFrame = this.icons[button.spriteID];
         }
+
+        if (oldProgress <1 && progress >=1){
+            // just unlocked the achievement
+            this.feedbackController.showFeedback("Achievement: " + button.title, new cc.Color(0,255,0), "achievement", true, 5.0);
+            this.showNotification();
+        }
     },
+
+    updateStat(sub, field, value){
+        this.setButtons();
+        let obj = window.gameSession.stats;
+        let name = field;
+        if (sub != null){
+            obj = obj[sub];
+            name = "" + sub + field;
+        }
+        if(! obj.hasOwnProperty(field)) return;
+
+        obj[field] += value;
+        this.updateButton(name);
+    },
+
+    // Other
 
     saveGame(){
         cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
+    },
+
+    showNotification(){
+        this.notification.active = true;
     },
 
     // update (dt) {},

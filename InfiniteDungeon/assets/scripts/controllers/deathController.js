@@ -1,20 +1,22 @@
 const PopupController = require("popupController");
 const HudController = require("hudController");
 const FeedbackController = require("feedbackController");
+const AchievementController = require("achievementController");
 
 var deathController = cc.Class({
     extends: cc.Component,
 
     properties: {
         popupController: PopupController,
-        feedbackController: FeedbackController,
         hudController: HudController,
+        feedbackController: FeedbackController,
+        achievementController: AchievementController,
         deathPopup: cc.Node,
         deathMessage: cc.Label,
     },
 
     iDied: function(){
-        window.gameSession.stats.row = 0;
+        this.achievementController.updateStat(null, "row", -window.gameSession.stats.row);
         window.analytics.Level_Fail("Floor " + window.gameSession.level, "Dungeon Scene");
         // back to level
         window.gameSession.level = window.gameSession.levelMin;
@@ -41,7 +43,7 @@ var deathController = cc.Class({
 
     iAmBack: function(){
         if (window.gameSession.currency < 100) return;
-        window.gameSession.stats.row = 0;
+        this.achievementController.updateStat(null, "row", -window.gameSession.stats.row);
         window.gameSession.currency -= 100;
         window.analytics.Design_event("event:ressurrection", window.gameSession.currency);
         window.gameSession.hp = window.gameSession.hpMax;

@@ -11,23 +11,9 @@ var upgradeController = cc.Class({
         hudController: HudController,
 
 		grid: cc.Node,
-		canvas: cc.Node,
-		dungeonAchievement: cc.Node,
-		feedbackLog: cc.Node,
+		notification: cc.Node,
 
 		button: cc.Prefab,
-		feedbackPrefab: cc.Prefab,
-		logPrefab: cc.Prefab,
-
-		dungeonXP: cc.Label,
-
-		inventoryFire: cc.Label,
-		inventoryIce: cc.Label,
-		inventoryAcid: cc.Label,
-		inventoryElectricity: cc.Label,
-		inventorySpikes: cc.Label,
-		inventoryPoison: cc.Label,
-		inventoryPotion: cc.Label,
 
 		icons: [cc.SpriteFrame],
 	},
@@ -41,6 +27,8 @@ var upgradeController = cc.Class({
 	},
 
 	onEnable (){
+		this.notification.active = false;
+
 		this.checkSecretPassage();
 		this.checkSpecialButton(window.gameSession.stats.traps.total, this.trapFinder);
 		this.checkSpecialButton(window.gameSession.stats.traps.fire, this.fireFinder);
@@ -395,8 +383,7 @@ var upgradeController = cc.Class({
 
 	useXP(qtd){
 		window.gameSession.xp -= qtd;
-		window.gameSession.stats.xp += qtd;
-		if (window.gameSession.stats.xp % 100000 == 0) this.feedbackController.showFeedback("Achievement: High Level", new cc.Color(0,255,0), "achievement", true, 5.0);
+		this.inventoryController.achievementController.updateStat(null, "xp", qtd);
 		this.hudController.updateLabel("xp", ""+window.gameSession.xp);
 	},
 
@@ -420,6 +407,10 @@ var upgradeController = cc.Class({
 		}
 		if (maxXP < minXP) minXP = maxXP;
 		return minXP;
+	},
+
+	showNotification(){
+		this.notification.active = true;
 	},
 
 	// update (dt) {},

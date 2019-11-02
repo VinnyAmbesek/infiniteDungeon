@@ -4,9 +4,13 @@ const FeedbackController = require("feedbackController");
 var inventoryController = cc.Class({
     extends: cc.Component,
 
-    properties: {
+    properties: () => ({
         hudController: HudController,
         feedbackController: FeedbackController,
+        achievementController: {
+            default: null, 
+            type: require("achievementController")
+        },
         inventoryFire: cc.Label,
         inventoryIce: cc.Label,
         inventoryAcid: cc.Label,
@@ -14,7 +18,7 @@ var inventoryController = cc.Class({
         inventorySpikes: cc.Label,
         inventoryPoison: cc.Label,
         inventoryPotion: cc.Label,
-    },
+    }),
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -64,8 +68,8 @@ var inventoryController = cc.Class({
             this.feedbackController.showFeedbackAtNode("Used potion", new cc.Color(0,255,0), node, true, 3.0, 150);
         }
 
-        window.gameSession.stats.items.potion+=qtd;
-        window.gameSession.stats.items.total+=qtd;
+        this.achievementController.updateStat("items", item, qtd);
+        this.achievementController.updateStat("items", 'total', qtd);
     },
 
     jsUcfirst: function(string){

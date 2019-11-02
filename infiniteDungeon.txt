@@ -4,15 +4,12 @@ cash: fill inventory, phoenix feather [full restore on death], ad click to recov
 roadmap: 
 * improve icons
 * random powerfull effects [death-trap, death-boss]
-* technical debt: make individual controllers, gridController is too big
+* technical debt: make individual controllers, gridController is too big [doing]
 * scoreboard
 * better effects
 * skin: use souls to unlock dungeon skins
 * add artifacts/special treasures to boss loot
 * make upgrade controller control shown upgrades: trap finder, treasure hunter and tracker in hud and not grid controller
-* make achievement controller decide when to show achievement unlocked
-* make secret passage cost be based on secret passage level
-* achievement: find lever before door
 
 * retention: add push notifications [right time, remeber free upgrade, dont be annoying]
 * retention: add share into social networks

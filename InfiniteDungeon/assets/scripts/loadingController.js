@@ -15,7 +15,7 @@ cc.Class({
     start () {
         this.saveLoaded = false;
         this.timer = 0;
-        let saveVersion = {major: 0, minor: 7, fix: 0};
+        let saveVersion = {major: 0, minor: 8, fix: 0};
         this.initSession(saveVersion);
         this.saveLoaded = true;
     },
@@ -86,6 +86,10 @@ cc.Class({
         this.setDefault(window.gameSession.stats.unique, "lucky", false);
         this.setDefault(window.gameSession.stats.unique, "subboss", false);
         this.setDefault(window.gameSession.stats.unique, "boss", false);
+        this.setDefault(window.gameSession.stats.unique, "firstLevel", false);
+        this.setDefault(window.gameSession.stats.unique, "killSubboss", false);
+        this.setDefault(window.gameSession.stats.unique, "killBoss", false);
+        this.setDefault(window.gameSession.stats.unique, "lever", false);
 
         this.setDefault(window.gameSession.stats, "death", {});
         this.setDefault(window.gameSession.stats.death, "total", 0);

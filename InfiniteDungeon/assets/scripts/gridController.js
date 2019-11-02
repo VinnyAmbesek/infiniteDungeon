@@ -4,6 +4,7 @@ const HudController = require("hudController");
 const FeedbackController = require("feedbackController");
 const DeathController = require("deathController");
 const UpgradeController = require("upgradeController");
+const AchievementController = require("achievementController");
 
 var gridController = cc.Class({
 	extends: cc.Component,
@@ -15,6 +16,7 @@ var gridController = cc.Class({
         feedbackController: FeedbackController,
         deathController: DeathController,
         upgradeController: UpgradeController,
+        achievementController: AchievementController,
 
 		tilePrefab: cc.Prefab,
 
@@ -47,6 +49,7 @@ var gridController = cc.Class({
 			this.popupController.openPermanentPopup("death");
 		}
 		window.analytics.Level_Start("Floor " + window.gameSession.level, "Dungeon Scene");
+		if (window.gameSession.level > 1) this.achievementController.updateSpecialStat("firstLevel");
 
 		this.enumSides = {undefined: 0, block: 1, wall: 2, open: 3};
 		this.enumTile = {undefined: 0, entrance: 1, exit: 2, deadend: 3,corridor: 4};
@@ -152,7 +155,6 @@ var gridController = cc.Class({
 	},
 
 	wbPrize(){
-		this.upgradeController.setButtons();
 		let minXP = this.upgradeController.getMinXP();
 
 		this.upgradeController.getXP(minXP, "dailyXP");
@@ -167,11 +169,13 @@ var gridController = cc.Class({
 	},
 
 	showUpgrades: function(){
-		if (!window.gameSession.options.autoupgrade) return;
-		this.upgradeController.setButtons();
 		let minXP = this.upgradeController.getMinXP();
 
-		if (window.gameSession.xp > minXP) this.popupController.openPopup("upgrade");
+		if (window.gameSession.xp > minXP && window.gameSession.options.autoupgrade){
+			this.popupController.openPopup("upgrade");
+		} else {
+			this.upgradeController.showNotification();
+		}
 	},
 
 	showJobSelection: function(){
@@ -307,8 +311,7 @@ var gridController = cc.Class({
 		// mark tiles walked to avoid tile replay
 		event.target.used = true;
 		this.clickable--;
-		window.gameSession.stats.tiles++;
-		if (window.gameSession.stats.tiles % 1000 == 0) this.feedbackController.showFeedback("Achievement: Runner", new cc.Color(0,255,0), "achievement", true, 5.0);
+		this.achievementController.updateStat(null, "tiles", 1);
 
 		if(window.gameSession.treasureHunter) this.hudController.activateLabel("chests");
 		if(window.gameSession.trapFinder) this.hudController.activateLabel("traps");
@@ -334,8 +337,6 @@ var gridController = cc.Class({
 		// use a potion
 		if (this.deathController.hasDamage() && window.gameSession.inventory.potion > 0) {
 			this.inventoryController.useItem("potion", 1, event.target);
-			if (window.gameSession.stats.items.potion % 100 == 0) this.feedbackController.showFeedback("Achievement: Not addicted", new cc.Color(0,255,0), "achievement", true, 5.0);
-			if (window.gameSession.stats.items.total % 100 == 0) this.feedbackController.showFeedback("Achievement: Spender", new cc.Color(0,255,0), "achievement", true, 5.0);
 
 			if (window.gameSession.job == this.enumClass["wizard"]) {
 				this.deathController.heal(2);
@@ -370,8 +371,7 @@ var gridController = cc.Class({
 			if (! this.deathController.isDead()) {
 				xp += window.gameSession.level*25;
 				if (window.gameSession.job == this.enumClass["rogue"]) xp += window.gameSession.level*25;
-				window.gameSession.stats.traps.total++;
-				if (window.gameSession.stats.traps.total % 100 == 0) this.feedbackController.showFeedback("Achievement: Trap Finder", new cc.Color(0,255,0), "achievement", true, 5.0);
+				this.achievementController.updateStat("traps", "total", 1);
 			} else {
 				this.popupController.openPermanentPopup("death");
 				this.deathController.setMessage("You were " + this.lastDanger + "!");
@@ -382,8 +382,7 @@ var gridController = cc.Class({
 			this.dungeonMoves++;
 			window.analytics.Design_event("event:darkness", this.dungeonMoves);
 			if (this.dungeonMoves> 1) {
-				window.gameSession.stats.unique.darkness = true
-				if (! window.gameSession.achievements.unique.darkness) this.feedbackController.showFeedback("Achievement: Stop Moving!", new cc.Color(0,255,0), "achievement", true, 5.0);
+				this.achievementController.updateSpecialStat("darkness");
 			}
 			this.running = false;
 			let x = event.target.tile.x;
@@ -437,6 +436,8 @@ var gridController = cc.Class({
 			if (exitTile.status == this.enumStatus["visible"]) {
 				this.revealSubSprite(this.exit.x,this.exit.y);
 				this.nextButton.active = true;
+			} else {
+				this.achievementController.updateSpecialStat("lever");
 			}
 		}
 
@@ -540,49 +541,43 @@ var gridController = cc.Class({
 		this.lastDanger = effect;
 
 		if ((strength - window.gameSession.inventory[field]) < -9) {
-			if (!window.gameSession.achievements.unique.overkill) this.feedbackController.showFeedback("Achievement: Overkill", new cc.Color(0,255,0), "achievement", true, 5.0);
-			window.gameSession.stats.unique.overkill = true;
+			this.achievementController.updateSpecialStat("overkill");
 		}
 		window.analytics.Design_event("Fight:" + field + ":" + strength, window.gameSession.inventory[field]);
 		strength -= Math.min(strength, window.gameSession.inventory[field]);
 		// receives strength in damage
 		if (strength>0) {
 			this.deathController.hurt(strength);
-			window.gameSession.stats.damage[field] += strength;
-			if (window.gameSession.stats.damage[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivDamage, new cc.Color(0,255,0), "achievement", true, 5.0);
-			window.gameSession.stats.damage.total += strength;
-			if (window.gameSession.stats.damage.total % 100 == 0) this.feedbackController.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), "achievement", true, 5.0);
+			this.achievementController.updateStat("damage", field, 1);
+			this.achievementController.updateStat("damage", "total", 1);
 		}
 
 		if (! this.deathController.isDead()) {
-			window.gameSession.stats.kills[field]++;
-			if (window.gameSession.stats.kills[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivKills, new cc.Color(0,255,0), "achievement", true, 5.0);
-			window.gameSession.stats.kills.total++;
-			if (window.gameSession.stats.kills.total % 100 == 0) this.feedbackController.showFeedback("Achievement: God of War", new cc.Color(0,255,0), "achievement", true, 5.0);
-
+			this.achievementController.updateStat("kills", field, 1);
+			this.achievementController.updateStat("kills", "total", 1);
+			if (boss == 1) {
+				this.achievementController.updateSpecialStat("killSubboss");
+			}
+			if (boss == 2) {
+				this.achievementController.updateSpecialStat("killBoss");
+			}
 			//LOOT
 			this.giveTreasure(Math.floor((Math.random() * 100) + 1), node, true);
 		} else {
 			if (this.deathController.isTrulyDead()) {
-				if (!window.gameSession.achievements.unique.truedeath) this.feedbackController.showFeedback("Achievement: True Death", new cc.Color(0,255,0), "achievement", true, 5.0);
-				window.gameSession.stats.unique.truedeath = true;
+				this.achievementController.updateSpecialStat("truedeath");
 			}
 			if (boss == 1) {
-				if (!window.gameSession.achievements.unique.subboss) this.feedbackController.showFeedback("Achievement: Did not expected that", new cc.Color(0,255,0), "achievement", true, 5.0);
-				window.gameSession.stats.unique.subboss = true;
+				this.achievementController.updateSpecialStat("subboss");
 			}
 			if (boss == 2) {
-				if (!window.gameSession.achievements.unique.boss) this.feedbackController.showFeedback("Achievement: Expected that", new cc.Color(0,255,0), "achievement", true, 5.0);
-				window.gameSession.stats.unique.boss = true;
+				this.achievementController.updateSpecialStat("boss");
 			}
 			if (window.gameSession.death) {
-				if (!window.gameSession.achievements.unique.already) this.feedbackController.showFeedback("Achievement: Already Back?", new cc.Color(0,255,0), "achievement", true, 5.0);
-				window.gameSession.stats.unique.already = true;
+				this.achievementController.updateSpecialStat("already");
 			}
-			window.gameSession.stats.death[field]++;
-			if (window.gameSession.stats.death[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivDeath, new cc.Color(0,255,0), "achievement", true, 5.0);
-			window.gameSession.stats.death.total++;
-			if (window.gameSession.stats.death.total % 100 == 0) this.feedbackController.showFeedback("Achievement: Kenny", new cc.Color(0,255,0), "achievement", true, 5.0);
+			this.achievementController.updateStat("death", field, 1);
+			this.achievementController.updateStat("death", "total", 1);
 		}
 	},
 
@@ -601,8 +596,7 @@ var gridController = cc.Class({
 		let achivDeath;
 
 		if (this.deathController.isAlmostDead() && ! this.inventoryController.hasDefenses()){
-			if (!window.gameSession.achievements.unique.daredevil) this.feedbackController.showFeedback("Achievement: Daredevil", new cc.Color(0,255,0), "achievement", true, 5.0);
-			window.gameSession.stats.unique.daredevil = true;
+			this.achievementController.updateSpecialStat("daredevil");
 		}
 
 		switch(danger) {
@@ -678,8 +672,7 @@ var gridController = cc.Class({
 
 		this.feedbackController.showFeedbackAtNode(feedback, new cc.Color(255,0,0), node, true, 3.0, 75);
 		this.lastDanger = effect;
-		window.gameSession.stats.traps[field]++;
-		if (window.gameSession.stats.traps[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivTrap, new cc.Color(0,255,0), "achievement", true, 5.0);
+		this.achievementController.updateStat("traps", field, 1);
 		
 		if (window.gameSession.inventory[field] > 0){
 			let shield = window.gameSession.inventory[field];
@@ -687,8 +680,6 @@ var gridController = cc.Class({
 
 			// use shields up to strength of danger
 			this.inventoryController.useItem(field, protection, node);
-			if (window.gameSession.stats.items[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivItem, new cc.Color(0,255,0), "achievement", true, 5.0);
-			if (window.gameSession.stats.items.total % 100 == 0) this.feedbackController.showFeedback("Achievement: Spender", new cc.Color(0,255,0), "achievement", true, 5.0);
 
 			// danger strength is reduced by spent shields
 			strength -= protection;
@@ -697,24 +688,18 @@ var gridController = cc.Class({
 		// receives strength in damage
 		if (strength>0) {
 			this.deathController.hurt(strength);
-			window.gameSession.stats.damage[field] += strength;
-			if (window.gameSession.stats.items[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivItem, new cc.Color(0,255,0), "achievement", true, 5.0);
-			window.gameSession.stats.damage.total += strength;
-			if (window.gameSession.stats.damage.total % 100 == 0) this.feedbackController.showFeedback("Achievement: It hurts everywhere", new cc.Color(0,255,0), "achievement", true, 5.0);
+			this.achievementController.updateStat("damage", field, strength);
+			this.achievementController.updateStat("damage", "total", strength);
 		}
 		if (this.deathController.isDead()) {
 			if (this.deathController.isTrulyDead()) {
-				if (!window.gameSession.achievements.unique.truedeath) this.feedbackController.showFeedback("Achievement: True Death", new cc.Color(0,255,0), "achievement", true, 5.0);
-				window.gameSession.stats.unique.truedeath = true;
+				this.achievementController.updateSpecialStat("truedeath");
 			}
 			if (window.gameSession.death) {
-				if (!window.gameSession.achievements.unique.already) this.feedbackController.showFeedback("Achievement: Already Back?", new cc.Color(0,255,0), "achievement", true, 5.0);
-				window.gameSession.stats.unique.already = true;
+				this.achievementController.updateSpecialStat("already");
 			}
-			window.gameSession.stats.death[field]++;
-			if (window.gameSession.stats.death[field] % 100 == 0) this.feedbackController.showFeedback("Achievement: " + achivDeath, new cc.Color(0,255,0), "achievement", true, 5.0);
-			window.gameSession.stats.death.total++;
-			if (window.gameSession.stats.death.total % 100 == 0) this.feedbackController.showFeedback("Achievement: Kenny", new cc.Color(0,255,0), "achievement", true, 5.0);
+			this.achievementController.updateStat("death", field, 1);
+			this.achievementController.updateStat("death", "total", 1);
 		}
 	},
 
@@ -724,8 +709,7 @@ var gridController = cc.Class({
 			this.hudController.updateLabel("chests", ""+this.treasures);
 		}
 		let reward = 1 + window.gameSession.skills.totalShield;
-		window.gameSession.stats.items.chests += reward;
-		if (window.gameSession.stats.items.chests % 100 == 0) this.feedbackController.showFeedback("Achievement: Treasure Hunter", new cc.Color(0,255,0), "achievement", true, 5.0);
+		this.achievementController.updateStat("items", "chests", reward);
 		if (prize <= 10) {
 			this.inventoryController.giveItem("potion", reward, node, "Potion");
 		} else if (prize <= 25 ) {
@@ -751,16 +735,14 @@ var gridController = cc.Class({
 		this.loadingAnimation.active = true;
 		window.gameSession.death = false;
 		if (!this.hitTrap) {
-			if (!window.gameSession.achievements.unique.lucky) this.feedbackController.showFeedback("Achievement: Lucky", new cc.Color(0,255,0), "achievement", true, 5.0);
-			window.gameSession.stats.unique.lucky = true;
+			this.achievementController.updateSpecialStat("lucky");
 		}
 		window.gameSession.currency++;
-		window.gameSession.stats.row++;
+		this.achievementController.updateStat(null, "row", 1);
 
 		window.analytics.Level_Complete("Floor " + window.gameSession.level, "Dungeon Scene");
 		window.gameSession.level++;
-		if (window.gameSession.level > window.gameSession.stats.levelMax) window.gameSession.stats.levelMax = window.gameSession.level;
-		if (window.gameSession.stats.levelMax % 100 == 0) this.feedbackController.showFeedback("Achievement: Explorer", new cc.Color(0,255,0), "achievement", true, 5.0);
+		if (window.gameSession.level > window.gameSession.stats.levelMax) this.achievementController.updateStat(null, "levelMax", (window.gameSession.level - window.gameSession.stats.levelMax));
 		cc.director.loadScene("gameScene");
 	},
 
