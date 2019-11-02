@@ -88,7 +88,7 @@ var achievementController = cc.Class({
         this.createSpecialButton("Stairs!", "Finish your first level.", "firstLevel", 1);
         this.createSpecialButton("Subdued", "Kill your first sub-boss", "killSubboss", 1);
         this.createSpecialButton("Going up the food chain", "Kill your first boss", "killBoss", 1);
-        this.createSpecialButton("What does this do?", "Find a lever before the closed door.", "lever", 1); 
+        this.createSpecialButton("What does this do?", "Find a lever before the closed door.", "lever", 1);
         this.createSpecialButton("True Death", "Get to -10HP", "truedeath", 1);
         this.createSpecialButton("Daredevil", "Face a trap with 1HP and 0 shields", "daredevil", 1);
         this.createSpecialButton("Already back?", "Die, then die again in the next floor", "already", 1);
