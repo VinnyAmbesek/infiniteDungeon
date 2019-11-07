@@ -25,6 +25,7 @@ var achievementController = cc.Class({
         this.updateSpecialButton("overkill");
         this.updateSpecialButton("darkness");
         this.updateSpecialButton("lucky");
+        this.updateSpecialButton("clean");
 
         this.updateButton("levelMax");
         this.updateButton("xp");
@@ -95,6 +96,7 @@ var achievementController = cc.Class({
         this.createSpecialButton("Overkill", "Get an enemy to -10HP", "overkill", 1);
         this.createSpecialButton("Stop Moving!", "Get 'Dungeon Moves' twice in a floor", "darkness", 1);
         this.createSpecialButton("Lucky", "Cross a floor without hitting any trap", "lucky", 1);
+        this.createSpecialButton("Clean", "Visit all tiles in a floor", "clean", 1);
         this.createSpecialButton("Did not expected that", "Die to a sub boss", "subboss", 1);
         this.createSpecialButton("Expected that", "Die to a boss", "boss", 1);
 

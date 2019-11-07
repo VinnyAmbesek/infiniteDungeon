@@ -315,6 +315,7 @@ var gridController = cc.Class({
 		this.clicks++;
 		if (this.clicks == this.gridSize) {
 			window.analytics.Design_event("event:cleanFloor", window.gameSession.level);
+			this.achievementController.updateSpecialStat("clean");
 			xp += window.gameSession.level*(this.gridSize+1);
 			if (window.gameSession.job == this.enumClass["wizard"]) xp += window.gameSession.level*this.gridSize;
 		}
@@ -335,8 +336,11 @@ var gridController = cc.Class({
 		if(tile.content == this.enumContent["danger"]) {
 			// remove from qtd of traps
 			this.dangersType[tile.contentType-1]--;
+        	this.dangers--;
+			this.hudController.updateLabel("traps", ""+this.dangers);
 			// calculate trap effects
 			this.deathController.stepOnTrap(tile.contentType, event.target, this.dangersType[tile.contentType-1]);
+
 			// show trap subsprite
 			this.findSubSprite(tile, tile.contentType);
 			// award victory xp
@@ -464,7 +468,7 @@ var gridController = cc.Class({
 	fightMonster: function(monster, node, boss){
 		this.monsters--;
 		this.hudController.updateLabel("enemies", ""+this.monsters);
-		let strength = Math.floor(window.gameSession.level/5) + 1 + boss * Math.floor((Math.random() * Math.floor(window.gameSession.level/10)) + 1);
+		let strength = Math.floor(window.gameSession.level/5) + 2 + boss * Math.floor((Math.random() * Math.floor(window.gameSession.level/10)) + 1);
 		if (window.gameSession.job == this.enumClass["fighter"]) strength--;
 		let feedback;
 		let effect;

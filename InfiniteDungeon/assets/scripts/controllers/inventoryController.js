@@ -81,11 +81,14 @@ var inventoryController = cc.Class({
     },
 
     openLootSack: function(prize, node){
-        this.openCommonChest(prize, node);
+        this.openCommonChest(prize, node, true);
     },
 
-    openCommonChest: function(prize, node){
+    openCommonChest: function(prize, node, loot=false){
         let reward = 1 + window.gameSession.skills.totalShield;
+        if (loot){
+            reward = Math.floor((reward+1)/2);
+        }
         this.achievementController.updateStat("items", "chests", reward);
         if (prize <= 10) {
             this.giveItem("potion", reward, node, "Potion");

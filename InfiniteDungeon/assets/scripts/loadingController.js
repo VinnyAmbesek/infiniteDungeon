@@ -90,6 +90,7 @@ cc.Class({
         this.setDefault(window.gameSession.stats.unique, "killSubboss", false);
         this.setDefault(window.gameSession.stats.unique, "killBoss", false);
         this.setDefault(window.gameSession.stats.unique, "lever", false);
+        this.setDefault(window.gameSession.stats.unique, "clean", false);
 
         this.setDefault(window.gameSession.stats, "death", {});
         this.setDefault(window.gameSession.stats.death, "total", 0);

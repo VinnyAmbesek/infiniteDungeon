@@ -3,7 +3,6 @@ cash: fill inventory, phoenix feather [full restore on death], ad click to recov
 
 roadmap: 
 * improve icons
-* random powerfull effects [death-trap, death-boss]
 * technical debt: make individual controllers, gridController is too big [doing]
 * scoreboard
 * better effects
@@ -11,8 +10,6 @@ roadmap:
 * add artifacts/special treasures to boss loot
 * make upgrade controller control shown upgrades: trap finder, treasure hunter and tracker in hud and not grid controller
 * Upgrade to run speed [?]
-* increase monster damage by 1
-* achievement to clean map
 
 * retention: add push notifications [right time, remeber free upgrade, dont be annoying]
 * retention: add share into social networks

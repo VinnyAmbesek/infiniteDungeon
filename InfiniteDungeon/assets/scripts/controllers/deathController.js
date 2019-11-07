@@ -104,101 +104,37 @@ var deathController = cc.Class({
 
     // step on a trap
     stepOnTrap: function(danger, node, left){
-        this.dangers--;
         this.hitTrap = true;
-        this.hudController.updateLabel("traps", ""+this.dangers);
+
+        let trap = this.getTrap(danger);
+
         let strength = Math.floor(window.gameSession.level/10 + 1);
+        let chance = Math.floor((Math.random() * 100) + 1);
+        cc.log(chance);
+        if (chance <= 25+(window.gameSession.level/4)){
+            strength += Math.floor((Math.random() * Math.floor(window.gameSession.level/10)) + 1);
+            trap.feedback = "Strong " + trap.feedback;
+        }
         if (this.jobController.isClass("rogue")) strength--;
-        let feedback;
-        let effect;
-        let field;
-        let item;
-        let achivTrap;
-        let achivItem;
-        let achivDeath;
 
         if (this.isAlmostDead() && ! this.inventoryController.hasDefenses()){
             this.achievementController.updateSpecialStat("daredevil");
         }
 
-        switch(danger) {
-            case 1:
-                // code block
-                feedback = "Fire Trap";
-                effect = "burned";
-                field = "fire";
-                item = "Fire"
-                achivTrap = "Getting warmer";
-                achivItem = "Like sunscreen";
-                achivDeath = "Barbecue";
-                break;
-            case 2:
-                // code block
-                feedback = "Freezing Trap";
-                effect = "frozen";
-                field = "ice"
-                item = "Ice";
-                achivTrap = "Getting colder";
-                achivItem = "A warm blanket";
-                achivDeath = "Popsicle";
-                break;
-            case 3:
-                // code block
-                feedback = "Acid Trap";
-                effect = "dissolved";
-                field = "acid"
-                item = "Acid";
-                achivTrap = "Dirty floor";
-                achivItem = "Still intact";
-                achivDeath = "Not much left";
-                break;
-            case 4:
-                // code block
-                feedback = "Electricity Trap";
-                effect = "electrocuted";
-                field = "electricity"
-                item = "Electricity";
-                achivTrap = "Tesla attack";
-                achivItem = "Fully isolated";
-                achivDeath = "Full of Energy";
-                break;
-            case 5:
-                // code block
-                feedback = "Floor Spikes Trap";
-                effect = "impaled";
-                field = "spikes"
-                item = "Spikes";
-                achivTrap = "Holed floor";
-                achivItem = "Steel boots";
-                achivDeath = "Is Vlad here?";
-                break;
-            case 6:
-                // code block
-                feedback = "Poisoned Dart Trap";
-                effect = "poisoned";
-                field = "poison"
-                item = "Poison";
-                achivTrap = "Holed wall";
-                achivItem = "Antidote";
-                achivDeath = "Is there an antidote?";
-                break;
-            default:
-                // code block
-        }
+        window.analytics.Design_event("Trap:" + trap.field + ":" + strength, window.gameSession.inventory[trap.field]);
+        strength -= window.gameSession.skills[trap.field + "Shield"];
 
-        window.analytics.Design_event("Trap:" + field + ":" + strength, window.gameSession.inventory[field]);
-        strength -= window.gameSession.skills[field + "Shield"];
-
-        this.feedbackController.showFeedbackAtNode(feedback, new cc.Color(255,0,0), node, true, 3.0, 75);
-        this.lastDanger = effect;
-        this.achievementController.updateStat("traps", field, 1);
+        this.feedbackController.showFeedbackAtNode(trap.feedback, new cc.Color(255,0,0), node, true, 3.0, 75);
+        this.lastDanger = trap.effect;
+        this.achievementController.updateStat("traps", trap.field, 1);
         
-        if (window.gameSession.inventory[field] > 0){
-            let shield = window.gameSession.inventory[field];
+        if (window.gameSession.inventory[trap.field] > 0){
+            let shield = window.gameSession.inventory[trap.field];
             let protection = Math.min(strength, shield);
+            protection = Math.max(protection, 0);
 
             // use shields up to strength of danger
-            this.inventoryController.useItem(field, protection, node);
+            this.inventoryController.useItem(trap.field, protection, node);
 
             // danger strength is reduced by spent shields
             strength -= protection;
@@ -207,7 +143,7 @@ var deathController = cc.Class({
         // receives strength in damage
         if (strength>0) {
             this.hurt(strength);
-            this.achievementController.updateStat("damage", field, strength);
+            this.achievementController.updateStat("damage", trap.field, strength);
             this.achievementController.updateStat("damage", "total", strength);
         }
         if (this.isDead()) {
@@ -217,11 +153,57 @@ var deathController = cc.Class({
             if (window.gameSession.death) {
                 this.achievementController.updateSpecialStat("already");
             }
-            this.achievementController.updateStat("death", field, 1);
+            this.achievementController.updateStat("death", trap.field, 1);
             this.achievementController.updateStat("death", "total", 1);
         }
 
-        this.hudController.updateTraps(field, left);
+        this.hudController.updateTraps(trap.field, left);
+    },
+
+    getTrap(danger){
+        let trap = {};
+        switch(danger) {
+            case 1:
+                // code block
+                trap.feedback = "Fire Trap";
+                trap.effect = "burned";
+                trap.field = "fire";
+                break;
+            case 2:
+                // code block
+                trap.feedback = "Freezing Trap";
+                trap.effect = "frozen";
+                trap.field = "ice";
+                break;
+            case 3:
+                // code block
+                trap.feedback = "Acid Trap";
+                trap.effect = "dissolved";
+                trap.field = "acid";
+                break;
+            case 4:
+                // code block
+                trap.feedback = "Electricity Trap";
+                trap.effect = "electrocuted";
+                trap.field = "electricity";
+                break;
+            case 5:
+                // code block
+                trap.feedback = "Floor Spikes Trap";
+                trap.effect = "impaled";
+                trap.field = "spikes";
+                break;
+            case 6:
+                // code block
+                trap.feedback = "Poisoned Dart Trap";
+                trap.effect = "poisoned";
+                trap.field = "poison";
+                break;
+            default:
+                // code block
+        }
+
+        return trap;
     },
 
     setMessage(msg){
