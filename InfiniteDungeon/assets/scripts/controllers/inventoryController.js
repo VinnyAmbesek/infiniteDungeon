@@ -75,6 +75,34 @@ var inventoryController = cc.Class({
     jsUcfirst: function(string){
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
+
+    openChest: function(){
+
+    },
+
+    openLootSack: function(prize, node){
+        this.openCommonChest(prize, node);
+    },
+
+    openCommonChest: function(prize, node){
+        let reward = 1 + window.gameSession.skills.totalShield;
+        this.achievementController.updateStat("items", "chests", reward);
+        if (prize <= 10) {
+            this.giveItem("potion", reward, node, "Potion");
+        } else if (prize <= 25 ) {
+            this.giveItem("fire", reward, node, "Fire Shield");
+        } else if (prize <= 40 ) {
+            this.giveItem("ice", reward, node, "Ice Shield");
+        } else if (prize <= 55 ) {
+            this.giveItem("acid", reward, node, "Acid Shield");
+        } else if (prize <= 70 ) {
+            this.giveItem("electricity", reward, node, "Electricity Shield");
+        } else if (prize <= 85 ) {
+            this.giveItem("spikes", reward, node, "Spikes Shield");
+        } else if (prize <= 100 ) {
+            this.giveItem("poison", reward, node, "Poison Shield");
+        }
+    }
 });
 
 module.exports = inventoryController;

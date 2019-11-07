@@ -1,15 +1,9 @@
-// Learn cc.Class:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/class.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/class.html
-// Learn Attribute:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/life-cycle-callbacks.html
-
-cc.Class({
+var jobController = cc.Class({
     extends: cc.Component,
+
+    ctor: function(){
+        this.enumClass = {undefined: 0, rogue: 1, fighter: 2, wizard: 3};
+    },
 
     properties: {
     },
@@ -19,7 +13,6 @@ cc.Class({
     // onLoad () {},
 
     start () {
-        this.enumClass = {undefined: 0, rogue: 1, fighter: 2, wizard: 3};
 
     },
 
@@ -29,9 +22,15 @@ cc.Class({
         this.saveGame();
     },
 
+    isClass: function(name){
+        return (window.gameSession.job == this.enumClass[name]);
+    },
+
     saveGame(){
         cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
     },
 
     // update (dt) {},
 });
+
+module.exports = jobController;

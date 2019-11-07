@@ -5,7 +5,7 @@ const FeedbackController = require("feedbackController");
 const DeathController = require("deathController");
 const UpgradeController = require("upgradeController");
 const AchievementController = require("achievementController");
-
+const RewardController = require("rewardController");
 var gridController = cc.Class({
 	extends: cc.Component,
 
@@ -17,7 +17,7 @@ var gridController = cc.Class({
         deathController: DeathController,
         upgradeController: UpgradeController,
         achievementController: AchievementController,
-
+		rewardController: RewardController,
 		tilePrefab: cc.Prefab,
 
 		gridNode: cc.Node,
@@ -63,7 +63,7 @@ var gridController = cc.Class({
 			this.showJobSelection();
 		}
 		this.showUpgrades();
-		this.checkTime();
+		this.rewardController.checkTime();
 		
 		this.saveGame();
 
@@ -118,51 +118,7 @@ var gridController = cc.Class({
 		if(window.gameSession.poisonFinder) this.hudController.activateTrapLabel("poison");
 		if(window.gameSession.tracker) this.hudController.activateLabel("enemies");
 	},
-
-	checkTime(){
-		let d = new Date(); 
-		let date = {d: d.getDate(), m: d.getMonth(), y: d.getFullYear()};
-		let lastPrize = window.gameSession.date;
-
-		let newDay = this.isNewDay(date, lastPrize);
-		if (newDay){
-			this.wbPrize();
-			this.popupController.openPermanentPopup("dailyReward");
-			window.gameSession.date = date;
-			this.saveGame();
-		}
-	},
-
-	isNewDay(today, lastDay){
-		if(!lastDay) {
-			window.gameSession.date = today;
-			return false;
-		}
-
-		if (lastDay.y < today.y) return true;
-		// went back in time?
-		if (lastDay.y > today.y) return false;
-
-		if (lastDay.m < today.m) return true;
-		// went back in time?
-		if (lastDay.m > today.m) return false;
-
-		if (lastDay.d < today.d) return true;
-		// went back in time?
-		if (lastDay.d > today.d) return false;
-
-		return false;
-	},
-
-	wbPrize(){
-		let minXP = this.upgradeController.getMinXP();
-
-		this.upgradeController.getXP(minXP, "dailyXP");
-		window.gameGlobals.xpReward = minXP;
-
-		window.gameSession.currency+=10;
-		this.hudController.updateLabel("soul", ""+window.gameSession.currency);
-	},
+	// Save Game
 
 	saveGame(){
 		cc.sys.localStorage.setItem('gameSession', JSON.stringify(window.gameSession));
@@ -182,6 +138,8 @@ var gridController = cc.Class({
 		this.popupController.openPermanentPopup("job");
 	},
 
+
+	// Make an empty map
 	cleanGrid: function (size){
 		this.nextButton.active = false;
 
@@ -198,6 +156,7 @@ var gridController = cc.Class({
 		}
 	},
 
+	// initialize all grid objetcs before putting stuff on the maze
 	initGrid: function (size){
 		this.grid = new Array(size);
 		this.gridUI = new Array(size);
@@ -231,6 +190,7 @@ var gridController = cc.Class({
 		}
 	},
 
+	//Look at adjacent tiles and mark them as clickable if they have a path to them
 	showClickZones: function(x, y){
 		let tile = this.grid[x][y];
 		let zones = 0;
@@ -249,6 +209,7 @@ var gridController = cc.Class({
 		if (zones > 1) this.running = false;
 	},
 
+	// Add the click function to an available tile on the map
 	addClickFunction: function(x,y){
 		let tile = this.grid[x][y];
 		if (tile.status == this.enumStatus["visible"]) return false;
@@ -272,11 +233,14 @@ var gridController = cc.Class({
 		return true;
 	},
 
+	// When running the game will automatically 'click' next available path, until it hits a bifurcation
 	startRunning: function(){
 		this.running = true;
 		this.timeToRun = 0.5;
 	},
 
+	// Get the next tile in the path and click it
+	// If there is no clear path, will stop running
 	run: function(size){
 		let node = {};
 
@@ -291,6 +255,7 @@ var gridController = cc.Class({
 		if (node.target != null) this.gridClick(node);
 	},
 
+	// function that is called when a tile is clicked
 	gridClick: function(event){
 		//if dead ignore click
 		if (this.deathController.isDead()){
@@ -359,15 +324,22 @@ var gridController = cc.Class({
 		if (window.gameSession.job == this.enumClass["wizard"]) xp += window.gameSession.level;
 
 		// verify room content
+
+		// if the room has anything stop running
+		if (tile.content != this.enumContent["empty"]) this.running = false;
 		if(tile.content == this.enumContent["treasure"]) {
-			this.running = false;
-			this.giveTreasure(Math.floor((Math.random() * 100) + 1), event.target);
+			this.inventoryController.openCommonChest(Math.floor((Math.random() * 100) + 1), event.target);
+			this.treasures--;
+            this.hudController.updateLabel("chests", ""+this.treasures);
 		}
 		if(tile.content == this.enumContent["danger"]) {
-			this.running = false;
-			this.fightDanger(tile.contentType, event.target);
+			// remove from qtd of traps
+			this.dangersType[tile.contentType-1]--;
+			// calculate trap effects
+			this.deathController.stepOnTrap(tile.contentType, event.target, this.dangersType[tile.contentType-1]);
+			// show trap subsprite
 			this.findSubSprite(tile, tile.contentType);
-			// victory xp
+			// award victory xp
 			if (! this.deathController.isDead()) {
 				xp += window.gameSession.level*25;
 				if (window.gameSession.job == this.enumClass["rogue"]) xp += window.gameSession.level*25;
@@ -384,7 +356,6 @@ var gridController = cc.Class({
 			if (this.dungeonMoves> 1) {
 				this.achievementController.updateSpecialStat("darkness");
 			}
-			this.running = false;
 			let x = event.target.tile.x;
 			let y = event.target.tile.y;
 
@@ -413,7 +384,6 @@ var gridController = cc.Class({
 			this.showClickZones(x, y);
 		}
 		if(tile.content == this.enumContent["monster"]) {
-			this.running = false;
 			let index = Math.floor((Math.random() * 3) + 1);
 			this.fightMonster(index, event.target, 0);
 			this.findSubSprite(tile, index)
@@ -481,6 +451,7 @@ var gridController = cc.Class({
 		this.upgradeController.getXP(xp, null);
 	},
 
+	// Reveal content sprite in tile
 	revealSubSprite: function(x,y){
 		let tile = this.grid[x][y];
 		let cell = this.gridUI[x][y];
@@ -489,6 +460,7 @@ var gridController = cc.Class({
 		if (tile.subsprite) content.getComponent(cc.Sprite).spriteFrame = tile.subsprite;
 	},
 
+	// fight a monster
 	fightMonster: function(monster, node, boss){
 		this.monsters--;
 		this.hudController.updateLabel("enemies", ""+this.monsters);
@@ -562,7 +534,7 @@ var gridController = cc.Class({
 				this.achievementController.updateSpecialStat("killBoss");
 			}
 			//LOOT
-			this.giveTreasure(Math.floor((Math.random() * 100) + 1), node, true);
+			this.inventoryController.openLootSack(Math.floor((Math.random() * 100) + 1), node, true);
 		} else {
 			if (this.deathController.isTrulyDead()) {
 				this.achievementController.updateSpecialStat("truedeath");
@@ -581,152 +553,7 @@ var gridController = cc.Class({
 		}
 	},
 
-	fightDanger: function(danger, node){
-		this.dangers--;
-		this.hitTrap = true;
-		this.hudController.updateLabel("traps", ""+this.dangers);
-		let strength = Math.floor(window.gameSession.level/10 + 1);
-		if (window.gameSession.job == this.enumClass["rogue"]) strength--;
-		let feedback;
-		let effect;
-		let field;
-		let item;
-		let achivTrap;
-		let achivItem;
-		let achivDeath;
-
-		if (this.deathController.isAlmostDead() && ! this.inventoryController.hasDefenses()){
-			this.achievementController.updateSpecialStat("daredevil");
-		}
-
-		switch(danger) {
-			case 1:
-				// code block
-				feedback = "Fire Trap";
-				effect = "burned";
-				field = "fire";
-				item = "Fire"
-				achivTrap = "Getting warmer";
-				achivItem = "Like sunscreen";
-				achivDeath = "Barbecue";
-				break;
-			case 2:
-				// code block
-				feedback = "Freezing Trap";
-				effect = "frozen";
-				field = "ice"
-				item = "Ice";
-				achivTrap = "Getting colder";
-				achivItem = "A warm blanket";
-				achivDeath = "Popsicle";
-				break;
-			case 3:
-				// code block
-				feedback = "Acid Trap";
-				effect = "dissolved";
-				field = "acid"
-				item = "Acid";
-				achivTrap = "Dirty floor";
-				achivItem = "Still intact";
-				achivDeath = "Not much left";
-				break;
-			case 4:
-				// code block
-				feedback = "Electricity Trap";
-				effect = "electrocuted";
-				field = "electricity"
-				item = "Electricity";
-				achivTrap = "Tesla attack";
-				achivItem = "Fully isolated";
-				achivDeath = "Full of Energy";
-				break;
-			case 5:
-				// code block
-				feedback = "Floor Spikes Trap";
-				effect = "impaled";
-				field = "spikes"
-				item = "Spikes";
-				achivTrap = "Holed floor";
-				achivItem = "Steel boots";
-				achivDeath = "Is Vlad here?";
-				break;
-			case 6:
-				// code block
-				feedback = "Poisoned Dart Trap";
-				effect = "poisoned";
-				field = "poison"
-				item = "Poison";
-				achivTrap = "Holed wall";
-				achivItem = "Antidote";
-				achivDeath = "Is there an antidote?";
-				break;
-			default:
-				// code block
-		}
-
-		this.dangersType[danger-1]--;
-		this.hudController.updateTraps(field, this.dangersType[danger-1]);
-
-		window.analytics.Design_event("Trap:" + field + ":" + strength, window.gameSession.inventory[field]);
-		strength -= window.gameSession.skills[field + "Shield"];
-
-		this.feedbackController.showFeedbackAtNode(feedback, new cc.Color(255,0,0), node, true, 3.0, 75);
-		this.lastDanger = effect;
-		this.achievementController.updateStat("traps", field, 1);
-		
-		if (window.gameSession.inventory[field] > 0){
-			let shield = window.gameSession.inventory[field];
-			let protection = Math.min(strength, shield);
-
-			// use shields up to strength of danger
-			this.inventoryController.useItem(field, protection, node);
-
-			// danger strength is reduced by spent shields
-			strength -= protection;
-		}
-
-		// receives strength in damage
-		if (strength>0) {
-			this.deathController.hurt(strength);
-			this.achievementController.updateStat("damage", field, strength);
-			this.achievementController.updateStat("damage", "total", strength);
-		}
-		if (this.deathController.isDead()) {
-			if (this.deathController.isTrulyDead()) {
-				this.achievementController.updateSpecialStat("truedeath");
-			}
-			if (window.gameSession.death) {
-				this.achievementController.updateSpecialStat("already");
-			}
-			this.achievementController.updateStat("death", field, 1);
-			this.achievementController.updateStat("death", "total", 1);
-		}
-	},
-
-	giveTreasure: function(prize, node, loot=false){
-		if (!loot){
-			this.treasures--;
-			this.hudController.updateLabel("chests", ""+this.treasures);
-		}
-		let reward = 1 + window.gameSession.skills.totalShield;
-		this.achievementController.updateStat("items", "chests", reward);
-		if (prize <= 10) {
-			this.inventoryController.giveItem("potion", reward, node, "Potion");
-		} else if (prize <= 25 ) {
-			this.inventoryController.giveItem("fire", reward, node, "Fire Shield");
-		} else if (prize <= 40 ) {
-			this.inventoryController.giveItem("ice", reward, node, "Ice Shield");
-		} else if (prize <= 55 ) {
-			this.inventoryController.giveItem("acid", reward, node, "Acid Shield");
-		} else if (prize <= 70 ) {
-			this.inventoryController.giveItem("electricity", reward, node, "Electricity Shield");
-		} else if (prize <= 85 ) {
-			this.inventoryController.giveItem("spikes", reward, node, "Spikes Shield");
-		} else if (prize <= 100 ) {
-			this.inventoryController.giveItem("poison", reward, node, "Poison Shield");
-		}
-	},
-
+	// Go to next floor
 	nextLevel: function(){
 		if (this.deathController.isDead()) {
 			this.popupController.openPermanentPopup("death");
@@ -746,6 +573,7 @@ var gridController = cc.Class({
 		cc.director.loadScene("gameScene");
 	},
 
+	// Once we have every tile info, we place the tile on the map
 	fillGrid: function(size){
 		for(var i = 0; i < size; i++){
 			for(var j = 0; j < size; j++){
@@ -775,6 +603,7 @@ var gridController = cc.Class({
 		}
 	},
 
+	// Find the sprite for a tile content
 	findSubSprite: function(tile, index){
 		if (tile.tile == this.enumTile["entrance"]) {
 			tile.subsprite = this.stair_up;
@@ -793,6 +622,7 @@ var gridController = cc.Class({
 		}
 	},
 
+	// Find the sprite for a tile
 	findSprite: function(tile){
 		if (tile.tile == this.enumTile["deadend"]){
 			this.showDeadend(tile);
@@ -819,6 +649,7 @@ var gridController = cc.Class({
 		}
 	},
 
+	// Find the sprite for a door tile
 	showDoor: function(tile){
 		// 2 sprites, 4 directions each
 		let blocks = 0;
@@ -938,6 +769,7 @@ var gridController = cc.Class({
 		tile.angle = -0;
 	},
 
+	// turn all undefined sides into walls
 	makeWall: function(tile){
 		if (tile.north == this.enumSides["undefined"]) tile.north = this.enumSides["wall"];
 		if (tile.south == this.enumSides["undefined"]) tile.south = this.enumSides["wall"];
@@ -945,6 +777,7 @@ var gridController = cc.Class({
 		if (tile.west == this.enumSides["undefined"]) tile.west = this.enumSides["wall"];
 	},
 
+	// fill every tile info
 	buildMaze: function(x, y){
 		this.buildStack.push({x: x, y: y});
 		let tile = this.grid[x][y];
@@ -1001,6 +834,7 @@ var gridController = cc.Class({
 		}
 	},
 
+	// Make a path between two tiles, based on a direction 
 	makePath: function(x, y, path){
 		let tile = this.grid[x][y];
 		let i = 0;
@@ -1046,6 +880,7 @@ var gridController = cc.Class({
 		}
 	},
 
+	// Find opened routes from a tile
 	findPath: function(tile){
 		let paths = 0;
 		// for each direction verify if can go, if not create wall
@@ -1076,6 +911,7 @@ var gridController = cc.Class({
 		return paths;
 	},
 
+	// return if the path in a direction is free
 	isPathFree: function(dir, tile, x, y){
 		if(tile[dir] == this.enumSides["block"]) return false;
 		let adj = this.grid[x][y];
@@ -1084,8 +920,8 @@ var gridController = cc.Class({
 		return false;
 	},
 
-	setDoorDirection: function(size){
-		// sets entrance and exit in opposite sides
+	// sets entrance and exit in opposite sides
+	setDoorDirection: function(size){	
 		let dir = Math.floor((Math.random() * 4) + 1);
 		let endMod = Math.floor(Math.random() * Math.floor(this.size/2));
 		switch(dir) {
@@ -1110,6 +946,7 @@ var gridController = cc.Class({
 		}
 	},
 
+	// sets the position of the lever to open closed exits
 	setLever: function(size){
 		let x = Math.floor((Math.random() * (size-2)) + 1);
 		let y = Math.floor((Math.random() * (size-2)) + 1);
@@ -1117,6 +954,7 @@ var gridController = cc.Class({
 		tile.content = this.enumContent["lever"];
 	},
 
+	// makes entrance and exit doors
 	makeDoors: function(x1, y1, x2, y2){
 		// entrance
 		let tile = this.grid[x1][y1];

@@ -10,6 +10,9 @@ roadmap:
 * skin: use souls to unlock dungeon skins
 * add artifacts/special treasures to boss loot
 * make upgrade controller control shown upgrades: trap finder, treasure hunter and tracker in hud and not grid controller
+* Upgrade to run speed [?]
+* increase monster damage by 1
+* achievement to clean map
 
 * retention: add push notifications [right time, remeber free upgrade, dont be annoying]
 * retention: add share into social networks
