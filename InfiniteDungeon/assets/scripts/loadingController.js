@@ -18,6 +18,8 @@ cc.Class({
         let saveVersion = {major: 0, minor: 9, fix: 0};
         this.initSession(saveVersion);
         this.saveLoaded = true;
+
+        if (cc.sys.isMobile) sdkbox.PluginOneSignal.init();
     },
 
     initSession: function(saveVersion){
