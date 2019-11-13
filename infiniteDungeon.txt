@@ -10,6 +10,11 @@ roadmap:
 * add artifacts/special treasures to boss loot
 * make upgrade controller control shown upgrades: trap finder, treasure hunter and tracker in hud and not grid controller
 * Upgrade to run speed [?]
+* option deactivate notifications
+* class upgrades 
+* black market: reveal traps, reveal treasures, reveal enemies, reveal exit, reveal lever
+* analytics to ads
+* achievement: souless [watch an ad]
 
 * retention: add push notifications [right time, remeber free upgrade, dont be annoying]
 * retention: add share into social networks

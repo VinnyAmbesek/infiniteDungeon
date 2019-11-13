@@ -8,16 +8,20 @@ const InventoryController = require("inventoryController");
 var deathController = cc.Class({
     extends: cc.Component,
 
-    properties: {
+    properties: () => ({
         popupController: PopupController,
         hudController: HudController,
         feedbackController: FeedbackController,
         achievementController: AchievementController,
         jobController: JobController,
         inventoryController: InventoryController,
-        deathPopup: cc.Node,
+        adsController: {
+             default: null,
+             type: require("adsController")
+         },
+        adRes: cc.Node,
         deathMessage: cc.Label,
-    },
+    }),
 
     // death functions
 
@@ -51,6 +55,11 @@ var deathController = cc.Class({
         if (window.gameSession.currency < 100) return;
         this.achievementController.updateStat(null, "row", -window.gameSession.stats.row);
         window.gameSession.currency -= 100;
+        this.ressurrect();
+    },
+
+    resurrect(){
+        if (cc.sys.isMobile) console.log("NATIVE: ressurrect");
         window.analytics.Design_event("event:ressurrection", window.gameSession.currency);
         window.gameSession.hp = window.gameSession.hpMax;
         this.hudController.updateLabel("hp", window.gameSession.hp);
@@ -213,8 +222,13 @@ var deathController = cc.Class({
 
     // onLoad () {},
 
-    start () {
-        
+    // AD
+    showResAd(){
+        this.adsController.showAd(null, "resurrection");
+    },
+
+    onEnable () {
+        this.adRes.active = this.adsController.isAvailable("res");
     },
 
     saveGame(){

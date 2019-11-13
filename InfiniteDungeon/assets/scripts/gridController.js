@@ -45,6 +45,7 @@ var gridController = cc.Class({
 
 	// onLoad () {},
 	start () {
+		this.loadingAnimation.active = true;
 		if (this.deathController.isDead()) {
 			this.popupController.openPermanentPopup("death");
 		}
@@ -117,6 +118,8 @@ var gridController = cc.Class({
 		if(window.gameSession.spikesFinder) this.hudController.activateTrapLabel("spikes");
 		if(window.gameSession.poisonFinder) this.hudController.activateTrapLabel("poison");
 		if(window.gameSession.tracker) this.hudController.activateLabel("enemies");
+
+		this.loadingAnimation.active = false;
 	},
 	// Save Game
 

@@ -19,7 +19,9 @@ cc.Class({
         this.initSession(saveVersion);
         this.saveLoaded = true;
 
-        if (cc.sys.isMobile) sdkbox.PluginOneSignal.init();
+        if (cc.sys.isMobile) {
+            sdkbox.PluginOneSignal.init();
+        }
     },
 
     initSession: function(saveVersion){

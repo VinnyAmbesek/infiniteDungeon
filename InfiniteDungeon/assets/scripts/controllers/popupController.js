@@ -8,6 +8,7 @@ var popupController = cc.Class({
         store: cc.Node,
         achievement: cc.Node,
         options: cc.Node,
+        ads: cc.Node,
         tutorial: cc.Node,
         log: cc.Node,
         death: cc.Node, // usually only activated permanently

@@ -1,6 +1,7 @@
 const InventoryController = require("inventoryController");
 const HudController = require("hudController");
 const DeathController = require("deathController");
+const AdsController = require("adsController");
 
 cc.Class({
     extends: cc.Component,
@@ -9,6 +10,7 @@ cc.Class({
         inventoryController: InventoryController,
         hudController: HudController,
         deathController: DeathController,
+        adsController: AdsController,
         grid: cc.Node,
         storeButton: cc.Prefab,
     },
@@ -16,10 +18,12 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onEnable (){
-
+        if (this.hasOwnProperty("adButton")) this.adButton.active = this.adsController.isAvailable("soul");
     },
 
     start () {
+        this.adButton = this.createButton("10 Souls", "Sell your soul for 10 souls.", 0, "currency", "getSoul", "Watch an Ad.");
+        this.adButton.active = this.adsController.isAvailable("soul");
         this.createButton("Fire Shield", "Get as many as you can carry.", 10, "fire", "fillPocket");
         this.createButton("Ice Shield", "Get as many as you can carry.", 10, "ice", "fillPocket");
         this.createButton("Acid Shield", "Get as many as you can carry.", 10, "acid", "fillPocket");
@@ -30,7 +34,7 @@ cc.Class({
         this.createButton("A Place to Rest", "You can continue when fully rested.", 75, "", "healing");
     },
 
-    createButton(name, desc, price, item, handler){
+    createButton(name, desc, price, item, handler, altPrice = ""){
         let button = cc.instantiate(this.storeButton);
         button.parent = this.grid;
 
@@ -41,6 +45,7 @@ cc.Class({
         button.item = item;
         button.price = price;
         button.txt = name;
+        if (altPrice != "") button.getChildByName("Price").getComponent(cc.Label).string = altPrice;
 
                 //add click event
         let eventHandler = new cc.Component.EventHandler();
@@ -48,6 +53,8 @@ cc.Class({
         eventHandler.component = "storeController";
         eventHandler.handler = handler;
         button.getComponent(cc.Button).clickEvents.push(eventHandler);
+
+        return button;
     },
 
     fillPocket(event){
@@ -76,7 +83,10 @@ cc.Class({
         this.deathController.heal(window.gameSession.hpMax);
 
         this.saveGame();
+    },
 
+    getSoul(){
+        this.adsController.showAd(null, "soul");
     },
 
     saveGame(){
